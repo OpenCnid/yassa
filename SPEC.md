@@ -8,7 +8,8 @@ conversation. Sections marked **Proposal** remain reviewable design choices.
 The examples are explanatory, not configured defaults, benchmark results, or
 evidence that a capability has been implemented.
 
-Repository state: simulated and bounded native Codex fixture implementations exist.
+Repository state: simulated fixtures, the original bounded native Codex fixture,
+and configurable native file studies are implemented.
 [README.md](README.md) provides usage and [AGENTS.md](AGENTS.md) the development
 index. Python 3.11.16 and Inspect 0.3.263 are selected for this milestone;
 [ARCHITECTURE.md](ARCHITECTURE.md#implemented-fixture-milestone) identifies the
@@ -16,6 +17,10 @@ implemented boundaries. [Milestone evidence](docs/milestone-1.md) distinguishes
 executed fixture checks from unverified real-study capabilities. The
 [native fixture](docs/native-fixture.md) records the subsequent Codex comparison. The product
 requirements and open Dovetail study choices below remain broader than this path.
+The [configurable native milestone](docs/configurable-native.md) supports versioned
+task/file contracts, declared checker selection, pinned source bindings, multiple
+builds and repeats, and full-plan attempt/deadline admission. General preparation
+and broader task/checker semantics remain outstanding.
 
 ## 1. Purpose
 
@@ -776,7 +781,7 @@ contexts unless the study explicitly includes it.
 - [x] Refine `AGENTS.md` into the repository index and bounded navigation guide.
 - [x] Pin Inspect 0.3.263 and implement complete simulated and native Codex fixture paths with preserved evidence and rescoring.
 - [x] Validate the account-totals checker and descriptive reporting; execute and audit the separately identified native fixture comparison.
-- [ ] Generalize the native study definition beyond the fixed account-totals contract, two builder arms, and one build per arm/condition.
+- [x] Generalize the native study definition beyond the fixed account-totals contract, two builder arms, and one build per arm/condition; see [the bounded v2 contracts](docs/configurable-native.md).
 - [ ] Implement preparation from a user's rough request into a validated, reviewable study, extending the current deterministic fixture generator.
 - [ ] Run a more informative pilot on varied work and independent builds, with controls and budgets chosen for its question.
 - [ ] Implement the remaining resource controls, recovery, additional vendor/runtime support, and selected analysis or model-grading methods as their study scope requires.

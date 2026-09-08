@@ -1,4 +1,4 @@
-"""A deliberately bounded, two-arm native builder fixture with recorded rescoring."""
+"""Native version dispatch and the preserved v1 builder fixture and readers."""
 
 import json
 import random
@@ -89,7 +89,18 @@ def snapshot_source(source: Path, names: tuple[str, ...]) -> tuple[dict[str, byt
     }
 
 
-def prepare_native(study_path: Path, root: Path, source: Path, image: str) -> Path:
+def prepare_native(study_path: Path, root: Path, source: Path | None, image: str) -> Path:
+    version = parse_json(read_regular(study_path)).get("schema_version")
+    if version == 2:
+        from .native_runner import prepare_native_v2
+
+        if source is not None:
+            raise ValueError("native v2 uses pinned study sources; omit --dovetail-dir")
+        return prepare_native_v2(study_path, root, image)
+    if version != 1:
+        raise ValueError("unsupported native study schema_version")
+    if source is None:
+        raise ValueError("native v1 requires --dovetail-dir")
     root = external_root(root)
     if not re.fullmatch(r"sha256:[0-9a-f]{64}", image):
         raise ValueError("pin the native runtime by its local Docker image SHA-256 identity")
@@ -227,15 +238,22 @@ CONSUMER_PROMPT = (
 )
 
 
-def native_package(exported: dict[str, bytes], store: EvidenceStore, output_id: str) -> str:
-    prefix = "output/account-totals/"
+def native_package(
+    exported: dict[str, bytes],
+    store: EvidenceStore,
+    output_id: str,
+    *,
+    package_name: str = "account-totals",
+    package_path: str = "output/account-totals",
+) -> str:
+    prefix = safe_name(package_path) + "/"
     files = {
         name.removeprefix(prefix): data
         for name, data in exported.items()
         if name.startswith(prefix)
     }
     if "SKILL.md" not in files or len(files) > 100 or sum(map(len, files.values())) > 5_000_000:
-        raise ValueError("missing or oversized account-totals package")
+        raise ValueError(f"missing or oversized {package_name} package")
     text = files["SKILL.md"].decode("utf-8")
     frontmatter = re.match(r"\A---\r?\n(.*?)\r?\n---(?:\r?\n|$)", text, flags=re.S)
     if frontmatter is None:
@@ -244,8 +262,8 @@ def native_package(exported: dict[str, bytes], store: EvidenceStore, output_id: 
         metadata = yaml.safe_load(frontmatter[1])
     except yaml.YAMLError as error:
         raise ValueError("invalid native frontmatter") from error
-    if not isinstance(metadata, dict) or metadata.get("name") != "account-totals":
-        raise ValueError("native skill name must be account-totals")
+    if not isinstance(metadata, dict) or metadata.get("name") != package_name:
+        raise ValueError(f"native skill name must be {package_name}")
     if not isinstance(metadata.get("description"), str) or not metadata["description"].strip():
         raise ValueError("native skill needs YAML frontmatter and a description")
     manifest = parse_json(read_regular(store.root / "artifacts" / output_id / "manifest.json"))
@@ -258,6 +276,13 @@ def native_package(exported: dict[str, bytes], store: EvidenceStore, output_id: 
 
 
 def execute_native_study(root: Path, auth_path: Path) -> Path:
+    version = parse_json(read_regular(root / "study.json")).get("schema_version")
+    if version == 2:
+        from .native_runner import execute_native_v2
+
+        return execute_native_v2(root, auth_path)
+    if version != 1:
+        raise ValueError("unsupported native evidence schema_version")
     freeze = parse_json(read_regular(root / "freeze-seal.json"))
     body = {key: value for key, value in freeze.items() if key != "id"}
     current = [x for x in inventory(root) if x["path"] != "freeze-seal.json"]
@@ -393,6 +418,13 @@ def native_usage(files: dict[str, bytes]) -> dict:
 
 
 def rescore_native(root: Path, label: str, reason: str | None = None) -> Path:
+    version = parse_json(read_regular(root / "study.json")).get("schema_version")
+    if version == 2:
+        from .native_runner import rescore_native_v2
+
+        return rescore_native_v2(root, label, reason)
+    if version != 1:
+        raise ValueError("unsupported native evidence schema_version")
     safe_name(label)
     if "/" in label:
         raise ValueError("interpretation label must be one path component")

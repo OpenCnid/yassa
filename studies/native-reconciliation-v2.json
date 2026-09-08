@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "id": "native-reconciliation-v2",
+  "question": "Does the configurable runner preserve task, build and consumer evidence?",
+  "scope": "synthetic-fixture",
+  "runtime": "native-codex-cli",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "xhigh",
+  "task": {
+    "schema_version": 1,
+    "id": "reconciliation-v1",
+    "requirements": "Read two UTF-8 CSV files with exactly the columns id,cents. IDs are nonempty case-sensitive strings; do not trim or normalize them. Cents are signed integers. Sum duplicate IDs separately on each side. Return only JSON with one key, balances, an array containing exactly one object per ID in the union of both files, including zero balances. Each object has exactly id, left_cents, right_cents, delta_cents; delta_cents is left minus right. Missing sides are zero. All amounts must be JSON integers, never booleans. Array order, JSON key order and whitespace do not matter. Empty files with headers yield an empty balances array. No extra fields or prose.",
+    "package_name": "ledger-reconciliation",
+    "package_path": "output/package",
+    "result_path": "output/answer.json",
+    "brief_path": "input/task.json",
+    "build_prompt": "Build a reusable skill for the supplied task and examples.",
+    "consumer_prompt": "Process the current input files: /work/input/left.csv, /work/input/right.csv.",
+    "checker": "reconciliation-v1",
+    "checker_inputs": [
+      "input/left.csv",
+      "input/right.csv"
+    ]
+  },
+  "sources": [],
+  "arms": [
+    {
+      "id": "control",
+      "builds": 2
+    },
+    {
+      "id": "explicit-checks",
+      "builds": 1,
+      "invocation": "Check the package against additional edge cases before finishing."
+    }
+  ],
+  "conditions": [
+    {
+      "id": "supplied",
+      "route": "user-supplied",
+      "source_path": "native-reconciliation-supplied-v2.json",
+      "source_sha256": "d883136f63ddd12ff004aa2de354991118dd5926ebf2adb37f33ed404b2a6315"
+    },
+    {
+      "id": "prepared",
+      "route": "yassa-prepared",
+      "source_path": null,
+      "source_sha256": null,
+      "request": "Small synthetic implementation check.",
+      "seed": 72,
+      "evaluation_cases": 2,
+      "generator": "reconciliation-v1"
+    }
+  ],
+  "consumer_repeats": 2,
+  "schedule_seed": 19,
+  "admission": {
+    "max_attempts": 30,
+    "max_scheduled_seconds": 3000,
+    "build_timeout_seconds": 180,
+    "consumer_timeout_seconds": 60
+  }
+}

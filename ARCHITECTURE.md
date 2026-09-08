@@ -1,8 +1,9 @@
 # Architecture
 
-Status: simulated and native Codex fixtures implemented, 2026-09-08. The implemented
-slice is identified below; the broader component design and explicitly proposed
-paths describe remaining work. Conceptual record names are not all public APIs.
+Status: simulated fixtures and configurable native Codex file studies implemented,
+2026-09-08. The implemented slice is identified below; the broader component
+design and explicitly proposed paths describe remaining work. Conceptual record
+names are not all public APIs.
 
 [SPEC.md](SPEC.md) owns the product requirements and measurement semantics.
 [AGENTS.md](AGENTS.md) is the development entry point. This document explains how
@@ -66,7 +67,7 @@ yassa/
 |-- HANDOFF.md         Current development state and next milestone
 |-- pyproject.toml     Package, CLI entry point, and dependency pins
 |-- uv.lock            Resolved dependency graph and distribution hashes
-|-- src/yassa/         Implemented small-module fixture path
+|-- src/yassa/         Fixture and configurable native study modules
 |-- studies/           Synthetic study and supplied-material fixtures
 |-- runtime/codex/     Container recipe, controlled configuration, boundary probe
 |-- tests/             Executable contracts and Inspect integration checks
@@ -247,6 +248,43 @@ timed-out build can proceed, with exhaustion retained in its attempt record.
 Failed packages score zero downstream; CLI and harness failures remain missing.
 Original evidence is sealed and native rescoring makes no model calls. See
 [native fixture evidence](docs/native-fixture.md) for observed results and limits.
+
+## Implemented configurable native runner
+
+Native study/evidence version 2 adds a shared file-processing route without
+changing the Inspect execution responsibility. The public contracts and plan
+arithmetic are in [native_contracts.py](src/yassa/native_contracts.py); versioned
+controller checkers are in [native_checkers.py](src/yassa/native_checkers.py);
+[native_runner.py](src/yassa/native_runner.py) composes freezing, execution,
+lineage, rescoring, and descriptive reporting. `native.py` dispatches explicitly
+by version and retains its legacy readers. Artifact manifests and seals retain
+their existing version and byte semantics.
+
+Task-specific prompts, package names, input/output paths and checker selection
+come from the study. Materials define UTF-8 files and protected reference JSON.
+Both supplied and deterministic prepared routes converge on the same validated
+file material contract. Account totals, two-file reconciliation, and author-
+verified exact JSON tasks use the common runner. New semantic checkers require
+versioned checker code and validation, without changing orchestration.
+
+Arms declare exact external source file pins, invocation prefixes, and individual
+build allocations. Sources contain only explicitly bound files and modes.
+Consumers receive only the case files and exact parent package. Common prompts
+and file bundles are frozen separately from treatments, and each binding records
+their identities together with build/group/case/repeat lineage. The underlying
+adapter retains a new Inspect sandbox and native process for every attempt.
+
+The planner reserves the whole allocation against an attempt count and the sum
+of native command deadlines. It rejects excess allocation before calls, without
+dropping groups. There are no harness retries. Setup/export time, token/spend
+limits, and crash recovery remain outside this admission mechanism. Reports
+preserve planned/scored/missing denominators per condition, arm and independent
+build, with native deadline status separate from package readiness.
+
+The output collector also rejects a symlink at an export root, as well as nested
+non-regular paths. The command permission profile and credential injection remain
+unchanged. See [the v2 guide and evidence](docs/configurable-native.md) for schema
+limits, usage, verification, and compatibility details.
 
 ## Component map and API boundaries
 
@@ -778,17 +816,16 @@ the account-totals checker, a pinned native Codex runtime, Docker isolation, and
 executable package transfer. These are bounded fixture capabilities; the wider
 product still needs:
 
-1. General study preparation and broader user-defined task/evidence contracts.
-2. Configurable native arms, independent builds, execution repeats, and allocation.
+1. General study preparation into the implemented shared file/task definition.
+2. Broader task semantics, binary attachments, and validated checker extensions.
 3. Additional vendor runtimes and separately verified adapter capabilities.
 4. Resource admission beyond deadlines, cancellation recovery, and local resume.
 5. A selected paired analysis method appropriate to a broader study's design.
 6. A verified different-family grading route when deterministic checks are insufficient.
 
-The next recommended milestone is a configurable native study path that can
-accept a new task brief, materials, and a validated checker without modifying
-the account-totals fixture implementation. Extend preparation into that common
-study definition, then choose a more informative pilot's work, controls, and
+The configurable native milestone is implemented for the bounded contracts above.
+Extend preparation into that common study definition, then choose a more
+informative pilot's work, controls, and
 allocation through
 [SPEC section 13](SPEC.md#13-first-dovetail-study-decisions-still-open).
-These are proposed next steps; the additional capabilities have not been implemented.
+These broader preparation and pilot steps remain proposals, not implemented capabilities.

@@ -16,6 +16,9 @@ exact packages, responses, original Inspect logs, and deterministic scores.
 A second, bounded route runs real Codex CLI builders with and without a pinned
 external Dovetail runtime pack, then fresh native consumers on held-out fixtures.
 See [the native fixture](docs/native-fixture.md) for its design and measured scope.
+The configurable native v2 route also supports declared file tasks, checker
+selection, pinned source bindings, multiple builds, and consumer repeats; see
+[configurable native studies](docs/configurable-native.md).
 
 ## Run the fixture
 
@@ -81,6 +84,13 @@ the exact source profile, runtime boundaries, and interpretation limits.
 
 ## Configure a small trial
 
+For native v2, start from [account totals](studies/native-totals-v2.json) or
+[reconciliation](studies/native-reconciliation-v2.json). Both examples use the
+same native runner and include supplied/prepared materials. Run them with the
+native commands above, omitting `--dovetail-dir`; source bindings belong in the
+study definition. [The v2 guide](docs/configurable-native.md#run-a-definition)
+describes task files, checkers, source pins, allocation, and admission limits.
+
 [fixture-study.json](studies/fixture-study.json) is an editable example, not a
 default for the Dovetail study. It declares three simulated treatments, both
 preparation conditions, three evaluation cases per condition, one build per arm,
@@ -133,9 +143,11 @@ package do not become independent builder measurements. No inferential analysis
 or cross-vendor claim is supported yet.
 
 The `native-codex-cli` route exercises native skill loading and executable
-packages in fresh Docker sandboxes. It reuses the fixture contract, preparation,
-evidence store, and deterministic checker. Arbitrary task families, additional
-native CLIs, model grading, and inferential comparisons remain future work.
+packages in fresh Docker sandboxes. Native v2 supports UTF-8 file tasks with
+account-totals, reconciliation, or exact-JSON checkers, configurable arms, and
+independent builds/repeats. Legacy runs remain verifiable and rescorable. Broader
+preparation, semantic checkers, additional native CLIs, model grading, and
+inferential comparisons remain future work.
 
 ## Design navigation
 

@@ -321,7 +321,7 @@ def rescore(root: Path, label: str, reason: str | None = None) -> Path:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Yassa: traceable simulated and native Inspect fixture trials"
+        description="Yassa: traceable simulated fixtures and configurable native studies"
     )
     commands = parser.add_subparsers(dest="command", required=True)
     for name in ("prepare", "run"):
@@ -340,7 +340,7 @@ def main() -> int:
         command = commands.add_parser(name)
         command.add_argument("study", type=Path)
         command.add_argument("--run-dir", required=True, type=Path)
-        command.add_argument("--dovetail-dir", required=True, type=Path)
+        command.add_argument("--dovetail-dir", type=Path, help="legacy native v1 only")
         command.add_argument("--image", required=True)
         if name == "native-run":
             command.add_argument("--auth-file", required=True, type=Path)

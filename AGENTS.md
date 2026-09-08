@@ -10,10 +10,11 @@ context declared by their study.
 
 ## Repository map and navigation
 
-The repository implements a simulated Inspect fixture path and a bounded native
-Codex builder comparison. See [README.md](README.md) for verified usage,
-[the simulated milestone](docs/milestone-1.md), and
-[the native fixture](docs/native-fixture.md) for their measured scope.
+The repository implements simulated Inspect fixtures, the original bounded
+native Codex comparison, and configurable native file studies. See
+[README.md](README.md) for usage, [the simulated milestone](docs/milestone-1.md),
+[the native fixture](docs/native-fixture.md), and
+[native v2](docs/configurable-native.md) for their measured scope.
 
 ```text
 yassa/
@@ -25,7 +26,7 @@ yassa/
 |-- pyproject.toml     Package, CLI, exact direct dependencies, and check configuration
 |-- uv.lock            Complete resolved dependency pins and hashes
 |-- src/yassa/         Preparation, plans, Inspect execution, evidence, scores, reports
-|-- studies/           Synthetic study definition and supplied-input fixture
+|-- studies/           Synthetic study definitions and supplied-input fixtures
 |-- runtime/codex/     Pinned container recipe, controlled config, boundary probe
 |-- tests/             Contract and Inspect integration checks
 `-- docs/              Milestone evidence and implementation limitations
@@ -38,6 +39,7 @@ Start with [README.md](README.md), then follow the relevant route:
 | Continue development in a fresh session | [HANDOFF.md](HANDOFF.md) |
 | Run or modify the implemented fixture path | [README usage](README.md#run-the-fixture) and [implemented boundaries](ARCHITECTURE.md#implemented-fixture-milestone) |
 | Run or modify the native Codex comparison | [Native usage](README.md#run-the-native-codex-fixture) and [native boundaries](ARCHITECTURE.md#implemented-native-codex-fixture) |
+| Configure or extend native file studies | [Native v2 guide](docs/configurable-native.md) and [implemented runner](ARCHITECTURE.md#implemented-configurable-native-runner) |
 | Study preparation and user interaction | [SPEC section 3](SPEC.md#3-helping-the-user-define-a-study) |
 | First Dovetail study and its two input conditions | [SPEC section 13](SPEC.md#13-first-dovetail-study-decisions-still-open) |
 | Sampling, sensitivity, or scoring | [SPEC section 7](SPEC.md#7-experimental-sensitivity-and-selectable-inference-budgets) and [section 8](SPEC.md#8-scoring-recorded-work) |

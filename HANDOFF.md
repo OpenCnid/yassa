@@ -1,9 +1,10 @@
 # Development handoff
 
-Updated 2026-09-08 after the simulated and native Codex fixture milestones.
-The full spec is not implemented. The next recommended milestone is a configurable
-native study runner, followed by broader study preparation and a more informative
-pilot. Follow the current user's request if it changes that direction.
+Updated 2026-09-08 after the configurable native v2 implementation.
+The full spec is not implemented. The next recommended milestone is broader
+study preparation into the shared native definition, followed by a pilot whose
+work, controls, and budget are chosen for its question. Follow the current user's
+request if it changes that direction.
 
 ## Begin here
 
@@ -14,6 +15,8 @@ Read [AGENTS.md](AGENTS.md) and [README.md](README.md), then:
   and [remaining decisions](ARCHITECTURE.md#open-implementation-decisions).
 - [Native milestone evidence](docs/native-fixture.md) for the actual experiment,
   source selection, limitations, and recorded corrections.
+- [Configurable native studies](docs/configurable-native.md) for v2 contracts,
+  examples, admission, compatibility, and integration evidence.
 
 Inspect the current checkout and tools before choosing commands. This is a dated
 handoff, not evidence that a path, installed tool, or account connection is still
@@ -57,45 +60,41 @@ study inputs -> frozen plan -> builder -> frozen package -> fresh consumer
   remain missing. A usable package can proceed after its builder's deadline,
   with the underlying timeout retained separately from package readiness.
 
-Native support is deliberately narrow: one account-totals contract, two fixed
-builder arms, one build per arm/condition, and one consumer per case. The
-Yassa-prepared route is a seeded deterministic fixture generator. The intake
-helper does not yet synthesize general studies from natural language.
+Native v2 accepts task prompts, UTF-8 input files, package/result locations,
+account-totals/reconciliation/exact-JSON checkers, explicit pinned source bindings,
+configurable arms and independent builds, and consumer repeats. Whole-plan
+attempt/deadline admission occurs before launch. Both preparation routes produce
+the same file-material contract. Native v1 remains readable and rescorable.
+Yassa-prepared materials still use seeded deterministic fixture generators; the
+intake helper does not synthesize general studies from natural language.
 
 ## Next recommended implementation milestone
 
-**Completion target:** a new task brief, materials, checker, comparison groups,
-and build allocation can run through the native path without editing its Python
-orchestration for that particular study.
+**Completion target:** a rough user request can be developed into a validated,
+reviewable native v2 study, with task facts, invented assumptions, development
+examples, held-out materials, checker verification, controls, and budget made
+explicit. The expert file-definition path and guided preparation should converge
+on the existing contracts and runner.
 
 Develop a short concrete implementation plan, then carry it through code and
 verification. A bounded sequence is:
 
-1. Define versioned task/evidence contracts and native study configuration. Move
-   task-specific prompts, input/output locations, package naming, and checker
-   selection out of the fixed native orchestration. Keep protected scoring data
-   separate from subject-visible inputs.
-2. Make builder arms, source bindings, independent build counts, consumer repeats,
-   and attempt admission configurable. Reuse the existing planning and evidence
-   responsibilities where appropriate; keep Inspect responsible for execution.
-3. Exercise the common path with account totals and a second deterministic
-   file-processing task, such as reconciliation or joins. The second task is a
-   proposed implementation check, not a selected substantive benchmark.
-4. Keep supplied and prepared materials traceable through the same definition.
-   Preserve both routes in the first Dovetail study; future user studies need not
-   always include both. General preparation from a rough request should feed
-   this shared definition rather than a separate execution pipeline.
-5. Verify isolation, byte-identical common inputs, lineage across multiple builds,
-   file/package boundaries, failure accounting, and deterministic rescoring.
-   Existing recorded runs must remain verifiable and rescorable; introduce format
-   changes explicitly and preserve the legacy readers needed for old evidence.
+1. Define a bounded preparation interaction using SPEC section 3. Distinguish
+   supplied facts, proposals, invented rules, and unresolved correctness choices.
+2. Produce the existing `NativeStudyV2` and `FileMaterials` contracts. Extend their
+   limits deliberately when required; avoid a separate execution pipeline.
+3. Verify prepared references and splits with versioned checkers. The generic
+   exact-JSON checker does not independently establish semantic correctness.
+4. Preserve source originals, preparation records, assumptions, and both routes
+   in the first Dovetail study. Future user studies may select one route.
+5. Validate the preparation experience before choosing representative pilot work,
+   controls, independent builds, and resources. Preserve old evidence/readers.
 
-After this milestone, choose a pilot's work, controls, independent builds, and
-budget for its actual question. The previous small comparison is complete; its
-case count and deadlines are not defaults for that pilot. Broader preparation,
-resource controls, recovery, additional vendor runtimes, inferential analysis,
-and different-family model grading remain outstanding spec work. Some details
-are still proposals, not settled product requirements.
+The previous small comparison is complete; its case counts and deadlines, and
+the v2 example allocations, are not pilot defaults. Binary inputs, broader
+checker semantics, hard token/spend controls, recovery, additional vendor
+runtimes, inferential analysis, and different-family grading remain outstanding.
+Some details are proposals, not settled product requirements.
 
 ## Code entry points
 
@@ -103,18 +102,19 @@ are still proposals, not settled product requirements.
 | --- | --- |
 | CLI and simulated composition | [app.py](src/yassa/app.py) |
 | Schemas, preparation, planning | [study.py](src/yassa/study.py), [prepare.py](src/yassa/prepare.py), [planning.py](src/yassa/planning.py) |
-| Fixed native study and reporting | [native.py](src/yassa/native.py) |
+| Native version dispatch and legacy fixture | [native.py](src/yassa/native.py) |
+| Native v2 schemas, preparation, allocation | [native_contracts.py](src/yassa/native_contracts.py) |
+| Native v2 freezing, execution, reporting | [native_runner.py](src/yassa/native_runner.py) |
+| Versioned file-task checkers | [native_checkers.py](src/yassa/native_checkers.py) |
 | Native Inspect execution boundary | [native_execution.py](src/yassa/native_execution.py) |
 | Evidence and deterministic checking | [evidence.py](src/yassa/evidence.py), [scoring.py](src/yassa/scoring.py) |
 | Container and access profile | [Dockerfile](runtime/codex/Dockerfile), [config.toml](runtime/codex/config.toml), [boundary probe](runtime/codex/boundary_probe.py) |
-| Regression evidence | [tests](tests), [native evidence auditor](tests/audit_native_run.py) |
+| Regression evidence | [tests](tests), [legacy auditor](tests/audit_native_run.py), [v2 auditor](tests/audit_native_v2_run.py) |
 
-Start generalization by inspecting `NativeStudy`, `BUILD_PROMPT`,
-`CONSUMER_PROMPT`, `native_package`, and `execute_native_study` in `native.py`.
-They currently fix the task name, builder identities, paths, and allocation.
-The simulated and native paths have separate study schemas and orchestration;
-choose shared responsibilities deliberately while preserving their different
-execution capabilities.
+Start preparation work from `NativeStudyV2`, `TaskContract`, `FileMaterials`,
+`prepare_files`, and `validate_materials`. The simulated schema and legacy native
+schema remain separate compatibility paths. Both reuse original account-totals
+checking; v2 also adapts its generator. Preserve their recorded scope and readers.
 
 ## Completed native comparison
 
@@ -172,10 +172,25 @@ is at `C:/Users/Darian/yassa-runs/native-probe-01`. These are distinct runs.
 
 ## Verification and delivery
 
-Last application verification: **75 tests passed**, Ruff checks and formatting
-passed, wheel and source distribution built, and native runtime resources in
-the wheel matched their source bytes. The full native evidence audit and
-deterministic repeat scoring passed. Later handoff edits are documentation-only.
+Current application verification: **102 tests passed, 1 skipped**, Ruff checks
+and formatting passed, wheel and source distribution built, and native modules
+and runtime resources in the wheel matched their source bytes. Windows cannot
+create the symlink used by the skipped collector test; the same rejection check
+passed in the pinned Linux container. A local documentation check resolved
+affected links/anchors. Both original v1 runs still verify; their
+`native-v2-compatibility` interpretations preserve all original score rows.
+
+The v2 live smoke evidence and audit are recorded in
+[configurable native studies](docs/configurable-native.md#verification-evidence).
+Both task runs completed: 4 usable builds and 8/8 successful consumers across
+12 native attempts. Each task's six-session audit and byte-identical repeat
+scoring passed. Both totals builders reached their deadline with usable packages;
+the reconciliation builds completed within it. The runs used supplied totals and
+prepared reconciliation inputs; this was not a new Dovetail comparison. No smoke
+container remains running. Final preflight-only bounds have separate passing
+tests; the live runs retain their exact earlier procedure snapshots.
+The previous native milestone's 75-test result and original comparison remain
+historical evidence in its own document.
 
 The pinned environment is Python 3.11.16, Inspect AI 0.3.263, Pydantic 2.13.5,
 and PyYAML 6.0.3, with the complete dependency graph in `uv.lock`.
