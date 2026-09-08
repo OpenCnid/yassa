@@ -8,12 +8,14 @@ conversation. Sections marked **Proposal** remain reviewable design choices.
 The examples are explanatory, not configured defaults, benchmark results, or
 evidence that a capability has been implemented.
 
-Repository state: documentation only. [README.md](README.md) provides orientation
-and [AGENTS.md](AGENTS.md) provides the development index. No application,
-dependency manifest, or executable test suite has been established. An Inspect
-release and supported integrations still need to be selected and verified.
-[ARCHITECTURE.md](ARCHITECTURE.md) records a proposed design; its components have
-not been implemented.
+Repository state: simulated and bounded native Codex fixture implementations exist.
+[README.md](README.md) provides usage and [AGENTS.md](AGENTS.md) the development
+index. Python 3.11.16 and Inspect 0.3.263 are selected for this milestone;
+[ARCHITECTURE.md](ARCHITECTURE.md#implemented-fixture-milestone) identifies the
+implemented boundaries. [Milestone evidence](docs/milestone-1.md) distinguishes
+executed fixture checks from unverified real-study capabilities. The
+[native fixture](docs/native-fixture.md) records the subsequent Codex comparison. The product
+requirements and open Dovetail study choices below remain broader than this path.
 
 ## 1. Purpose
 
@@ -561,7 +563,7 @@ not a verified local installation:
 
 ### 11.1 Execution routes
 
-**Clarified design intent; integrations remain unimplemented.** Select the
+**Clarified design intent; a bounded native Codex fixture is implemented.** Select the
 execution route per stage according to the behavior being measured:
 
 | Route | Use | What executes |
@@ -601,7 +603,10 @@ the skill's workflow. The execution boundary is described in
 
 **Proposal.** The first working implementation must demonstrate the applicable
 behaviors below with small fixtures before running a substantive comparison.
-These are planned checks, not tests executed for this document.
+The applicable fixture checks are implemented under [tests](tests); see
+[milestone evidence](docs/milestone-1.md) and [native evidence](docs/native-fixture.md)
+for observed coverage. Additional providers/runtimes, model grading, and
+inferential capabilities remain future acceptance work.
 
 - Complete study requests proceed without redundant intake; underspecified ones
   receive at most two follow-up questions at a time and can use generated tasks
@@ -632,15 +637,21 @@ These are planned checks, not tests executed for this document.
 - Reports preserve raw counts, grouping, uncertainty assumptions, selection
   history, and scope; they do not convert inconclusive findings into equivalence.
 
-No executable command is specified here until repository configuration or a
-verified integration establishes it.
+Verified fixture check commands are maintained in
+[README.md](README.md#verify-changes) and [AGENTS.md](AGENTS.md#verify-changes).
+The milestone uses the declared all-required-work rule with one binary score per
+planned use. Failed builds contribute zero to their planned downstream uses;
+infrastructure failures remain missing. Reports show confirmed successes,
+planned denominators, and missing counts separately, without imputing missing
+work or pooling preparation conditions. It makes no inferential claim.
 
 ## 13. First Dovetail study: decisions still open
 
 **Accepted direction:** compare skill builders across multiple domains, with
 Dovetail and verified first-party builders as candidates. The first Dovetail
 study will test both user-supplied briefs/examples and Yassa-prepared
-briefs/examples. These are planned study conditions, not completed trials.
+briefs/examples. The synthetic native fixture exercises both routes; the broader
+multi-domain study remains planned.
 
 **Open:** exact builder revisions and dependency boundaries; creator/consumer
 model matrix; native hosts versus a shared workbench; domains and source datasets;
@@ -655,7 +666,8 @@ identified as official in a study.
 
 ### 13.1 First supported study candidate
 
-**Proposal for the remaining design, 2026-09-08; no study has run.** Begin with
+**Proposal for the broader study, 2026-09-08.** The
+[native fixture](docs/native-fixture.md) implements a bounded subset. Begin with
 one native-runtime builder comparison covering both accepted input-preparation
 conditions, then expand the supported study program to additional domains and
 vendor families. The runtime, task family, and other settings below remain
@@ -758,11 +770,16 @@ contexts unless the study explicitly includes it.
 - [x] Record the sensitivity-control discussion and the user's endorsement in principle.
 - [x] Record adaptive study preparation, synthetic examples, and support for simple descriptive trials as well as more demanding studies.
 - [x] Include both user-supplied and Yassa-prepared inputs in the first Dovetail study design.
-- [ ] Resolve the remaining first-study choices in section 13.1, including sources for both input conditions.
+- [x] Select and record the bounded native fixture's sources, model, input conditions, allocation, and deadlines; see [native evidence](docs/native-fixture.md).
+- [ ] Resolve the broader first-study choices in section 13.1, including representative work, controls, independent builds, and the intended claim.
 - [x] Draft `ARCHITECTURE.md` using the agreed map, boundaries, and invariants style.
 - [x] Refine `AGENTS.md` into the repository index and bounded navigation guide.
-- [ ] Select the Inspect version and implement one complete evidence-producing path.
-- [ ] Validate the checkers and analysis, then run a separately identified pilot.
+- [x] Pin Inspect 0.3.263 and implement complete simulated and native Codex fixture paths with preserved evidence and rescoring.
+- [x] Validate the account-totals checker and descriptive reporting; execute and audit the separately identified native fixture comparison.
+- [ ] Generalize the native study definition beyond the fixed account-totals contract, two builder arms, and one build per arm/condition.
+- [ ] Implement preparation from a user's rough request into a validated, reviewable study, extending the current deterministic fixture generator.
+- [ ] Run a more informative pilot on varied work and independent builds, with controls and budgets chosen for its question.
+- [ ] Implement the remaining resource controls, recovery, additional vendor/runtime support, and selected analysis or model-grading methods as their study scope requires.
 
 Research for this draft used primary statistical publications, framework
 documentation, benchmark papers, repository evidence, and the exact architecture

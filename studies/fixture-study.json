@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "first-fixture-path",
+  "question": "Does the harness retain correct lineage and failure accounting across both preparation routes?",
+  "scope": "synthetic-fixture",
+  "runtime": "simulated-api",
+  "task_contract": "account-totals-v1",
+  "scoring": "deterministic",
+  "analysis": "descriptive",
+  "kinds": ["direct", "builder"],
+  "arms": [
+    {"id": "fixture-complete", "fixture_behavior": "complete"},
+    {"id": "fixture-lossy", "fixture_behavior": "positive-only"},
+    {"id": "fixture-invalid", "fixture_behavior": "invalid"}
+  ],
+  "conditions": [
+    {
+      "id": "supplied",
+      "route": "user-supplied",
+      "source_path": "fixture-supplied.json",
+      "source_sha256": "4de677f7d39b86eb735e9170099fe6a087ed8ad7369245ab380a976ec71e3297"
+    },
+    {
+      "id": "prepared",
+      "route": "yassa-prepared",
+      "request": "Prepare synthetic account-total cases to exercise signed amounts and normalized account names.",
+      "seed": 73019,
+      "evaluation_cases": 3
+    }
+  ],
+  "builds_per_arm": 1,
+  "execution_repeats": 1,
+  "schedule_seed": 20260908,
+  "limits": {
+    "max_attempts": 100,
+    "infrastructure_retries": 1,
+    "max_output_tokens": 4096,
+    "time_limit_seconds": 30
+  }
+}
