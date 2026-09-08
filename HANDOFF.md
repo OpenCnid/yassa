@@ -1,9 +1,9 @@
 # Development handoff
 
-Updated 2026-09-08 after the configurable native v2 implementation.
-The full spec is not implemented. The next recommended milestone is broader
-study preparation into the shared native definition, followed by a pilot whose
-work, controls, and budget are chosen for its question. Follow the current user's
+Updated 2026-09-08 after the bounded guided preparation implementation.
+The full spec is not implemented. The next recommended milestone is to develop
+an informative pilot's work, controls and budget for its question, extending
+preparation/checker semantics where that work needs it. Follow the current user's
 request if it changes that direction.
 
 ## Begin here
@@ -17,6 +17,8 @@ Read [AGENTS.md](AGENTS.md) and [README.md](README.md), then:
   source selection, limitations, and recorded corrections.
 - [Configurable native studies](docs/configurable-native.md) for v2 contracts,
   examples, admission, compatibility, and integration evidence.
+- [Guided preparation](docs/guided-preparation.md) for draft/revision commands,
+  explicit correctness choices, constructed feature suites and preparation evidence.
 
 Inspect the current checkout and tools before choosing commands. This is a dated
 handoff, not evidence that a path, installed tool, or account connection is still
@@ -25,10 +27,9 @@ in ARCHITECTURE; update those documents as implementation advances.
 
 ## Checkout and evidence
 
-The implementation and this handoff are delivered together in the fixture
-milestone. Begin from the commit containing this file or a later revision of the
-default branch. Inspect `git status --short` and preserve any additional local
-changes before beginning new work.
+The implementation and this handoff advance together. Begin from the revision
+containing this milestone or a later default-branch revision. Inspect
+`git status --short` and preserve additional local changes before beginning work.
 
 The original development workspace was
 `C:/Users/Darian/.codex/worktrees/68a6/yassa`, based on `95666e2`
@@ -65,30 +66,38 @@ account-totals/reconciliation/exact-JSON checkers, explicit pinned source bindin
 configurable arms and independent builds, and consumer repeats. Whole-plan
 attempt/deadline admission occurs before launch. Both preparation routes produce
 the same file-material contract. Native v1 remains readable and rescorable.
-Yassa-prepared materials still use seeded deterministic fixture generators; the
-intake helper does not synthesize general studies from natural language.
+`study-draft` and `study-revise` now develop rough requests through explicit JSON
+decisions into those same contracts for account totals and reconciliation.
+Complete inputs proceed without an extra interview. Pending drafts expose at
+most two questions, retain open correctness choices and cannot export a runnable
+study. Preparation retains source originals, answer history, facts, assumptions,
+controls and budget review, plus checker/preparer source identities. The new
+seeded suites exercise six distinct features per family; callers may select a
+subset. Both routes use independent reference and split validation, with checker
+acceptance/rejection probes. Native freezing pins the review and materials, and
+native reports link to preparation evidence kept outside subject contexts.
+General natural-language synthesis and dataset research remain unimplemented.
 
 ## Next recommended implementation milestone
 
-**Completion target:** a rough user request can be developed into a validated,
-reviewable native v2 study, with task facts, invented assumptions, development
-examples, held-out materials, checker verification, controls, and budget made
-explicit. The expert file-definition path and guided preparation should converge
-on the existing contracts and runner.
+**Completion target:** choose an informative pilot for the intended comparison,
+with explicit work coverage, controls, independent builds, resources and limits
+on interpretation, then run and audit it under the user's chosen scope.
 
-Develop a short concrete implementation plan, then carry it through code and
-verification. A bounded sequence is:
-
-1. Define a bounded preparation interaction using SPEC section 3. Distinguish
-   supplied facts, proposals, invented rules, and unresolved correctness choices.
-2. Produce the existing `NativeStudyV2` and `FileMaterials` contracts. Extend their
-   limits deliberately when required; avoid a separate execution pipeline.
-3. Verify prepared references and splits with versioned checkers. The generic
-   exact-JSON checker does not independently establish semantic correctness.
-4. Preserve source originals, preparation records, assumptions, and both routes
-   in the first Dovetail study. Future user studies may select one route.
-5. Validate the preparation experience before choosing representative pilot work,
-   controls, independent builds, and resources. Preserve old evidence/readers.
+1. Use SPEC sections 3, 7 and 13 to establish what the result should inform. A
+   descriptive trial can be complete; broader claims need an appropriate design.
+2. Assess whether the two supported task families fit. Extend semantic contracts
+   and preparation deliberately when they do not; do not recast a user's work as
+   the nearest fixture. Arbitrary natural-language task synthesis remains open.
+3. Choose and pin external builder sources and any adaptations. Verify their
+   native capabilities before using a study to compare their outcomes.
+4. Preserve both preparation routes for the first Dovetail study. The draft's
+   `first_dovetail_study` flag enforces this commitment; future trials may select
+   one route. Source authorship and preparation route remain separate facts.
+5. Select controls and resources for the question. The native runner currently
+   measures builder treatments with package consumers; a consumer control without
+   a package requires an explicit runner extension. Execute only once the study
+   and its resources are concrete and authorized, then preserve and audit evidence.
 
 The previous small comparison is complete; its case counts and deadlines, and
 the v2 example allocations, are not pilot defaults. Binary inputs, broader
@@ -102,6 +111,9 @@ Some details are proposals, not settled product requirements.
 | --- | --- |
 | CLI and simulated composition | [app.py](src/yassa/app.py) |
 | Schemas, preparation, planning | [study.py](src/yassa/study.py), [prepare.py](src/yassa/prepare.py), [planning.py](src/yassa/planning.py) |
+| Guided draft schema, readiness and revision | [guided_preparation.py](src/yassa/guided_preparation.py) |
+| Constructed feature cases and checker probes | [preparation_templates.py](src/yassa/preparation_templates.py) |
+| Review/material byte pins and portable provenance | [preparation_evidence.py](src/yassa/preparation_evidence.py) |
 | Native version dispatch and legacy fixture | [native.py](src/yassa/native.py) |
 | Native v2 schemas, preparation, allocation | [native_contracts.py](src/yassa/native_contracts.py) |
 | Native v2 freezing, execution, reporting | [native_runner.py](src/yassa/native_runner.py) |
@@ -111,8 +123,9 @@ Some details are proposals, not settled product requirements.
 | Container and access profile | [Dockerfile](runtime/codex/Dockerfile), [config.toml](runtime/codex/config.toml), [boundary probe](runtime/codex/boundary_probe.py) |
 | Regression evidence | [tests](tests), [legacy auditor](tests/audit_native_run.py), [v2 auditor](tests/audit_native_v2_run.py) |
 
-Start preparation work from `NativeStudyV2`, `TaskContract`, `FileMaterials`,
-`prepare_files`, and `validate_materials`. The simulated schema and legacy native
+Start preparation work from `StudyDraft`, `prepare_draft`, `NativeStudyV2`,
+`TaskContract`, `FileMaterials`, `prepare_files`, and `validate_materials`.
+The simulated schema and legacy native
 schema remain separate compatibility paths. Both reuse original account-totals
 checking; v2 also adapts its generator. Preserve their recorded scope and readers.
 
@@ -172,13 +185,30 @@ is at `C:/Users/Darian/yassa-runs/native-probe-01`. These are distinct runs.
 
 ## Verification and delivery
 
-Current application verification: **102 tests passed, 1 skipped**, Ruff checks
-and formatting passed, wheel and source distribution built, and native modules
-and runtime resources in the wheel matched their source bytes. Windows cannot
-create the symlink used by the skipped collector test; the same rejection check
-passed in the pinned Linux container. A local documentation check resolved
-affected links/anchors. Both original v1 runs still verify; their
-`native-v2-compatibility` interpretations preserve all original score rows.
+Current application verification: **130 tests passed, 1 skipped** in the full
+suite; the **28 preparation tests** passed again after final provenance and
+review-format refinements. Ruff checks and formatting passed, wheel and source
+distribution built, and 23 packaged source modules/runtime files matched their
+source bytes. Windows cannot create the symlink used by the skipped collector
+test; the same rejection check passed in the prior milestone's pinned Linux
+container. A local documentation check resolved 160 links/anchors, including the
+generated preparation reviews.
+
+Both original v1 runs and both native v2 smoke runs still verify. New
+`guided-preparation-compatibility` interpretations preserve all original native
+score rows: 12 in the v1 comparison, 4 in v2 totals, and 4 in v2 reconciliation.
+Those are offline rescores of preserved work, with no new subject calls.
+
+The documented draft/revision commands completed under
+`C:/Users/Darian/yassa-runs/guided-preparation-milestone-v2`. The
+[ready review](C:/Users/Darian/yassa-runs/guided-preparation-milestone-v2/round-1/review.md)
+records both preparation routes, source originals, checker/preparer source bytes,
+and a plan reserving 54 attempts and 1,800 native command seconds. These are
+reviewed example settings; no subjects were launched. The earlier
+`guided-preparation-milestone-v1` draft example is preserved and predates final
+selection-provenance and review-format refinements. The native test adapter
+separately exercised freezing, 48 recorded consumer outcomes, preparation-context
+exclusion, report linkage and byte-identical relocated rescoring.
 
 The v2 live smoke evidence and audit are recorded in
 [configurable native studies](docs/configurable-native.md#verification-evidence).

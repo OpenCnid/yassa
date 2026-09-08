@@ -336,6 +336,13 @@ def main() -> int:
             command.add_argument("--reason")
     command = commands.add_parser("intake")
     command.add_argument("request", type=Path)
+    command = commands.add_parser("study-draft", help="develop a rough request into a native study")
+    command.add_argument("request", type=Path)
+    command.add_argument("--draft-dir", required=True, type=Path)
+    command = commands.add_parser("study-revise", help="record answers in a new preparation round")
+    command.add_argument("previous", type=Path)
+    command.add_argument("answers", type=Path)
+    command.add_argument("--draft-dir", required=True, type=Path)
     for name in ("native-prepare", "native-run"):
         command = commands.add_parser(name)
         command.add_argument("study", type=Path)
@@ -353,7 +360,15 @@ def main() -> int:
     command.add_argument("--reason")
     args = parser.parse_args()
     try:
-        if args.command.startswith("native-"):
+        if args.command in {"study-draft", "study-revise"}:
+            from .guided_preparation import prepare_draft
+
+            output = (
+                prepare_draft(args.request, args.draft_dir)
+                if args.command == "study-draft"
+                else (prepare_draft(args.answers, args.draft_dir, args.previous))
+            )
+        elif args.command.startswith("native-"):
             from .native import execute_native_study, prepare_native, rescore_native
 
             if args.command in {"native-prepare", "native-run"}:

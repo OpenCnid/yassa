@@ -24,9 +24,11 @@ from .native_contracts import (
     builder_files,
     make_native_plan,
     prepare_files,
+    resolve_sources,
     validate_materials,
 )
 from .native_execution import RUNTIME, execute_native
+from .preparation_evidence import load_preparation
 from .records import canonical, digest, identity, parse_json
 
 MISSING = {"harness_failure", "cli_failure", "dependency_missing"}
@@ -77,6 +79,13 @@ def prepare_native_v2(study_path: Path, root: Path, image: str) -> Path:
     root = external_root(root)
     original_request = read_regular(study_path)
     study = NativeStudyV2.model_validate(parse_json(original_request))
+    preparation = load_preparation(study, study_path.resolve().parent)
+    if preparation is not None:
+        validation = parse_json(preparation["validation.json"])
+        if validation.get("checker") != checker_identity(study.task)[0]:
+            raise ValueError(
+                "checker changed since preparation review; create a new draft revision"
+            )
     prepared = {
         c.id: prepare_files(study.task, c, study_path.resolve().parent) for c in study.conditions
     }
@@ -87,27 +96,7 @@ def prepare_native_v2(study_path: Path, root: Path, image: str) -> Path:
     make_native_plan(study, {key: value[0] for key, value in prepared.items()}, "preflight")
     if not re.fullmatch(r"sha256:[0-9a-f]{64}", image):
         raise ValueError("pin the native runtime by its local Docker image SHA-256 identity")
-    sources = {}
-    for source in study.sources:
-        directory = Path(source.path)
-        directory = (
-            directory if directory.is_absolute() else study_path.resolve().parent / directory
-        )
-        reject_links(directory)
-        directory = directory.resolve()
-        if directory.is_relative_to(Path(__file__).resolve().parents[2]):
-            raise ValueError("subject source packs must remain outside the yassa source tree")
-        files = {}
-        source_bytes = 0
-        for name, pin in source.files.items():
-            body = read_regular(directory / name)
-            source_bytes += len(body)
-            if source_bytes > 20_000_000:
-                raise ValueError("source bundle exceeds 20 MB")
-            if digest(body) != pin:
-                raise ValueError(f"source pin mismatch: {source.id}/{name}")
-            files[name] = body
-        sources[source.id] = (files, str(directory))
+    sources = resolve_sources(study, study_path.resolve().parent)
     subprocess.run(["docker", "image", "inspect", image], capture_output=True, check=True)
     root.mkdir(parents=True, exist_ok=False)
     store = EvidenceStore(root)
@@ -170,6 +159,8 @@ def prepare_native_v2(study_path: Path, root: Path, image: str) -> Path:
             ],
         },
     }
+    if preparation is not None:
+        body["preparation_id"] = store.put(preparation)
     frozen = {"id": identity(body), **body}
     write_new(root / "study.json", canonical(frozen))
     plan = make_native_plan(study, {key: value[0] for key, value in prepared.items()}, frozen["id"])
@@ -513,6 +504,11 @@ def rescore_native_v2(root: Path, label: str, reason: str | None = None) -> Path
         "- [Per-build counts](analysis.json)",
         "- [Native usage](usage.json)",
     ]
+    if frozen.get("preparation_id"):
+        lines.append(
+            f"- [Preparation review and original requests]"
+            f"(../../artifacts/{frozen['preparation_id']}/files/review.md)"
+        )
     for trial in plan["trials"]:
         result = results[trial["id"]]
         if result.get("launched"):

@@ -1,7 +1,8 @@
 # Architecture
 
-Status: simulated fixtures and configurable native Codex file studies implemented,
-2026-09-08. The implemented slice is identified below; the broader component
+Status: simulated fixtures, configurable native Codex file studies, and bounded
+guided preparation implemented, 2026-09-08. The implemented slice is identified
+below; the broader component
 design and explicitly proposed paths describe remaining work. Conceptual record
 names are not all public APIs.
 
@@ -285,6 +286,38 @@ The output collector also rejects a symlink at an export root, as well as nested
 non-regular paths. The command permission profile and credential injection remain
 unchanged. See [the v2 guide and evidence](docs/configurable-native.md) for schema
 limits, usage, verification, and compatibility details.
+
+## Implemented guided preparation
+
+[guided_preparation.py](src/yassa/guided_preparation.py) owns `StudyDraft`, bounded
+readiness feedback and immutable answer rounds. It produces `NativeStudyV2` and
+`FileMaterials`, reusing reference/split validation, source resolution and plan
+admission. [preparation_templates.py](src/yassa/preparation_templates.py) defines
+explicit contracts, seeded feature suites and checker acceptance/rejection probes.
+These are controller operations with no framework or model calls. The old intake
+helper and legacy generators remain unchanged compatibility paths.
+
+Rough requests retain free text as evidence. Family, correctness contract hash,
+scope, intended use, controls and resources are explicit decisions. Pending
+drafts expose at most two questions and cannot export a runnable study. Complete
+requests need no additional interaction. Each revision preserves raw requests,
+answers, normalized states and supplied source bytes; originals are never edited.
+
+[preparation_evidence.py](src/yassa/preparation_evidence.py) verifies a bounded,
+portable manifest against the effective native definition and every declared
+evidence file. Native v2 adds optional `preparation` and condition `materials`
+file/hash bindings. A `reviewed-files-v1` condition retains the prepared route
+while reading exact material bytes. Native freezing revalidates references,
+counts and admission, verifies the reviewed checker identity, and stores the
+preparation bundle in the existing evidence store before execution. Reports link
+to it. The preparation bundle includes preparer/checker source snapshots and stays
+outside subject contexts. No new execution or scoring pipeline is introduced.
+
+Schema additions are optional for old definitions. Legacy frozen records and
+scorer identities remain readable without rewriting their bytes. Future changes
+to a reviewed definition create a new preparation revision; changed checkers
+require renewed review and follow the existing scoring correction policy.
+See [guided preparation](docs/guided-preparation.md) for usage, limits and evidence.
 
 ## Component map and API boundaries
 
@@ -816,16 +849,15 @@ the account-totals checker, a pinned native Codex runtime, Docker isolation, and
 executable package transfer. These are bounded fixture capabilities; the wider
 product still needs:
 
-1. General study preparation into the implemented shared file/task definition.
+1. Preparation beyond the two implemented semantic families, including general
+   task synthesis and dataset research when required by a study.
 2. Broader task semantics, binary attachments, and validated checker extensions.
 3. Additional vendor runtimes and separately verified adapter capabilities.
 4. Resource admission beyond deadlines, cancellation recovery, and local resume.
 5. A selected paired analysis method appropriate to a broader study's design.
 6. A verified different-family grading route when deterministic checks are insufficient.
 
-The configurable native milestone is implemented for the bounded contracts above.
-Extend preparation into that common study definition, then choose a more
-informative pilot's work, controls, and
-allocation through
+The configurable native and bounded preparation milestones share the contracts
+above. Choose a more informative pilot's work, controls, and allocation through
 [SPEC section 13](SPEC.md#13-first-dovetail-study-decisions-still-open).
-These broader preparation and pilot steps remain proposals, not implemented capabilities.
+Broader preparation and the pilot remain future work.
