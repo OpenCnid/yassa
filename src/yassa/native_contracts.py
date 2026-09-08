@@ -9,7 +9,7 @@ from typing import Annotated, Any, Literal
 
 from pydantic import Field, StrictInt, model_validator
 
-from .evidence import read_regular, safe_name
+from .evidence import read_regular, reject_links, safe_name
 from .native_checkers import check, input_identity, oracle, reconciliation_candidate
 from .prepare import generate_materials
 from .records import canonical, digest, identity, parse_json
@@ -108,13 +108,23 @@ class FileMaterials(Record):
         return self
 
 
+class FileBinding(Record):
+    path: str
+    sha256: Hash
+
+
 class NativeCondition(Condition):
-    generator: Literal["account-totals-v1", "reconciliation-v1"] | None = None
+    generator: Literal["account-totals-v1", "reconciliation-v1", "reviewed-files-v1"] | None = None
+    materials: FileBinding | None = None
 
     @model_validator(mode="after")
     def preparation(self):
         if (self.route == "yassa-prepared") != (self.generator is not None):
             raise ValueError("prepared conditions require a generator; supplied ones forbid it")
+        if (self.generator == "reviewed-files-v1") != (self.materials is not None):
+            raise ValueError(
+                "reviewed-files-v1 requires pinned materials; other routes forbid them"
+            )
         return self
 
 
@@ -176,6 +186,7 @@ class NativeStudyV2(Record):
     consumer_repeats: Annotated[StrictInt, Field(ge=1, le=20)]
     schedule_seed: StrictInt
     admission: Admission
+    preparation: FileBinding | None = None
 
     @model_validator(mode="after")
     def dimensions(self):
@@ -193,9 +204,33 @@ class NativeStudyV2(Record):
         if used != sources.keys():
             raise ValueError("unused source binding")
         for condition in self.conditions:
-            if condition.generator and condition.generator != self.task.checker:
+            if condition.generator not in {None, "reviewed-files-v1", self.task.checker}:
                 raise ValueError("fixture generator must match the task checker")
         return self
+
+
+def resolve_sources(study: NativeStudyV2, base: Path) -> dict:
+    """Read only declared external pack bytes, shared by review and native freeze."""
+    sources = {}
+    for source in study.sources:
+        directory = Path(source.path)
+        directory = directory if directory.is_absolute() else base / directory
+        reject_links(directory)
+        directory = directory.resolve()
+        if directory.is_relative_to(Path(__file__).resolve().parents[2]):
+            raise ValueError("subject source packs must remain outside the yassa source tree")
+        files = {}
+        source_bytes = 0
+        for name, pin in source.files.items():
+            body = read_regular(directory / name)
+            source_bytes += len(body)
+            if source_bytes > 20_000_000:
+                raise ValueError("source bundle exceeds 20 MB")
+            if digest(body) != pin:
+                raise ValueError(f"source pin mismatch: {source.id}/{name}")
+            files[name] = body
+        sources[source.id] = (files, str(directory))
+    return sources
 
 
 def builder_files(task: TaskContract, materials: FileMaterials) -> dict[str, bytes]:
@@ -294,14 +329,23 @@ def generate_files(task: TaskContract, condition: NativeCondition) -> dict:
 
 
 def prepare_files(task: TaskContract, condition: NativeCondition, base: Path):
-    if condition.route == "user-supplied":
-        source = Path(condition.source_path)
+    if condition.route == "user-supplied" or condition.materials:
+        source = Path(condition.materials.path if condition.materials else condition.source_path)
         source = source if source.is_absolute() else base / source
         original = read_regular(source)
-        if digest(original) != condition.source_sha256:
+        pin = condition.materials.sha256 if condition.materials else condition.source_sha256
+        if digest(original) != pin:
             raise ValueError(f"source hash mismatch for condition {condition.id}")
         value = parse_json(original)
         provenance = {"source_path": str(source.resolve()), "preparation": "validated-file-copy-v2"}
+        if condition.materials:
+            provenance.update(
+                preparation="reviewed-files-v1",
+                request=condition.request,
+                seed=condition.seed,
+                generator="see pinned preparation record",
+                model=None,
+            )
     else:
         original = canonical(condition.model_dump(mode="json"))
         value = generate_files(task, condition)
@@ -316,6 +360,8 @@ def prepare_files(task: TaskContract, condition: NativeCondition, base: Path):
         }
     materials = FileMaterials.model_validate(value)
     validate_materials(task, materials)
+    if condition.materials and len(materials.evaluation) != condition.evaluation_cases:
+        raise ValueError("reviewed material case count differs from its condition")
     provenance.update(
         {
             "route": condition.route,

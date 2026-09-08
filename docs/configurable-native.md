@@ -5,9 +5,11 @@ selection, builder arms, pinned source files, independent build counts, and
 consumer repeats from a versioned study. It uses the existing Inspect Docker and
 Codex adapter. Native v1 and simulated v1 readers remain available.
 
-This is a bounded file-processing milestone. It does not implement general study
-preparation from conversation, inferential analysis, arbitrary checker execution,
-additional vendor runtimes, recovery, or token/spend limits.
+This is a bounded file-processing milestone. A subsequent
+[guided preparation workflow](guided-preparation.md) produces these same contracts
+for two task families. General task synthesis, inferential analysis, arbitrary
+checker execution, additional vendor runtimes, recovery, and token/spend limits
+remain outside the implemented scope.
 
 ## Run a definition
 
@@ -71,8 +73,10 @@ Original bytes, derivatives, assumptions, authorship, and preparation route are
 retained separately. Development and evaluation groups must be disjoint, IDs
 unique, and inputs distinct; specialized checkers also catch row-order relabeling.
 The deterministic generators implement invented rules; the recorded request does
-not cause natural-language task synthesis. A future preparation interface should
-emit this same definition.
+not cause natural-language task synthesis. Guided preparation emits this same
+definition with explicit decisions and richer constructed feature cases. Its
+`reviewed-files-v1` conditions bind exact material files and a portable preparation
+record; the existing generators and their byte-pinned examples remain unchanged.
 
 ## Checker selection
 

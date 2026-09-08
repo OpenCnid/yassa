@@ -84,6 +84,14 @@ the exact source profile, runtime boundaries, and interpretation limits.
 
 ## Configure a small trial
 
+For a rough request, `study-draft REQUEST.json --draft-dir DIRECTORY` creates a
+preparation review. `study-revise PREVIOUS_DIRECTORY ANSWERS.json --draft-dir
+NEW_DIRECTORY` records focused answers in a new round. Complete inputs produce
+the same native v2 definition used below. The bounded guided route supports
+account totals and reconciliation, explicit rule choices, constructed feature
+cases, original-byte provenance, checker verification, and budget review. See
+[guided preparation](docs/guided-preparation.md) for the runnable example and limits.
+
 For native v2, start from [account totals](studies/native-totals-v2.json) or
 [reconciliation](studies/native-reconciliation-v2.json). Both examples use the
 same native runner and include supplied/prepared materials. Run them with the
@@ -110,8 +118,9 @@ the route describes how it enters the harness, separately from its authorship.
   [study.py](src/yassa/study.py).
 
 `uv run --locked yassa intake REQUEST.json` provides up to two focused readiness
-questions. This limited template does not yet turn arbitrary natural-language
-requests into studies, research datasets, or model-generated rubrics.
+questions. This legacy helper is separate from the native guided workflow.
+Neither path interprets arbitrary natural language into task semantics,
+researches datasets, or generates model-based rubrics.
 
 ## Verify changes
 
@@ -145,9 +154,10 @@ or cross-vendor claim is supported yet.
 The `native-codex-cli` route exercises native skill loading and executable
 packages in fresh Docker sandboxes. Native v2 supports UTF-8 file tasks with
 account-totals, reconciliation, or exact-JSON checkers, configurable arms, and
-independent builds/repeats. Legacy runs remain verifiable and rescorable. Broader
-preparation, semantic checkers, additional native CLIs, model grading, and
-inferential comparisons remain future work.
+independent builds/repeats. Guided preparation now produces that same definition
+for two explicit task families. Legacy runs remain verifiable and rescorable.
+General task synthesis, broader semantic checkers, additional native CLIs, model
+grading, and inferential comparisons remain future work.
 
 ## Design navigation
 

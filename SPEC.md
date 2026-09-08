@@ -19,8 +19,10 @@ executed fixture checks from unverified real-study capabilities. The
 requirements and open Dovetail study choices below remain broader than this path.
 The [configurable native milestone](docs/configurable-native.md) supports versioned
 task/file contracts, declared checker selection, pinned source bindings, multiple
-builds and repeats, and full-plan attempt/deadline admission. General preparation
-and broader task/checker semantics remain outstanding.
+builds and repeats, and full-plan attempt/deadline admission.
+[Guided preparation](docs/guided-preparation.md) now develops rough requests through
+explicit JSON decisions into that definition for totals and reconciliation.
+General task synthesis and broader task/checker semantics remain outstanding.
 
 ## 1. Purpose
 
@@ -164,6 +166,21 @@ condition rather than supplying every answer to the builder.
 Before running, the user can inspect the resulting conditions, expected work,
 measurement procedure, sampling plan, and estimated resource use. The system
 uses the authorization supplied by the user for execution and publication.
+
+**Implemented bounded preparation, 2026-09-08.** `study-draft` and `study-revise`
+preserve original requests, answer rounds, supplied bytes, separately recorded
+facts/inferences/assumptions/proposals, and unresolved choices. Complete requests
+proceed directly; incomplete ones expose at most two questions per round. Explicit
+contract acceptance is required for the two supported semantic families. Free-text
+facts are recorded, not automatically interpreted or checked for contradiction.
+Descriptive scope, prepared inputs, and all template features are identified
+routine choices; models, builds, repeats and deadlines are explicit settings.
+Broader evidence requests remain unresolved instead of being silently downgraded.
+The generated feature suites, independent reference verification, checker probes,
+source pins and admitted allocation produce the same native v2 contracts used by
+expert definitions. Both routes remain identifiable; `first_dovetail_study`
+requires both. This does not yet implement conversational model preparation,
+dataset research, arbitrary business-rule synthesis, or a broader pilot.
 
 ## 4. Study definition
 
@@ -782,7 +799,8 @@ contexts unless the study explicitly includes it.
 - [x] Pin Inspect 0.3.263 and implement complete simulated and native Codex fixture paths with preserved evidence and rescoring.
 - [x] Validate the account-totals checker and descriptive reporting; execute and audit the separately identified native fixture comparison.
 - [x] Generalize the native study definition beyond the fixed account-totals contract, two builder arms, and one build per arm/condition; see [the bounded v2 contracts](docs/configurable-native.md).
-- [ ] Implement preparation from a user's rough request into a validated, reviewable study, extending the current deterministic fixture generator.
+- [x] Implement bounded preparation from a rough request into a validated, reviewable native study, with explicit decisions and extended deterministic feature suites; see [guided preparation](docs/guided-preparation.md).
+- [ ] Extend preparation beyond the two fixed semantic families, including general task synthesis or research where required by the selected study.
 - [ ] Run a more informative pilot on varied work and independent builds, with controls and budgets chosen for its question.
 - [ ] Implement the remaining resource controls, recovery, additional vendor/runtime support, and selected analysis or model-grading methods as their study scope requires.
 
