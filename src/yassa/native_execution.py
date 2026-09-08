@@ -28,6 +28,9 @@ total = 0
 for prefix, base in [("output", "/work/output"),
                      ("sessions", "/home/runtime/codex/sessions"),
                      ("builtin-skills", "/home/runtime/codex/skills/.system")]:
+    if Path(base).is_symlink():
+        result["rejected"].append(base)
+        continue
     for root, dirs, files in os.walk(base, followlinks=False):
         for name in list(dirs):
             if Path(root, name).is_symlink():

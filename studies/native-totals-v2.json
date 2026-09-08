@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "id": "native-totals-v2",
+  "question": "Does the configurable runner preserve task, build and consumer evidence?",
+  "scope": "synthetic-fixture",
+  "runtime": "native-codex-cli",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "xhigh",
+  "task": {
+    "schema_version": 1,
+    "id": "account-totals-v1",
+    "requirements": "Return only a JSON object with one key, totals, containing an array of objects. Each object has exactly account, net_cents, and count. Normalize account names by stripping leading/trailing ASCII spaces and lowercasing. Include every input row, including negative amounts, zero amounts, and duplicate rows. For each normalized account, net_cents is the integer sum of cents and count is the integer row count. Include zero-sum accounts. Output account names must be normalized and unique; array order, whitespace, and JSON object key order do not matter. Empty input requires an empty totals array. No extra fields or prose. Booleans are not integers.",
+    "package_name": "ledger-totals",
+    "package_path": "output/package",
+    "result_path": "output/answer.json",
+    "brief_path": "input/task.json",
+    "build_prompt": "Build a reusable skill for the supplied task and examples.",
+    "consumer_prompt": "Process the current input files: /work/input/ledger.json.",
+    "checker": "account-totals-v1",
+    "checker_inputs": [
+      "input/ledger.json"
+    ]
+  },
+  "sources": [],
+  "arms": [
+    {
+      "id": "control",
+      "builds": 2
+    },
+    {
+      "id": "explicit-checks",
+      "builds": 1,
+      "invocation": "Check the package against additional edge cases before finishing."
+    }
+  ],
+  "conditions": [
+    {
+      "id": "supplied",
+      "route": "user-supplied",
+      "source_path": "native-totals-supplied-v2.json",
+      "source_sha256": "6e9475b7b75b909430efd02c4eefc3ec8af857caa72770e2366ec714828803ae"
+    },
+    {
+      "id": "prepared",
+      "route": "yassa-prepared",
+      "source_path": null,
+      "source_sha256": null,
+      "request": "Small synthetic implementation check.",
+      "seed": 72,
+      "evaluation_cases": 2,
+      "generator": "account-totals-v1"
+    }
+  ],
+  "consumer_repeats": 2,
+  "schedule_seed": 19,
+  "admission": {
+    "max_attempts": 30,
+    "max_scheduled_seconds": 3000,
+    "build_timeout_seconds": 180,
+    "consumer_timeout_seconds": 60
+  }
+}
