@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "codex-dovetail-native-fixture-v1",
+  "question": "How do fresh Codex consumers perform using skills built by Codex with and without the Codex-oriented Dovetail runtime pack?",
+  "scope": "synthetic-fixture",
+  "runtime": "native-codex-cli",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "xhigh",
+  "source_skills": ["better-skill-creator", "prompt-engineering", "hypershot-protocol", "subagent-composition", "judge-composition", "self-play", "spark-steering", "upsum"],
+  "conditions": [
+    {
+      "id": "supplied",
+      "route": "user-supplied",
+      "source_path": "fixture-supplied.json",
+      "source_sha256": "4de677f7d39b86eb735e9170099fe6a087ed8ad7369245ab380a976ec71e3297"
+    },
+    {
+      "id": "prepared",
+      "route": "yassa-prepared",
+      "request": "Prepare synthetic account-total cases to exercise signed amounts and normalized account names.",
+      "seed": 73019,
+      "evaluation_cases": 3
+    }
+  ],
+  "schedule_seed": 20260908,
+  "build_timeout_seconds": 300,
+  "consumer_timeout_seconds": 120
+}

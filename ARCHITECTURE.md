@@ -1,9 +1,8 @@
 # Architecture
 
-Status: proposed architecture, 2026-09-08. No application code or integrations
-described below have been implemented. Proposed paths and record names are a map
-for development, not existing APIs. Update this document as those boundaries are
-implemented, and replace proposed locations with links to real code.
+Status: simulated and native Codex fixtures implemented, 2026-09-08. The implemented
+slice is identified below; the broader component design and explicitly proposed
+paths describe remaining work. Conceptual record names are not all public APIs.
 
 [SPEC.md](SPEC.md) owns the product requirements and measurement semantics.
 [AGENTS.md](AGENTS.md) is the development entry point. This document explains how
@@ -19,7 +18,7 @@ and find or construct cases. A resolved study and sampling plan then specify the
 work to run through Inspect. Execution produces evidence; scoring and analysis
 produce versioned interpretations of it.
 
-The initial implementation is proposed as one Python package using Inspect, with
+The initial implementation is one Python package using Inspect, with
 ordinary module boundaries. A thin programmatic entry point can support a CLI or
 an agent-facing interface. The boundaries below do not require separate services
 or a separate model agent for each responsibility.
@@ -61,15 +60,23 @@ The current relevant tree, including this document, is:
 ```text
 yassa/
 |-- AGENTS.md          Development entry point and repository index
-|-- ARCHITECTURE.md    Proposed components, boundaries, and invariants
-|-- README.md          Project orientation and document navigation
+|-- ARCHITECTURE.md    Implemented slice and remaining technical design
+|-- README.md          Setup, run, verification, and navigation
 |-- SPEC.md            Working requirements and open product decisions
-`-- STARTDEV.md        Kickoff prompt for the first implementation context
+|-- HANDOFF.md         Current development state and next milestone
+|-- pyproject.toml     Package, CLI entry point, and dependency pins
+|-- uv.lock            Resolved dependency graph and distribution hashes
+|-- src/yassa/         Implemented small-module fixture path
+|-- studies/           Synthetic study and supplied-material fixtures
+|-- runtime/codex/     Container recipe, controlled configuration, boundary probe
+|-- tests/             Executable contracts and Inspect integration checks
+`-- docs/              Milestone evidence
 ```
 
-The following is a **proposed** source layout. None of these directories is
-created by this document. Start components as small modules where practical;
-split them when their responsibilities need separate code or guidance.
+The following remains a **proposed expanded** source layout. The implemented
+milestone uses the small modules listed in the next section, including
+`prepare.py`, `execution.py`, and `scoring.py` in place of proposed subpackages.
+Split components when their responsibilities need separate code or guidance.
 
 ```text
 src/yassa/
@@ -99,7 +106,152 @@ area to deeper explanations or a scoped `AGENTS.md` only when work in that area
 needs distinct instructions. Navigation follows the task rather than requiring
 every agent to read every document.
 
+## Implemented fixture milestone
+
+The first path uses Python 3.11.16, Inspect AI 0.3.263, and Pydantic 2.13.5, with
+exact direct/development/build dependencies and a complete uv lock. JSON is the
+editable study format. All cases are synthetic account totals with an explicit
+contract; real-study settings remain open in
+[SPEC section 13](SPEC.md#13-first-dovetail-study-decisions-still-open).
+
+| Module | Implemented responsibility |
+| --- | --- |
+| [study.py](src/yassa/study.py) | Strict versioned input schemas, supported capabilities, and disjoint case/group validation; no I/O |
+| [prepare.py](src/yassa/prepare.py) | Supplied original byte pins, deterministic synthetic construction, assumptions, provenance, and independent reference verification |
+| [planning.py](src/yassa/planning.py) | Fixed direct/build/consumer trials, stable dimension IDs, dependency slots, seeded ordering, and conservative attempt admission |
+| [contexts.py](src/yassa/contexts.py) | Allowlisted role projection, common prompt bytes, complete text treatment binding, and explicit empty tool/configuration access |
+| [execution.py](src/yassa/execution.py) | Fresh Inspect Task/Sample/model per attempt, `generate(tool_calls="none")`, configured limits, raw logs, and recorded responses |
+| [simulation.py](src/yassa/simulation.py) | Registered deterministic ModelAPI test double; consumes messages and generated policy resources, never a protected answer key |
+| [evidence.py](src/yassa/evidence.py) | External file storage, SHA-256 manifests, portable paths, link rejection, create-only writes, and sealing/integrity verification |
+| [records.py](src/yassa/records.py) | Canonical UTF-8 JSON, duplicate-key rejection, and content identities |
+| [scoring.py](src/yassa/scoring.py) | Independent reference oracle and deterministic checking of preserved JSON work |
+| [reporting.py](src/yassa/reporting.py) | Planned-denominator counts by route/stage/arm, missingness, resources, and evidence-linked Markdown |
+| [app.py](src/yassa/app.py) | CLI composition, freezing, bounded dependency execution/retries, and append-only scoring interpretations |
+
+`prepare` validates inputs, references, supported conditions, and maximum attempt
+arithmetic before creating the run. It freezes source bytes, normalized material,
+preparation provenance, actual installed dependency versions, implementation
+source, treatment files, the study revision, and plan. Canonical records use
+sorted JSON keys, compact separators, Unicode UTF-8, and a final LF; original
+file hashes always use their unchanged bytes. Builders see the brief, public
+contract, development examples, and assigned treatment. Consumers receive the
+same complete public contract, only their current rows, and all bytes of the
+assigned frozen text package. Protected expected results stay in controller
+evidence. No final target is placed in Inspect samples.
+
+The runtime is **simulated-api**, a trusted local ModelAPI implementation with
+explicit package text in the request. Inspect runs actual tasks and writes native
+`.eval` logs, but no LLM executes. The subject interface has no filesystem,
+network, tools, scripts, or discovery. This is a capability boundary at the model
+request, not an OS sandbox around untrusted provider code. The controller and
+provider implementation are trusted. Arbitrary provider plugins, executable
+packages, native CLIs, external builders, and provider-side tools are unsupported
+and cannot be selected through the study schema. Neither personal skills nor
+repository instructions are loaded into model requests. Tests compare the actual
+Inspect request messages with the frozen binding.
+
+Each builder package must be a bounded JSON envelope of UTF-8 `.md`, `.json`, or
+`.txt` files with nonempty `SKILL.md`. All paths are validated before ingestion;
+absolute/traversing paths, Windows aliases/streams, case collisions, link sources,
+and executable files are rejected. Package identity hashes paths, byte hashes,
+sizes, and the non-executable file profile. The fixture consumer interprets the
+generated `policy.json`; there is no claim about native Markdown instruction
+following or arbitrary package compatibility.
+
+Execution is sequential in plan order, with one Inspect generation per attempt.
+The plan reserves every permitted infrastructure retry before any call. The
+provider's output cap is explicitly simulated in UTF-8 byte units; Inspect
+enforces time limits. Real token and price fields remain null. Successful
+Inspect execution, usable package submission, and correct work are separate
+states. Only declared infrastructure failures receive bounded retries, with
+new attempt IDs and `retry_of`; wrong work is never retried. Failed builders get
+explicit downstream dispositions without fabricated consumers. Exhausted
+infrastructure and harness failures remain missing; failed packages contribute
+zero under the selected end-to-end rule.
+
+Launch records precede execution. Native logs, bindings, responses, packages,
+and final selections are preserved before a whole-run seal is written. Existing
+run roots and existing records cannot be overwritten. An interrupted/unsealed
+run remains incomplete; automatic crash recovery and resume are deferred.
+`execute` only admits an unchanged, never-started prepared run under the same
+code and dependency versions. File hashes detect later changes; they do not
+enforce OS immutability or protect against a privileged actor replacing seals.
+
+Scoring runs after the subject's work is sealed, using controller code and
+verified protected references. A new interpretation writes scores, analysis,
+the checker source, and report to a new directory. Rescoring uses preserved bytes
+without model calls; a changed checker identity requires a recorded correction
+reason. The run seal covers original evidence and excludes interpretation
+directories so additional interpretations do not alter original run identity.
+No submitted code is imported or executed during checking. The deterministic
+checker runs outside Inspect's generation step; Inspect's model-grading,
+aggregate reducers, and `score()` workflow are not claimed as integrated.
+
+The simulated fixture route covers both accepted preparation conditions. See
+[milestone evidence](docs/milestone-1.md) for its original checks. The subsequent
+native route is described below. Arbitrary guided study synthesis, dataset
+discovery, model grading, inferential methods, and cancellation recovery remain
+deferred.
+
+## Implemented native Codex fixture
+
+[native.py](src/yassa/native.py) supplies a narrow two-arm builder study schema,
+external source snapshot, seeded build/consumer plan, package freezing, and
+native reporting. It reuses preparation, materials, evidence storage, and the
+deterministic checker. [native_execution.py](src/yassa/native_execution.py) runs
+one native Codex CLI process in each fresh Inspect Task/Sample Docker sandbox.
+Inspect's inert model satisfies its task interface and makes no subject calls;
+Codex uses saved ChatGPT authentication directly. Agent Bridge is not used.
+
+The [container recipe](runtime/codex/Dockerfile) pins the Node base digest and
+Codex npm version. Runs require an immutable local image identity; actual Debian
+dependencies are part of that image. The image contains tools, but no repository,
+study, source pack, scorer, or answer key. Containers run as UID 1000 with all
+Linux capabilities dropped and no host bind mounts or Docker socket. Docker's
+seccomp and AppArmor profiles are relaxed to permit Codex's nested Bubblewrap
+sandbox; no privileged container mode is used. This is a local evaluation boundary,
+not a claim of protection against container/kernel exploits.
+
+The controlled [configuration](runtime/codex/config.toml) uses named Codex
+permissions. Subject commands can write the work directory, read its declared
+inputs and skills, and cannot read the injected credential file or modify inputs,
+skills, or runtime configuration. Command network access is disabled; the Codex
+process retains provider egress. Web search is disabled and no personal MCP,
+apps, rules, repository instructions, or user configuration are imported. Native
+built-in skills remain present in both arms and their bytes are captured.
+[boundary_probe.py](runtime/codex/boundary_probe.py) tests these command permissions
+before any inference is released, independently for every attempt.
+
+Builders receive the public contract and development examples. The Dovetail arm
+also receives a runtime-only snapshot of the explicitly selected external skill
+directories and an explicit creator invocation. Source tests and fixtures are
+excluded to prevent their nested skills from entering native discovery; included
+bytes are unchanged and pinned. Consumers receive only their current rows and
+the frozen generated `account-totals` package. That package is installed through
+`.agents/skills`, with file bytes and executable flags preserved. Consumers
+explicitly invoke it. This checks native loading under explicit invocation, not
+unprompted routing quality.
+
+The runner preserves native JSONL events, session transcripts, built-in skill
+bytes, submitted files, rejected paths, command configuration, boundary results,
+timing, and Inspect logs before container teardown. It never exports credentials.
+Bounded regular files are collected; package identities include executable flags.
+Each model response's usage is counted once across session logs by response ID.
+Native internal evaluators can use the same sandbox and deadline; their calls
+remain part of the treatment. Shell-launched external model CLIs cannot use the
+protected credentials or network. Dollar costs are unavailable.
+
+The example allows one build per arm/condition and one consumer per case, with
+fixed wall-time limits and no harness attempt retries. Usable packages produced by a
+timed-out build can proceed, with exhaustion retained in its attempt record.
+Failed packages score zero downstream; CLI and harness failures remain missing.
+Original evidence is sealed and native rescoring makes no model calls. See
+[native fixture evidence](docs/native-fixture.md) for observed results and limits.
+
 ## Component map and API boundaries
+
+The remainder of this component map describes the wider target design. Use the
+implemented map above to determine which interfaces exist today.
 
 ### `study.py`: the language of a study
 
@@ -588,15 +740,22 @@ checks. Real-provider smoke runs separately establish that the selected adapters
 load the intended context, collect outputs, and account for actual usage. Such
 smoke runs do not establish the statistical properties of a substantive study.
 
-No test command or passing integration is established by this document. Add
-verified commands to the relevant development guide when implementation exists.
+Verified fixture commands and observed coverage are maintained in
+[README.md](README.md#verify-changes) and [milestone evidence](docs/milestone-1.md).
 
 ## Inspect integration checkpoints
 
-Inspect is not installed in the Python environment checked for this draft, and
-the repository has no dependency pin. Select a release before implementation and
-verify its supported behavior. The current official documentation provides the
-following integration points:
+Inspect 0.3.263 is installed and pinned for the first fixture route. Its installed
+signatures and runtime behavior were checked against official
+[Model APIs](https://inspect.aisi.org.uk/extensions-model-api.html),
+[Tasks](https://inspect.aisi.org.uk/tasks.html),
+[Limits](https://inspect.aisi.org.uk/setting-limits.html), and
+[Scoring workflow](https://inspect.aisi.org.uk/scoring-workflow.html) documentation.
+Raw request checks use the documented
+[log attachment resolution](https://inspect.aisi.org.uk/eval-logs.html#attachments)
+when reading deduplicated model events from `.eval` files.
+Task generation and native logs are exercised by tests; the other target
+integration points below still require verification before use:
 
 - [Tasks and setup/cleanup](https://inspect.aisi.org.uk/tasks.html): map logical
   trials to samples and capture required state before sandbox cleanup. Cleanup
@@ -614,18 +773,22 @@ following integration points:
 
 ## Open implementation decisions
 
-The component boundaries above support an initial implementation without
-settling every detail. Resolve these in the first implementation work:
+The implemented paths resolve packaging, JSON serialization, local evidence,
+the account-totals checker, a pinned native Codex runtime, Docker isolation, and
+executable package transfer. These are bounded fixture capabilities; the wider
+product still needs:
 
-1. Python/Inspect dependency versions, packaging, and the first supported runtime.
-2. The initial human-editable study format and exact versioned record schemas.
-3. The first sandbox backend and supported native/common-workbench adapter.
-4. The artifact manifest details, file/link policy, and local recovery protocol.
-5. The first task template, deterministic checker, and paired analysis method.
-6. The permitted model-grading route for outputs with several producing families.
+1. General study preparation and broader user-defined task/evidence contracts.
+2. Configurable native arms, independent builds, execution repeats, and allocation.
+3. Additional vendor runtimes and separately verified adapter capabilities.
+4. Resource admission beyond deadlines, cancellation recovery, and local resume.
+5. A selected paired analysis method appropriate to a broader study's design.
+6. A verified different-family grading route when deterministic checks are insufficient.
 
-Start with one direct study path using fixtures, then add one build-to-consumer
-path that exercises artifact binding, isolation, failure accounting, and report
-lineage. Choose the real study's domains, models, controls, and sampling allocation
-through [SPEC section 13](SPEC.md#13-first-dovetail-study-decisions-still-open).
-Those choices are experimental configuration, not architectural constants.
+The next recommended milestone is a configurable native study path that can
+accept a new task brief, materials, and a validated checker without modifying
+the account-totals fixture implementation. Extend preparation into that common
+study definition, then choose a more informative pilot's work, controls, and
+allocation through
+[SPEC section 13](SPEC.md#13-first-dovetail-study-decisions-still-open).
+These are proposed next steps; the additional capabilities have not been implemented.

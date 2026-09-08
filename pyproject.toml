@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling==1.32.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "yassa"
+version = "0.1.0"
+description = "Traceable skill experiments through Inspect AI"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = ["inspect-ai==0.3.263", "pydantic==2.13.5", "PyYAML==6.0.3"]
+
+[project.scripts]
+yassa = "yassa.app:main"
+
+[dependency-groups]
+dev = ["pytest==9.1.1", "ruff==0.16.6"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"runtime/codex" = "yassa/_native_runtime"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

@@ -10,23 +10,34 @@ context declared by their study.
 
 ## Repository map and navigation
 
-The repository currently contains design documents; application code, dependency
-configuration, and executable tests have not been established.
+The repository implements a simulated Inspect fixture path and a bounded native
+Codex builder comparison. See [README.md](README.md) for verified usage,
+[the simulated milestone](docs/milestone-1.md), and
+[the native fixture](docs/native-fixture.md) for their measured scope.
 
 ```text
 yassa/
 |-- AGENTS.md          Development entry point and repository index
-|-- ARCHITECTURE.md    Proposed components, boundaries, and invariants
-|-- README.md          Project orientation and document navigation
+|-- ARCHITECTURE.md    Implemented boundaries and remaining technical design
+|-- README.md          Setup, run, checks, and document navigation
 |-- SPEC.md            Requirements, study design, and open decisions
-`-- STARTDEV.md        Kickoff prompt for the first implementation context
+|-- HANDOFF.md         Current development state and next milestone
+|-- pyproject.toml     Package, CLI, exact direct dependencies, and check configuration
+|-- uv.lock            Complete resolved dependency pins and hashes
+|-- src/yassa/         Preparation, plans, Inspect execution, evidence, scores, reports
+|-- studies/           Synthetic study definition and supplied-input fixture
+|-- runtime/codex/     Pinned container recipe, controlled config, boundary probe
+|-- tests/             Contract and Inspect integration checks
+`-- docs/              Milestone evidence and implementation limitations
 ```
 
 Start with [README.md](README.md), then follow the relevant route:
 
 | Work | Starting point |
 | --- | --- |
-| Begin the first implementation milestone | [STARTDEV.md](STARTDEV.md) |
+| Continue development in a fresh session | [HANDOFF.md](HANDOFF.md) |
+| Run or modify the implemented fixture path | [README usage](README.md#run-the-fixture) and [implemented boundaries](ARCHITECTURE.md#implemented-fixture-milestone) |
+| Run or modify the native Codex comparison | [Native usage](README.md#run-the-native-codex-fixture) and [native boundaries](ARCHITECTURE.md#implemented-native-codex-fixture) |
 | Study preparation and user interaction | [SPEC section 3](SPEC.md#3-helping-the-user-define-a-study) |
 | First Dovetail study and its two input conditions | [SPEC section 13](SPEC.md#13-first-dovetail-study-decisions-still-open) |
 | Sampling, sensitivity, or scoring | [SPEC section 7](SPEC.md#7-experimental-sensitivity-and-selectable-inference-budgets) and [section 8](SPEC.md#8-scoring-recorded-work) |
@@ -88,11 +99,18 @@ guide in every directory or require unrelated documents for each task.
 Select checks relevant to the changed behavior. Establish executable commands
 from repository configuration or verified documentation before running them.
 
-There are no established setup or application-test commands. For documentation
-changes, check affected local links and anchors, current/proposed path labels,
-cross-document consistency, and Markdown formatting. When implementation adds
-executable checks, record verified commands and their repository evidence in the
-relevant guide.
+Use `uv sync --locked` for setup. Verified checks are `uv run --locked pytest -q`,
+`uv run --locked ruff check src tests runtime`, and
+`uv run --locked ruff format --check src tests runtime`; their configuration is in
+[pyproject.toml](pyproject.toml). `git diff --check` checks patch whitespace.
+The suite uses actual Inspect tasks with an explicitly simulated provider and
+pure native-adapter checks. It makes no live model calls. Native behavior requires
+the separately recorded Docker/Codex integration evidence.
+
+For documentation changes, check affected local links and anchors,
+current/proposed path labels, cross-document consistency, and Markdown formatting.
+Preserve study fixture byte pins when changing supplied materials; a source
+revision needs a deliberate new hash. Do not write run artifacts into this checkout.
 
 Report what changed, which checks actually ran and their observed results, and
 any material unresolved limitation. Distinguish planned checks from executed

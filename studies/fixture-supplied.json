@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "brief": "Build reusable instructions for account-total tasks under the complete task contract.",
+  "authorship": "Yassa implementation fixture authored with coding assistance",
+  "source": "yassa/studies/fixture-supplied.json",
+  "synthetic": true,
+  "assumptions": [
+    "Invented scenario rules and records; not actual user business data.",
+    "This file exercises the supplied-material interface; it is not a real user study."
+  ],
+  "development": [
+    {
+      "id": "dev-shop",
+      "group": "development-shop",
+      "rows": [{"account": " Shop ", "cents": 200}, {"account": "shop", "cents": -50}],
+      "expected": [{"account": "shop", "net_cents": 150, "count": 2}]
+    }
+  ],
+  "evaluation": [
+    {
+      "id": "mixed-accounts",
+      "group": "evaluation-mixed",
+      "rows": [
+        {"account": " Cash ", "cents": 250},
+        {"account": "CASH", "cents": -90},
+        {"account": "fees", "cents": -10},
+        {"account": "fees", "cents": -10}
+      ],
+      "expected": [
+        {"account": "cash", "net_cents": 160, "count": 2},
+        {"account": "fees", "net_cents": -20, "count": 2}
+      ]
+    },
+    {
+      "id": "zero-sum",
+      "group": "evaluation-zero",
+      "rows": [
+        {"account": "Reserve", "cents": 40},
+        {"account": "reserve ", "cents": -40},
+        {"account": "EMPTY", "cents": 0}
+      ],
+      "expected": [
+        {"account": "reserve", "net_cents": 0, "count": 2},
+        {"account": "empty", "net_cents": 0, "count": 1}
+      ]
+    },
+    {"id": "empty-input", "group": "evaluation-empty", "rows": [], "expected": []}
+  ]
+}
