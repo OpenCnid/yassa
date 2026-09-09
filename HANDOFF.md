@@ -370,6 +370,11 @@ already differed from the pre-milestone source; their replays record an explicit
 reason. The [follow-up verification](C:/Users/Darian/yassa-runs/general-preparation-20260909-v1/historical-compatibility-followup.json)
 records those checks and the context diagnostic's unchanged seal. No original
 run, score, failed capture or benchmark allocation was replaced.
+The completed [compatibility summary](C:/Users/Darian/yassa-runs/general-preparation-20260909-v1/historical-compatibility-summary.json)
+confirms 250 unchanged score rows across seven historical studies, plus the
+context diagnostic seal. Initial path/interpretation diagnostics and their
+explicit follow-up corrections are retained. PR [#8](https://github.com/OpenCnid/yassa/pull/8)
+is open and unmerged.
 
 Offline reuse implementation: **217 tests passed, 1 skipped** in 353.69 seconds.
 The existing Windows symlink skip remains. The focused reuse/resource/timing

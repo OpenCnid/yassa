@@ -191,6 +191,9 @@ patch whitespace and distribution builds passed; 36 packaged source/runtime file
 matched their source bytes. The initial documentation check resolved 663 links
 without failures. The [local acceptance record](C:/Users/Darian/yassa-runs/general-preparation-20260909-v1/acceptance-final.json)
 links the preserved product review/report, score identity and exact software scope.
+The final [historical compatibility check](C:/Users/Darian/yassa-runs/general-preparation-20260909-v1/historical-compatibility-summary.json)
+retains all 250 score rows across seven studies and the context diagnostic seal;
+original interpretations, including failed audits, remain unchanged.
 
 Integration uses installed Inspect **0.3.263**, checked against its local
 `Task`, `eval`, `GenerateConfig` and model output interfaces and the official
