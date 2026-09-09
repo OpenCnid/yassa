@@ -183,6 +183,21 @@ class Admission(Record):
     consumer_timeout_seconds: Annotated[StrictInt, Field(ge=30, le=300)]
 
 
+class ReuseScenarios(Record):
+    horizons: tuple[Annotated[StrictInt, Field(ge=1)], ...]
+    primary: Annotated[StrictInt, Field(ge=1)]
+
+    @model_validator(mode="after")
+    def distinct(self):
+        if (
+            not self.horizons
+            or len(set(self.horizons)) != len(self.horizons)
+            or self.primary not in self.horizons
+        ):
+            raise ValueError("distinct horizons must include the primary scenario")
+        return self
+
+
 class NativeStudyV2(Record):
     schema_version: Literal[2]
     id: Slug
@@ -200,9 +215,18 @@ class NativeStudyV2(Record):
     admission: Admission
     preparation: FileBinding | None = None
     consumer_baseline: ConsumerBaseline | None = None
+    scheduling: Literal["case-repeat-blocks-v1"] | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
+    resource_scenarios: ReuseScenarios | None = Field(default=None, exclude_if=lambda v: v is None)
 
     @model_validator(mode="after")
     def dimensions(self):
+        if self.scheduling and (
+            self.consumer_baseline is None
+            or self.consumer_baseline.repeats != self.consumer_repeats
+        ):
+            raise ValueError("case/repeat blocks require one baseline per package repeat")
         for values in (self.sources, self.arms, self.conditions):
             if len({item.id for item in values}) != len(values):
                 raise ValueError("duplicate source, arm or condition ID")
@@ -472,4 +496,10 @@ def make_native_plan(
         "denominator": "all planned uses; failed builds zero; infrastructure failures missing",
         "time_scope": "native command deadlines; sandbox setup and export excluded",
     }
+    if study.scheduling:
+        from .native_scheduling import block_schedule
+
+        body["trials"], body["ordering"] = block_schedule(trials, study.schedule_seed)
+        body["planner"] = "native-case-repeat-plan-v1"
+        body["schedule"] = "seeded interleaved builds, then serial case/repeat blocks"
     return {"id": identity(body), **body}

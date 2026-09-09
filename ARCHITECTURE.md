@@ -403,6 +403,66 @@ accepted packages and 60/60 passing consumers, including all 12 baselines. The
 offline general and capture audits passed, and repeat score bytes were identical;
 the original pilot's failed audit is unchanged.
 
+## Proposed package reuse efficiency milestone
+
+**Offline harness implemented, 2026-09-09; future study still proposed.** The
+[proposal](docs/package-reuse-proposal.md) and
+[measurement requirements](SPEC.md#133-proposed-package-reuse-efficiency-follow-up)
+describe a prospective resource comparison after the repeated correctness
+ceiling. The implementation uses the native v2 execution route and unchanged
+`reconciliation-v2` checker. The [implemented guide](docs/package-reuse.md)
+defines the records, CLI, measurement boundaries and limitations. No experimental
+model attempts are authorized or executed by this milestone.
+
+| Boundary | Implemented change | Compatibility and acceptance |
+| --- | --- | --- |
+| `reuse_materials.py` and guided preparation | Separate `reconciliation-reuse-suite-v1` recipe for three development and six held-out inputs, with pinned historical originals, profile/ancestry and selection records | Independent reference/probe agreement, exact semantic and conservative renamed-history screens; existing recipe bytes/behavior unchanged |
+| `native_scheduling.py`, native contracts and guided preparation | Opt-in `case-repeat-blocks-v1`, seeded ordering and frozen ordering/balance metadata | Absent options omitted from legacy identity inputs; old study/plan bytes unchanged; exact allocation, parent associations and baseline independence tested |
+| `native_execution.py` and `native_timing.py` | Lifecycle offsets/durations around public Inspect evaluation, solver and sandbox boundaries, in addition to native command duration | Versioned evidence; unchanged native timeout semantics; controlled-clock tests for success, timeout, setup/capture/evaluation errors and unavailable phases |
+| `native_resources.py` and CLI `native-resources` | Separate versioned interpretation joining frozen plan, raw results/session usage and an existing score interpretation | Every planned root retained; equal case/build weights; baseline zero build cost/null lineage; correctness and missingness qualify crossovers; original interpretations untouched |
+
+For the proposed allocation, all six builds precede consumer execution. Twelve
+case/repeat blocks each contain the six package uses and one baseline, with a
+seeded order that balances arm positions as closely as possible. Freeze actual
+ordering and balance counts. The implementation uses seeded ring rotations with
+greedy squared position-count balancing; it records achieved balance and does not
+claim a global optimum for arbitrary allocations. Trial identities keep their build/case/repeat
+meaning; block metadata must not turn a shared baseline into replicated evidence.
+Failed-build dependency handling can leave unlaunched uses, but cannot remove
+baseline trials or rewrite the frozen schedule. Whole-plan admission remains
+6 x 600 + 84 x 90 = 11,160 native seconds and 90 root attempts.
+
+The resource interpreter first reconciles per-attempt records, then averages
+repeats within case and cases within build. It reports each build and the equal-
+build arm average. Deployment scenarios use one build's cost plus its average
+use cost times the declared horizon; the full cost of all research builds is a
+separate total. A baseline has zero build cost and null build lineage. Missing
+usage is unknown, not zero. Incorrect/missing uses invalidate a qualified
+efficiency crossover for that build while leaving its resources visible.
+Deadline outputs keep both their correctness and native timeout status.
+
+Lifecycle measurement uses controller monotonic clocks around `inspect_ai.eval`,
+solver setup through root preflight, the existing native `sandbox.exec`, and
+capture/acceptance. Evaluation includes framework setup/cleanup and logging;
+it encloses the adapter phases and must not be added to them. Separate framework
+provisioning and cleanup are explicitly unavailable, as are unreached phases.
+No phases are inferred by subtraction and no first-correct-output time is claimed.
+Controlled-clock tests cover success, timeout, setup/capture and evaluation errors. Existing
+native `duration_seconds` remains command start to return/cancellation.
+Official [sandbox](https://inspect.aisi.org.uk/sandboxing.html) and
+[limit](https://inspect.aisi.org.uk/setting-limits.html) documentation was checked
+against the installed version and current adapter during proposal review.
+Inspect model limits do not establish native CLI token/spend enforcement here.
+
+Offline acceptance includes deterministic scheduling/admission tests, meaningful
+resource/failure fixtures, clocked adapter tests, protected-context assertions,
+relocated rescoring and historical seal/score/audit preservation. The complete
+no-live-call test suite and normal lint/format/documentation checks apply to the
+implementation PR. Exact results are recorded in HANDOFF and the external review.
+New live timing evidence remains outstanding until separately
+authorized execution. The current root preflight, root/child postflight and raw
+capture gates stay in force; no stronger per-request attestation is claimed.
+
 ## Component map and API boundaries
 
 The remainder of this component map describes the wider target design. Use the

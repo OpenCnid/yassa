@@ -14,6 +14,7 @@ from .native_contracts import (
     FileMaterials,
     NativeArm,
     NativeStudyV2,
+    ReuseScenarios,
     SourceBinding,
     Text,
     make_native_plan,
@@ -56,6 +57,10 @@ class StudyDraft(Record):
     routes: tuple[Literal["user-supplied", "yassa-prepared"], ...] = ("yassa-prepared",)
     supplied: tuple[SuppliedMaterials, ...] = ()
     features: tuple[str, ...] | None = None
+    material_recipe: Literal["reconciliation-reuse-suite-v1"] | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
+    historical_materials: tuple[FileBinding, ...] = Field(default=(), exclude_if=lambda v: not v)
     seed: StrictInt | None = None
     sources: tuple[SourceBinding, ...] = ()
     arms: tuple[NativeArm, ...] = ()
@@ -65,10 +70,24 @@ class StudyDraft(Record):
     reasoning_effort: Literal["low", "medium", "high", "xhigh"] | None = None
     consumer_repeats: Annotated[StrictInt, Field(ge=1, le=20)] | None = None
     schedule_seed: StrictInt | None = None
+    scheduling: Literal["case-repeat-blocks-v1"] | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
+    resource_scenarios: ReuseScenarios | None = Field(default=None, exclude_if=lambda v: v is None)
     admission: Admission | None = None
 
     @model_validator(mode="after")
     def distinct(self):
+        if self.material_recipe and (
+            self.family != "reconciliation-v2"
+            or self.routes != ("yassa-prepared",)
+            or self.features is not None
+        ):
+            raise ValueError(
+                "reuse recipe requires only prepared reconciliation-v2 and all six cases"
+            )
+        if self.historical_materials and not self.material_recipe:
+            raise ValueError("historical material checks require a versioned recipe")
         if not self.routes or len(set(self.routes)) != len(self.routes):
             raise ValueError("choose distinct preparation routes")
         if len({s.id for s in self.supplied}) != len(self.supplied):
@@ -92,6 +111,11 @@ def readiness(draft: StudyDraft) -> list[dict]:
 
     def need(field, prompt):
         missing.append({"field": field, "prompt": prompt})
+
+    if draft.material_recipe and not draft.historical_materials:
+        need(
+            "historical_materials", "Pin historical material bundles for semantic duplicate checks."
+        )
 
     if not draft.intended_use:
         need("intended_use", "What decision should this result inform, and whose work matters?")
@@ -154,7 +178,11 @@ def readiness(draft: StudyDraft) -> list[dict]:
 
 def _paths(value: dict, base: Path) -> dict:
     """Resolve only newly supplied paths relative to that round's input file."""
-    for key, schema in (("supplied", SuppliedMaterials), ("sources", SourceBinding)):
+    for key, schema in (
+        ("supplied", SuppliedMaterials),
+        ("sources", SourceBinding),
+        ("historical_materials", FileBinding),
+    ):
         if key in value:
             if type(value[key]) is not list:
                 raise ValueError(f"{key} must be an array")
@@ -165,6 +193,9 @@ def _paths(value: dict, base: Path) -> dict:
         path = Path(item["source"]["path"])
         item["source"]["path"] = str(path if path.is_absolute() else base / path)
     for item in value.get("sources", []):
+        path = Path(item["path"])
+        item["path"] = str(path if path.is_absolute() else base / path)
+    for item in value.get("historical_materials", []):
         path = Path(item["path"])
         item["path"] = str(path if path.is_absolute() else base / path)
     return value
@@ -321,6 +352,15 @@ def prepare_draft(input_path: Path, destination: Path, previous: Path | None = N
     materials, validation, conditions, origins = {}, {}, [], []
     # Snapshot supplied originals even while other correctness choices remain unresolved.
     normalized = draft.model_dump(mode="json")
+    historical = []
+    for index, binding in enumerate(draft.historical_materials):
+        original = read_regular(Path(binding.path))
+        if digest(original) != binding.sha256:
+            raise ValueError("historical material hash mismatch")
+        historical.append(FileMaterials.model_validate(parse_json(original)))
+        name = f"history/{number:03d}-historical-{index}.json"
+        files[name] = original
+        normalized["historical_materials"][index]["path"] = name
     for supplied, entry in zip(draft.supplied, normalized["supplied"], strict=True):
         original = read_regular(Path(supplied.source.path))
         if digest(original) != supplied.source.sha256:
@@ -353,7 +393,15 @@ def prepare_draft(input_path: Path, destination: Path, previous: Path | None = N
     study, plan = None, None
     if not missing:
         if "yassa-prepared" in draft.routes:
-            material = generate_suite(task, draft.seed, draft.features or FEATURES[draft.family])
+            if draft.material_recipe:
+                from .reuse_materials import generate_reuse_suite
+
+                material, recipe = generate_reuse_suite(task, draft.seed, historical)
+                files["material-recipe.json"] = canonical(recipe)
+            else:
+                material = generate_suite(
+                    task, draft.seed, draft.features or FEATURES[draft.family]
+                )
             materials["prepared"] = material
             body = canonical(material.model_dump(mode="json"))
             conditions.append(
@@ -384,6 +432,8 @@ def prepare_draft(input_path: Path, destination: Path, previous: Path | None = N
             reasoning_effort=draft.reasoning_effort,
             consumer_repeats=draft.consumer_repeats,
             schedule_seed=draft.schedule_seed,
+            scheduling=draft.scheduling,
+            resource_scenarios=draft.resource_scenarios,
             admission=draft.admission,
         )
         resolve_sources(study, input_path.resolve().parent)
@@ -405,12 +455,20 @@ def prepare_draft(input_path: Path, destination: Path, previous: Path | None = N
             preparer["reconciliation_templates.py"] = read_regular(
                 Path(__file__).parent / "reconciliation_templates.py"
             )
+        if draft.material_recipe:
+            preparer["reuse_materials.py"] = read_regular(
+                Path(__file__).parent / "reuse_materials.py"
+            )
+        if draft.scheduling:
+            preparer["native_scheduling.py"] = read_regular(
+                Path(__file__).parent / "native_scheduling.py"
+            )
         files.update({"preparer/" + name: body for name, body in preparer.items()})
 
         validation = {
             "checker": checker,
             "generator": {
-                "version": template_version(task.checker),
+                "version": draft.material_recipe or template_version(task.checker),
                 "code": {name: digest(body) for name, body in preparer.items()},
             },
             "model": None,
@@ -423,6 +481,8 @@ def prepare_draft(input_path: Path, destination: Path, previous: Path | None = N
             "conditions": {name: verify_checker(task, m) for name, m in materials.items()},
             "plan": plan,
         }
+        if draft.material_recipe:
+            validation["recipe"] = parse_json(files["material-recipe.json"])
     for name, material in materials.items():
         files[f"materials/{name}.json"] = canonical(material.model_dump(mode="json"))
     status = "needs_input" if missing else "ready_for_freeze"

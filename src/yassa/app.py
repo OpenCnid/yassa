@@ -358,6 +358,12 @@ def main() -> int:
     command.add_argument("run_dir", type=Path)
     command.add_argument("--label", required=True)
     command.add_argument("--reason")
+    command = commands.add_parser(
+        "native-resources", help="write a separate offline resource interpretation"
+    )
+    command.add_argument("run_dir", type=Path)
+    command.add_argument("--scores", required=True, help="existing score interpretation label")
+    command.add_argument("--output-dir", required=True, type=Path)
     args = parser.parse_args()
     try:
         if args.command in {"study-draft", "study-revise"}:
@@ -377,6 +383,12 @@ def main() -> int:
                     execute_native_study(root, args.auth_file)
                     if args.command == "native-run"
                     else root / "plan.json"
+                )
+            elif args.command == "native-resources":
+                from .native_resources import write_resource_interpretation
+
+                output = write_resource_interpretation(
+                    args.run_dir.resolve(), args.scores, args.output_dir
                 )
             elif args.command == "native-execute":
                 output = execute_native_study(args.run_dir.resolve(), args.auth_file)

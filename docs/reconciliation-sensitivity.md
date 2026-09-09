@@ -217,3 +217,8 @@ consumers. It does not establish builder equivalence, package benefit, a general
 ranking or a causal preparation-route effect. The resource record and deadline
 outcomes remain useful descriptive evidence. Further study design needs a new
 review; this completed allocation is not authorization to add harder cases.
+
+The subsequent [offline assessment and next proposal](package-reuse-proposal.md)
+reviews this completed evidence and recommends a prospective package-reuse
+efficiency milestone. Its new scope and allocation are proposals; this study's
+original materials, outcomes and authorization remain unchanged.

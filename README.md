@@ -32,6 +32,11 @@ event revisions, voids, exact decimals, per-case policies and interacting cases.
 Its approved 68-attempt run completed with 60/60 consumers passing, including all
 12 baselines: another correctness ceiling. Both offline evidence audits passed,
 and repeat scoring was byte-identical.
+The [next-milestone proposal](docs/package-reuse-proposal.md) assesses the build/use
+resource tradeoff. The [offline reuse milestone](docs/package-reuse.md) now adds
+versioned resource reports, opt-in case/repeat blocks, lifecycle diagnostics and a
+new synthetic recipe. Future study scope and allocation remain proposals;
+no new experimental attempts are authorized.
 
 ## Run the fixture
 
