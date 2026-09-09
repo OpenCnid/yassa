@@ -2,6 +2,15 @@
 
 Status: working draft for discussion, updated 2026-09-09.
 
+**Delivery target, clarified by the user on 2026-09-09: build out the full
+specification. The product is incomplete.** Completed fixture milestones and
+authorized study runs do not reduce that target. Track implementation against
+[the capability coverage map](#151-capability-coverage), and use
+[the development sequence](#152-development-sequence) to choose the next work.
+Accepted directions below remain commitments; labeled proposals and open design
+choices retain those labels until resolved. A bounded implementation is current
+coverage, not a replacement requirement.
+
 This document records the accepted product direction and proposes requirements
 that make it implementable. Sections marked **Accepted direction** reflect the
 conversation. Sections marked **Proposal** remain reviewable design choices.
@@ -637,10 +646,12 @@ the skill's workflow. The execution boundary is described in
 
 **Proposal.** The first working implementation must demonstrate the applicable
 behaviors below with small fixtures before running a substantive comparison.
-The applicable fixture checks are implemented under [tests](tests); see
+Checks for the implemented fixture subset are under [tests](tests); see
 [milestone evidence](docs/milestone-1.md) and [native evidence](docs/native-fixture.md)
-for observed coverage. Additional providers/runtimes, model grading, and
-inferential capabilities remain future acceptance work.
+for observed coverage. This does not mean that every behavior listed below is
+implemented. Additional preparation, providers/runtimes, model grading, recovery,
+and inferential capabilities remain acceptance work. Current gaps and their
+completion criteria are tracked in [section 15.1](#151-capability-coverage).
 
 - Complete study requests proceed without redundant intake; underspecified ones
   receive at most two follow-up questions at a time and can use generated tasks
@@ -821,6 +832,51 @@ audits passed, repeat scoring was byte-identical and the previous evidence was
 reverified unchanged. These results do not establish equivalence or authorize
 outcome-driven extensions.
 
+### 13.3 Package reuse efficiency follow-up
+
+**Implemented and separately executed, 2026-09-09.** The user first authorized
+the bounded offline implementation, then explicitly authorized the exact frozen
+launch review. The [assessment](docs/package-reuse-proposal.md) remains the
+historical proposal; the [implemented guide and results](docs/package-reuse.md)
+record the accepted allocation and observed evidence.
+
+Accepted scope: one Yassa-prepared synthetic brief, three development examples,
+six new held-out cases in three equally weighted profiles, three independent
+builds per common-request/Dovetail arm, and two executions per package/case and
+per baseline/case. The frozen allocation reserved six builds and 84 consumers:
+90 attempts and 11,160 native seconds at 600/90-second deadlines. These are
+study-specific choices, not product defaults. Baselines have null build/parent
+lineage; repeated uses and related cases are not independent builds or briefs.
+Common-request is not an explicitly invoked official-creator comparator.
+
+The intended decision is whether to invest in a broader efficiency comparison.
+The primary contrasts compare each package arm with the no-package control using
+complete-task correctness and per-build native-time curves at H=20; horizons 1,
+5 and 50 are additional scenarios. Builder-to-builder is secondary. Curves
+extrapolate observed per-use time under the budgeted protocol; they are not
+actual executions at every horizon or uncapped completion-time estimates.
+Research expenditure, one build's cost, consumer time, timeouts and recorded
+token usage remain distinct. No dollar-cost, equivalence, non-inferiority or
+general builder-ranking claim follows. Retained scripts and instruction/code
+ablations were not included, so the result does not isolate skill packaging.
+
+Acceptance requirements preserve checker semantics, legitimate alternatives and
+fault probes; record construction/selection provenance and disjoint histories;
+give consumers equal complete facts; enforce the existing context/capture
+boundary; retain every planned denominator; and qualify efficiency claims by
+correctness, missingness and audits. Scheduling, weights and timing scope were
+frozen and tested before launch. Historical artifacts, scores, audits and seals
+remain unchanged. The [technical boundary](ARCHITECTURE.md#package-reuse-efficiency-milestone)
+records implemented behavior and remaining limits.
+
+Observed execution: all six packages were accepted and all 84 consumers passed,
+including 12 baselines, with no missing scores. Five baselines reached their
+deadlines with correct usable outputs. Repeat scores are byte-identical; general,
+capture/context and live timing/order audits passed. Per-build curves, actual
+resources and exact evidence identities are in
+[the recorded results](docs/package-reuse.md#recorded-results). This consumed
+allocation does not authorize further calls or replace the broader study design.
+
 ## 14. Documentation responsibilities
 
 **Accepted direction from the documentation discussion.**
@@ -848,6 +904,92 @@ contexts unless the study explicitly includes it.
 
 ## 15. Next work
 
+The development objective is the complete product described in this spec.
+The sequence below replaces treating another reconciliation study as the default
+next milestone. Existing results remain valid within their recorded scope.
+
+### 15.1 Capability coverage
+
+Status is assessed against the product capability, not a single fixture. A
+**partial** row has working code but still lacks required behavior or integration
+evidence; **missing** means no implemented product route supplies the capability.
+An operator performing a step in a development conversation does not implement
+that step in Yassa. Requirement IDs below are tracking labels for the linked
+sections, not new semantics or a count-based completion percentage.
+
+| ID and capability | Current implementation | Remaining work and completion evidence |
+| --- | --- | --- |
+| Y01 — Adaptive preparation ([section 3](#3-helping-the-user-define-a-study)) | **Partial.** [Guided preparation](src/yassa/guided_preparation.py) accepts structured requests and answer rounds for totals/reconciliation. | A callable preparation workflow develops user-described work beyond those recipes into the same definition as the expert path; sufficient requests proceed, material gaps get focused questions, and assumptions and revisions remain inspectable. The developer must not manually author a replacement study for the demonstration. |
+| Y02 — Tasks, rubrics and materials ([sections 3](#3-helping-the-user-define-a-study), [6](#6-benchmark-templates-and-task-selection)) | **Partial.** [File contracts](src/yassa/native_contracts.py), supplied originals, prepared recipes, references and provenance work for the supported text-file scope. | Reusable rubric and case-preparation operations support the selected wider task contracts, source research/adaptation when needed, legitimate alternatives, verification of references, grouping and held-out splits. Exercise supplied and prepared material beyond a new hardcoded reconciliation recipe; retain source/access and synthetic limitations. |
+| Y03 — Study definitions and comparisons ([sections 4](#4-study-definition), [5](#5-comparisons-and-experimental-conditions), [11](#11-inspect-integration-requirements)) | **Partial.** Simulated direct/builder comparisons; native builder-to-consumer studies with an optional no-package baseline. [Native v2](src/yassa/native_contracts.py) has one native runtime and limited task/checker types. | Generalize the resolved definition and real execution routes for the selected direct and builder study forms, role/model assignments and supported task evidence. Preserve preparation conditions and declared treatment differences; explicitly resolve activation/clarification conditions when selected. Verify compatibility with recorded v1/v2 evidence. |
+| Y04 — Sources and access boundaries ([sections 2](#2-scope-and-commitments), [9](#9-execution-resource-accounting-and-failure-handling), [11](#11-inspect-integration-requirements)) | **Partial.** Pinned external pack bytes, Docker isolation, root preflight and recorded root/child catalog acceptance work on the Codex route. | Resolve required sources/dependencies and enforce declared filesystem, configuration, tool and network boundaries on every supported route. Record each adapter's observed limits; the current child postflight is not per-request interception or upstream attestation. Acceptance includes protected-context checks on added routes. |
+| Y05 — Multiple vendor families ([sections 2](#2-scope-and-commitments), [13](#13-first-dovetail-study-decisions-still-open)) | **Missing beyond the native Codex route.** Simulated providers do not supply cross-vendor study evidence. | Implement and separately verify the additional provider/runtime roles needed for a study program involving different vendors. Record the role and capabilities of each family and host; do not attribute host differences solely to the skill builder. Exact vendor/model selections remain study decisions. |
+| Y06 — Scope, resolution and resource planning ([section 7](#7-experimental-sensitivity-and-selectable-inference-budgets)) | **Partial.** Explicit allocations, admission arithmetic, seeded scheduling and reuse scenarios exist. Broader sensitivity requests stay unresolved. | Implement budget-first, resolution-first and expert planning for selected supported designs, with assumptions and unknowns visible. Preserve independent briefs/builds/tasks/repeats and pairing. Simple descriptive studies must continue without a mandatory power target or pilot. Select and validate methods before claiming sensitivity. |
+| Y07 — Scoring recorded work ([section 8](#8-scoring-recorded-work)) | **Partial.** [Deterministic checkers](src/yassa/native_checkers.py), diagnostics and versioned rescoring support a limited set of contracts. | Add task-appropriate checker/evidence interfaces and a calibrated model-grading route that enforces the different-family rule when grading is selected. Preserve raw judgments, component semantics, missing grades and scorer revisions; validate legitimate alternatives and plausible wrong work. |
+| Y08 — Resource controls and accounting ([section 9](#9-execution-resource-accounting-and-failure-handling)) | **Partial.** Native attempt/deadline admission, duration, available root/child usage and build/use curves are implemented. Hard native token/spend controls and general preparation/grading accounting are absent. | Account for preparation, builds, uses, internal agents and external grading; admit and enforce selected limits at the granularity each adapter actually supports. Verify exhaustion with in-flight work and retain partial evidence. Unsupported hard caps must remain explicit until implemented, not be treated as zero cost or precise enforcement. |
+| Y09 — Cancellation, recovery and retry ([sections 9](#9-execution-resource-accounting-and-failure-handling), [11](#11-inspect-integration-requirements)) | **Missing for native crash recovery/resume.** Interrupted evidence is retained and a started run cannot simply be relaunched. | Reconcile durable attempts and Inspect evidence after interruption; preserve uncertain launches, original failures and linked retries. Exercise cancellation and restart without duplicating completed trials or granting failed answers unrecorded extra chances. No exactly-once provider-execution claim is required. |
+| Y10 — Evidence operations and reporting ([sections 10](#10-evidence-and-reporting), [12](#12-acceptance-evidence-for-an-implementation)) | **Partial, with a substantial implemented core.** [Evidence storage](src/yassa/evidence.py), native logs, score revisions and descriptive reports work. Recent launch coordination, some audits and final assessments used external developer scripts. | Make required preparation-to-report operations callable and reproducible through supported product interfaces. Cover all implemented study roles and artifact types, and identify supported replay and public/redacted derivatives. An end-to-end acceptance example must not depend on an untracked developer-written orchestration script. |
+| Y11 — Analysis and claim scope ([sections 7.4](#74-analysis-and-stopping), [10](#10-evidence-and-reporting)) | **Partial.** Descriptive scores, denominators, per-build curves and paired case times exist; inferential methods are not implemented. | Implement selected fixed-plan methods and compatible planning with declared grouping, weights, uncertainty assumptions and practical thresholds. Validate the dependency structures each method supports. Keep descriptive results available and identify unsupported inference; sequential methods remain a separately justified extension. |
+| Y12 — First substantive Dovetail study ([section 13](#13-first-dovetail-study-decisions-still-open)) | **Partial.** Completed synthetic fixtures validate portions of the machinery and describe those cases. The accepted multi-domain, two-vendor program and verified first-party builder comparison are unfinished. | Resolve representative work, controls/provenance, model roles, input conditions and the intended claim; exercise the resulting supported product path on held-out work. Preserve both supplied and Yassa-prepared conditions. A further saturated reconciliation run does not close this row. |
+
+Completion of a row requires code reachable through a supported interface,
+appropriate behavioral checks and recorded integration evidence for its claimed
+scope. Full-product completion also requires the rows to compose through the
+user's preparation-to-report workflow. Existing unit tests, scorer probes and
+audits support particular implementation claims; their counts are not additional
+experimental observations or proof that task selection is informative.
+
+Outstanding choices include the supported initial non-fixture task contracts,
+rubric/checker extension interfaces, additional model/runtime roles, statistical
+methods and planning defaults, resource enforcement granularity, recovery policy,
+and the substantive study's workload and controls. Resolve engineering choices
+within existing authorization and record them in the owning sections. Material
+product or resource choices that cannot be inferred need focused clarification;
+do not silently mark a missing capability complete or permanently out of scope.
+
+### 15.2 Development sequence
+
+This is an implementation order, not a new experimental allocation. Each step
+must name the coverage IDs it advances and the behavior it leaves incomplete.
+
+1. **General preparation through a runnable study (Y01, Y02, Y03, Y10).** Extend
+   the existing guided/expert contracts so a user-described task outside the
+   totals/reconciliation recipes can become a reviewed task, rubric, cases and
+   frozen study through product code. Preserve originals, proposed assumptions,
+   reference verification and held-out boundaries. Demonstrate supplied and
+   prepared routes reaching recorded scoring/reporting with the current verified
+   execution route. Adding another hand-authored fixture alone does not complete
+   this milestone. This is the next implementation priority.
+2. **Execution and grading across the required roles (Y03, Y04, Y05, Y07).** Add
+   the real comparison forms, adapter capabilities and different-family grading
+   required by the selected wider contracts. Preserve existing execution and
+   evidence boundaries; verify each newly claimed native capability separately.
+3. **Usable resource and recovery controls (Y08, Y09, Y10).** Integrate stage
+   accounting, supported budget enforcement, cancellation and recoverable
+   orchestration. Build these alongside any earlier step that needs them; do not
+   defer necessary cost controls until after an expensive validation run.
+4. **Design assistance and analysis (Y06, Y11).** Implement selected planning and
+   analysis methods together, with compatible grouping and uncertainty checks.
+   Preserve the simple descriptive route and avoid unsupported precision claims.
+5. **Full workflow acceptance and substantive study (Y12 and all dependencies).**
+   Run a requirement-based integration review using the product interfaces,
+   resolve the remaining first-study decisions, and execute its concrete plan
+   under the user's applicable authorization. Treat the study's findings and
+   product completion as separate reported outcomes.
+
+Product development authorization and permission to incur experimental usage
+are distinct. Use existing authorization where it applies; do not repeatedly ask
+the user to approve the overall goal or reversible implementation work. Any live
+validation proposal must identify the requirement it validates, the scope it can
+establish and the concrete resource allocation. Completed run approvals remain
+consumed. A study request does not automatically change the product roadmap.
+
+### 15.3 Completed milestones and historical decisions
+
+The record below preserves development and experiment history. Checked entries
+mean those milestones completed within their stated boundaries; they are not a
+full-spec completion checklist. Remaining work is owned by the coverage map above.
+
 - [x] Research experimental sensitivity, sampling units, and supported claim types.
 - [x] Produce this reviewable specification draft with research links and open choices.
 - [x] Record the sensitivity-control discussion and the user's endorsement in principle.
@@ -868,7 +1010,9 @@ contexts unless the study explicitly includes it.
 - [x] Preserve bounded raw native exports before path validation and collect independent transcripts/logs, retaining failure attribution and immutable evidence; malformed, credential-containing and uncollected content remain explicitly unavailable. See [capture limits](docs/native-context.md#evidence-when-capture-or-acceptance-fails).
 - [x] Prepare more informative synthetic reconciliation work after the pilot ceiling, with a separate checker, validated alternatives/faults, frozen materials and a descriptive 68-attempt budget; see [prepared scope](docs/reconciliation-sensitivity.md).
 - [x] Obtain separate approval and execute the frozen 68-attempt reconciliation allocation: 60/60 consumers passed, including all 12 baselines; both audits and byte-identical repeat scoring passed. See [recorded results](docs/reconciliation-sensitivity.md#recorded-results).
-- [ ] Review the repeated ceiling and recorded resource outcomes before selecting another workload and reviewing a new allocation; no further launch is authorized.
+- [x] Review the repeated ceiling, resources, deadlines and audits; compare bounded follow-ups and produce an offline proposal. See [the assessment](docs/package-reuse-proposal.md); its allocation was only a proposal at that stage.
+- [x] Implement the bounded offline reuse-efficiency milestone in section 13.3, preserving checker semantics and prior evidence; prepare a new external frozen launch review.
+- [x] Obtain separate authorization and execute the exact frozen 90-attempt reuse study; 84/84 consumers passed, repeat scoring and all evidence/timing audits passed. Preserve its completed allocation and historical review.
 - [ ] Implement the remaining resource controls, recovery, additional vendor/runtime support, and selected analysis or model-grading methods as their study scope requires.
 
 Research for this draft used primary statistical publications, framework

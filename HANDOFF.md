@@ -1,6 +1,73 @@
 # Development handoff
 
-Updated 2026-09-09: the user-approved reconciliation sensitivity allocation
+Updated 2026-09-09: **the delivery target is the full specification, and the
+product is incomplete.** The user clarified that their build approvals were for
+that target. The completed fixture milestones and study runs remain useful
+evidence, but do not substitute for the missing product capabilities.
+
+## Current development priority
+
+Build the general preparation-to-study workflow described in
+[SPEC section 15.2](SPEC.md#152-development-sequence), advancing Y01, Y02, Y03 and
+Y10 in the [capability coverage map](SPEC.md#151-capability-coverage). The next
+milestone must let Yassa turn user-described work outside the existing
+totals/reconciliation recipes into a reviewed, executable study. Another fixed
+benchmark or external developer-written study script does not complete it.
+
+Start with the existing guided draft and expert study contracts, then connect
+preparation to the implemented freezing, execution, scoring and reporting path.
+The [architecture priority](ARCHITECTURE.md#current-implementation-priority)
+identifies the code boundaries. Completion evidence must demonstrate:
+
+- A sufficient task request proceeds; material gaps produce focused questions,
+  with assumptions and revisions visible to the user.
+- Both supplied materials and Yassa-prepared materials reach a reviewed task,
+  rubric, verified references and held-out cases beyond the current recipes.
+- Guided and expert routes resolve to the same supported study definition,
+  retaining source provenance and the declared input/access boundaries.
+- A resulting study reaches recorded execution, scoring and reporting through
+  supported product interfaces. The development agent does not manually replace
+  missing preparation or orchestration code for the acceptance demonstration.
+- Behavioral checks cover the newly supported contracts and failure cases;
+  any live validation identifies the specific capability, claimed scope and
+  resource allocation, using the applicable authorization.
+
+The broader sequence adds required execution/vendor/grading roles, complete
+resource and recovery operations, compatible planning and analysis, then full
+workflow acceptance and the substantive first study. These remain commitments
+subject to the proposals and open choices recorded in the spec. Resolve ordinary
+engineering choices within existing authorization; do not ask the user to
+reapprove the overall goal or routine reversible implementation work.
+
+Report each milestone in terms of the behavior users can now exercise, coverage
+IDs advanced and remaining work. Test counts and successful experimental outputs
+are separate evidence; neither is a full-product completion measure. This
+realignment changes documentation and development priority, not runtime behavior.
+
+## Latest completed experiment
+
+The separately authorized [package reuse allocation](docs/package-reuse.md#recorded-results)
+completed all 90 attempts: six accepted packages, 72 package consumers and 12
+no-package baselines. All 84 consumers passed; no scores are missing. Native
+command time was 7,545.795 seconds (125.76 minutes); elapsed launch time
+through original reporting was 165.16 minutes. Five baselines reached their
+90-second deadlines with usable correct outputs. No builds or package consumers
+timed out. No retries, replacement builds or added attempts ran.
+
+Repeat scoring is byte-identical. General evidence, raw-capture/context and live
+schedule/lifecycle audits passed, as did independent resource arithmetic checks.
+The original frozen review, six historical seals and read-only proposal files
+remain unchanged. The [result assessment](C:/Users/Darian/yassa-runs/package-reuse-execution-20260909-v1/results.md) links the complete
+external evidence under `C:/Users/Darian/yassa-runs/package-reuse-execution-20260909-v1`.
+The copied execution preserves the [original review](C:/Users/Darian/yassa-runs/package-reuse-efficiency-20260909-v1/launch-review.md) and its
+unexecuted candidate. Do not relaunch this allocation or merge as a consequence
+of this handoff. Further studies need their own concrete scope and authorization.
+
+The preceding offline implementation began from PR #6 at `7c362caa`, integrated
+the seven proposal documents from the read-only `5040` worktree and made no
+experimental calls. The user then separately authorized this exact frozen run.
+
+Earlier execution status: the user-approved reconciliation sensitivity allocation
 completed all 68 attempts under
 `C:/Users/Darian/yassa-runs/reconciliation-sensitivity-20260909-v1`. All eight
 packages were accepted and all 60 consumers passed, including all 12 no-package
@@ -57,7 +124,9 @@ is not implemented.
 
 Read [AGENTS.md](AGENTS.md) and [README.md](README.md), then:
 
-- [SPEC next work](SPEC.md#15-next-work) for completed and outstanding scope.
+- [SPEC capability coverage](SPEC.md#151-capability-coverage) and
+  [development sequence](SPEC.md#152-development-sequence) for remaining product
+  work; completed milestones are recorded separately in section 15.3.
 - [Architecture: implemented native fixture](ARCHITECTURE.md#implemented-native-codex-fixture)
   and [remaining decisions](ARCHITECTURE.md#open-implementation-decisions).
 - [Native milestone evidence](docs/native-fixture.md) for the actual experiment,
@@ -72,6 +141,8 @@ Read [AGENTS.md](AGENTS.md) and [README.md](README.md), then:
   independent raw capture, authenticated checks and remaining limits.
 - [Reconciliation sensitivity study](docs/reconciliation-sensitivity.md)
   for the frozen materials, checker contract, completed allocation and new ceiling.
+- [Assessment and next proposal](docs/package-reuse-proposal.md) for the reviewed
+  correctness/resource/audit evidence, alternative designs and proposed allocation.
 
 Inspect the current checkout and tools before choosing commands. This is a dated
 handoff, not evidence that a path, installed tool, or account connection is still
@@ -86,6 +157,12 @@ containing this milestone or a later default-branch revision. Inspect
 This preparation began from merged PR #5, `0919307`, in
 `C:/Users/Darian/.codex/worktrees/e3cc/yassa`. New run/preparation outputs are at
 `C:/Users/Darian/yassa-runs/reconciliation-sensitivity-20260909-v1`.
+
+The subsequent proposal review began from a clean detached checkout at merged
+PR #6, `7c362caa3a24c1dbe10c1f8b2a5e459e4b6a793c`, in
+`C:/Users/Darian/.codex/worktrees/5040/yassa`. Its separate offline calculations
+are under `C:/Users/Darian/yassa-runs/reconciliation-next-design-20260909-v1`.
+No completed run or interpretation was rewritten.
 
 The original development workspace was
 `C:/Users/Darian/.codex/worktrees/68a6/yassa`, based on `95666e2`
@@ -160,34 +237,34 @@ Every reference passes an independent oracle, and 476 recorded checker probes
 cover legitimate alternatives, structural errors and eleven faulty solvers.
 Diagnostic components stay in score records; the primary outcome remains binary.
 
-## Next step: review the repeated ceiling
+## Interpretation of completed studies
 
-**The approved allocation and its audit are complete.** Review the results within
-the declared descriptive scope. The added event interactions still
-produced a correctness ceiling, including the no-package baselines. Do not extend
-the cases or reuse the consumed launch authorization.
+These results are historical context for development. The
+[current implementation priority](#current-development-priority) owns the next
+product work.
 
-1. Read the [launch review](C:/Users/Darian/yassa-runs/reconciliation-sensitivity-20260909-v1/launch-review.md)
-   and [frozen plan](C:/Users/Darian/yassa-runs/reconciliation-sensitivity-20260909-v1/run/plan.json).
-   The selected claim is descriptive condition discovery on 12 constructed cases,
-   with two builds per arm/condition and one baseline per case. Keep baseline and
-   independent-build denominators separate; no general ranking or preparation-route
-   causal claim. The observed ceiling gives no correctness separation at this
-   model and deadlines. Review the recorded resource and deadline outcomes. A
-   future comparison needs a separately selected workload and reviewed allocation;
-   greater complexity alone is not evidence that it will discriminate builders.
-2. Retain the current catalog gate and evidence contract. Plugin, remote-plugin
-   and app loading are now explicitly disabled; exact expected catalogs come
-   from pinned built-ins and declared inputs. The authenticated diagnostic and
-   preserved pilot replay passed. If a future study needs prevention before
-   every child request or attestation of all upstream context, implement and
-   validate that stronger boundary before claiming it.
-3. Preserve original pilot and diagnostic evidence, failed audits and correction
-   records. Raw capture now survives portable-path rejection, with independent
-   logs/control surviving output collection failures; malformed, withheld and
-   uncollected content still have explicit limits. General recovery is future
-   work. New subject calls require a separate reviewed allocation and launch
-   authorization; no completed run authorizes further spending.
+**The earlier sensitivity allocation and its assessment are complete.** Its
+60/60 correctness ceiling gives no builder separation or equivalence result.
+Assisted consumers used less native command time, but build costs were not
+recovered at the four/eight uses actually assigned per package. The post hoc
+15-19-use crossover calculation is an extrapolation, not a measured result.
+
+1. [The completed package reuse results](docs/package-reuse.md#recorded-results)
+   and their external evidence record primary H=20 arithmetic contrasts that are
+   conditional on one synthetic brief and case mixture. Package uses are nested
+   in builds; the shared baseline is not independent evidence for each contrast.
+2. The broader multi-domain/official-builder program remains unimplemented.
+   Retained ordinary scripts and instruction-versus-code ablations were outside
+   this study. Further experimental work needs a concrete purpose and allocation;
+   it must not displace unfinished product work by default. This completed run
+   does not authorize outcome-driven extensions.
+3. Lifecycle timing now has live evidence for evaluation, adapter setup, native
+   command and capture/acceptance. Separate provisioning/cleanup and
+   first-correct-output time remain unavailable. See
+   [the technical boundary](ARCHITECTURE.md#package-reuse-efficiency-milestone).
+4. Retain exact root preflight, recorded root/child postflight, raw captures,
+   unsuccessful denominators and immutable history. Child checks remain after
+   execution. Preserve the pilot's failed audits and four missing uses.
 
 The previous small comparison is complete; its case counts and deadlines, and
 the v2 example allocations, are not pilot defaults. Binary inputs, broader
@@ -207,6 +284,7 @@ Some details are proposals, not settled product requirements.
 | Review/material byte pins and portable provenance | [preparation_evidence.py](src/yassa/preparation_evidence.py) |
 | Native version dispatch and legacy fixture | [native.py](src/yassa/native.py) |
 | Native v2 schemas, preparation, allocation | [native_contracts.py](src/yassa/native_contracts.py) |
+| Package reuse resources, scheduling, timing and materials | [native_resources.py](src/yassa/native_resources.py), [native_scheduling.py](src/yassa/native_scheduling.py), [native_timing.py](src/yassa/native_timing.py), [reuse_materials.py](src/yassa/reuse_materials.py) |
 | Native v2 freezing, execution, reporting | [native_runner.py](src/yassa/native_runner.py) |
 | Versioned file-task checkers | [native_checkers.py](src/yassa/native_checkers.py) |
 | Native Inspect execution boundary | [native_execution.py](src/yassa/native_execution.py) |
@@ -280,6 +358,32 @@ is at `C:/Users/Darian/yassa-runs/native-probe-01`. These are distinct runs.
   already verified evidence.
 
 ## Verification and delivery
+
+Offline reuse implementation: **217 tests passed, 1 skipped** in 353.69 seconds.
+The existing Windows symlink skip remains. The focused reuse/resource/timing
+checks passed 21 tests, including failed-build baseline independence and byte-
+identical relocated scores/resource interpretations. `uv sync --locked`, Ruff
+lint/format and whitespace checks passed. No authenticated smoke or model calls
+ran during that implementation stage. The later separately authorized run adds
+the live evidence linked at the top of this handoff.
+
+The separate historical resource replay reconciled 68 roots, 354 native response
+records and 6,198.559 native seconds. The external candidate preparation freezes
+90 roots and 11,160 native seconds with the same checker/runtime and verified
+83-file external pack as sensitivity. See the
+[launch review](C:/Users/Darian/yassa-runs/package-reuse-efficiency-20260909-v1/launch-review.md)
+for exact identities, validation and history preservation at freeze time.
+Separate user authorization subsequently launched its exact copied candidate;
+the completed allocation and new audits are linked at the top of this handoff.
+
+Offline proposal review: resource arithmetic and original/audited score bytes
+agree; six run seals were reverified, and the pilot's failed audits and diagnostic
+check match their historical hashes. All 220 checked local documentation links/
+anchors and `git diff --check` passed. `uv sync --locked` confirmed Inspect
+0.3.263. Repository changes are documentation only; the full pytest/Ruff checks
+were not rerun for this proposal. Review scripts and results are in the separate
+`reconciliation-next-design-20260909-v1` external directory. No experimental
+model calls were made. The results below remain the previous milestone's checks.
 
 Prelaunch preparation verification: **196 tests passed, 1 skipped** in 239.73
 seconds. The existing Windows symlink skip remains. Focused preparation/event

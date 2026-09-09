@@ -6,6 +6,12 @@ implemented slice is identified below; the broader component design and explicit
 proposed paths describe remaining work. Conceptual record
 names are not all public APIs.
 
+The full specification remains the delivery target. The
+[capability coverage map](SPEC.md#151-capability-coverage) records unfinished
+behavior, and the [development sequence](SPEC.md#152-development-sequence)
+sets implementation priority. Completed native studies validate portions of this
+architecture; they do not establish completion of the product workflow.
+
 [SPEC.md](SPEC.md) owns the product requirements and measurement semantics.
 [AGENTS.md](AGENTS.md) is the development entry point. This document explains how
 the system is divided, how information moves, and which invariants each boundary
@@ -14,8 +20,8 @@ must preserve. Its structure follows the user's pinned
 
 ## Bird's-eye view
 
-Yassa turns a user's comparison question into a recorded experiment. Preparation
-accepts supplied materials and may use AI to clarify the task, propose a rubric,
+The target product turns a user's comparison question into a recorded experiment.
+Preparation accepts supplied materials and may use AI to clarify the task, propose a rubric,
 and find or construct cases. A resolved study and sampling plan then specify the
 work to run through Inspect. Execution produces evidence; scoring and analysis
 produce versioned interpretations of it.
@@ -39,8 +45,10 @@ flowchart TD
     S --> A
 ```
 
-The diagram shows information dependencies. It does not require a separate
-process for every box or delay all scoring until every trial has completed.
+The diagram describes the target workflow. General preparation and analysis
+remain partial, as identified in the implemented sections below. It shows
+information dependencies and does not require a separate process for every box
+or delay all scoring until every trial has completed.
 Scoring can happen as soon as the required evidence for an attempt is sealed.
 
 The ground records are the resolved conditions and observed work. Scores,
@@ -54,6 +62,32 @@ silently revise the conditions of a running experiment.
 **Architecture invariant:** a report's numerical claims originate in recorded
 scores and analysis. Report generation does not invent measurements or decide
 which unsuccessful attempts disappear.
+
+## Current implementation priority
+
+The next product milestone advances Y01, Y02, Y03 and Y10 in the
+[coverage map](SPEC.md#151-capability-coverage): general preparation connected to
+a runnable study. Start from `StudyDraft` and `prepare_draft` in
+[guided_preparation.py](src/yassa/guided_preparation.py), the task/material/study
+contracts in [native_contracts.py](src/yassa/native_contracts.py), and the existing
+freeze, execution and reporting path in [native_runner.py](src/yassa/native_runner.py).
+
+The implementation must accept work outside the current recipes, expose material
+questions and proposed assumptions, and produce reviewed task, rubric and case
+records. Guided and expert preparation must resolve to the same executable
+definition. Separate effectful preparation operations, including model calls or
+source access when needed, from contract validation and plan construction.
+Preserve originals, reference verification, provenance and held-out access
+boundaries through both supplied and prepared routes. Add the corresponding
+checker/evidence interfaces as required by the chosen task contract, while
+preserving existing v1/v2 readers and reproducibility.
+
+This is remaining design work, not an implemented general preparation API.
+Developer-authored study files, external launch helpers and manually written
+assessments do not fill these product boundaries. Acceptance must exercise the
+supported preparation-to-report interfaces, with explicit evidence for each
+newly claimed live capability. The proposed expanded layout below is optional
+organization for this work, not a requirement to create every module first.
 
 ## Repository map
 
@@ -402,6 +436,73 @@ preparation, the separately approved 68-attempt allocation completed with eight
 accepted packages and 60/60 passing consumers, including all 12 baselines. The
 offline general and capture audits passed, and repeat score bytes were identical;
 the original pilot's failed audit is unchanged.
+
+## Package reuse efficiency milestone
+
+**Harness implemented and separately executed, 2026-09-09.** The
+[proposal](docs/package-reuse-proposal.md) and
+[measurement requirements](SPEC.md#133-package-reuse-efficiency-follow-up)
+describe a prospective resource comparison after the repeated correctness
+ceiling. The implementation uses the native v2 execution route and unchanged
+`reconciliation-v2` checker. The [implemented guide](docs/package-reuse.md)
+defines the records, CLI, measurement boundaries and limitations. Offline
+implementation made no experimental calls. The user later authorized its frozen
+90-attempt allocation; all 84 consumers passed, repeat scoring was byte-identical,
+and general, capture/context and live timing/order audits passed. The completed
+allocation is consumed; [recorded results](docs/package-reuse.md#recorded-results)
+link the external evidence.
+
+| Boundary | Implemented change | Compatibility and acceptance |
+| --- | --- | --- |
+| `reuse_materials.py` and guided preparation | Separate `reconciliation-reuse-suite-v1` recipe for three development and six held-out inputs, with pinned historical originals, profile/ancestry and selection records | Independent reference/probe agreement, exact semantic and conservative renamed-history screens; existing recipe bytes/behavior unchanged |
+| `native_scheduling.py`, native contracts and guided preparation | Opt-in `case-repeat-blocks-v1`, seeded ordering and frozen ordering/balance metadata | Absent options omitted from legacy identity inputs; old study/plan bytes unchanged; exact allocation, parent associations and baseline independence tested |
+| `native_execution.py` and `native_timing.py` | Lifecycle offsets/durations around public Inspect evaluation, solver and sandbox boundaries, in addition to native command duration | Versioned evidence; unchanged native timeout semantics; controlled-clock tests for success, timeout, setup/capture/evaluation errors and unavailable phases |
+| `native_resources.py` and CLI `native-resources` | Separate versioned interpretation joining frozen plan, raw results/session usage and an existing score interpretation | Every planned root retained; equal case/build weights; baseline zero build cost/null lineage; correctness and missingness qualify crossovers; original interpretations untouched |
+
+For the executed allocation, all six builds preceded consumer execution. Twelve
+case/repeat blocks each contain the six package uses and one baseline, with a
+seeded order that balances arm positions as closely as possible. Freeze actual
+ordering and balance counts. The implementation uses seeded ring rotations with
+greedy squared position-count balancing; it records achieved balance and does not
+claim a global optimum for arbitrary allocations. Trial identities keep their build/case/repeat
+meaning; block metadata must not turn a shared baseline into replicated evidence.
+Failed-build dependency handling can leave unlaunched uses, but cannot remove
+baseline trials or rewrite the frozen schedule. Whole-plan admission remains
+6 x 600 + 84 x 90 = 11,160 native seconds and 90 root attempts.
+
+The resource interpreter first reconciles per-attempt records, then averages
+repeats within case and cases within build. It reports each build and the equal-
+build arm average. Deployment scenarios use one build's cost plus its average
+use cost times the declared horizon; the full cost of all research builds is a
+separate total. A baseline has zero build cost and null build lineage. Missing
+usage is unknown, not zero. Incorrect/missing uses invalidate a qualified
+efficiency crossover for that build while leaving its resources visible.
+Deadline outputs keep both their correctness and native timeout status.
+
+Lifecycle measurement uses controller monotonic clocks around `inspect_ai.eval`,
+solver setup through root preflight, the existing native `sandbox.exec`, and
+capture/acceptance. Evaluation includes framework setup/cleanup and logging;
+it encloses the adapter phases and must not be added to them. Separate framework
+provisioning and cleanup are explicitly unavailable, as are unreached phases.
+No phases are inferred by subtraction and no first-correct-output time is claimed.
+Controlled-clock tests cover success, timeout, setup/capture and evaluation errors. Existing
+native `duration_seconds` remains command start to return/cancellation.
+Official [sandbox](https://inspect.aisi.org.uk/sandboxing.html) and
+[limit](https://inspect.aisi.org.uk/setting-limits.html) documentation was checked
+against the installed version and current adapter during proposal review.
+Inspect model limits do not establish native CLI token/spend enforcement here.
+
+Offline acceptance includes deterministic scheduling/admission tests, meaningful
+resource/failure fixtures, clocked adapter tests, protected-context assertions,
+relocated rescoring and historical seal/score/audit preservation. The complete
+no-live-call test suite and normal lint/format/documentation checks apply to the
+implementation PR. Exact results are recorded in HANDOFF and the external review.
+The separately authorized execution validated the recorded live timing/order
+contract across all 90 roots. Timing phases reconcile across raw results,
+lifecycle files and sealed results, including the five baseline deadlines.
+Separate framework provisioning/cleanup remain unavailable. The current root
+preflight, root/child postflight and raw capture gates stay in force; no stronger
+per-request attestation is claimed.
 
 ## Component map and API boundaries
 
@@ -927,6 +1028,10 @@ integration points below still require verification before use:
   enforcement granularity for every accounted model role and adapter.
 
 ## Open implementation decisions
+
+Use the [capability coverage map](SPEC.md#151-capability-coverage) for the full
+product backlog and completion criteria. The list below summarizes technical
+choices and gaps; it is not a separate delivery scope.
 
 The implemented paths resolve packaging, JSON serialization, local evidence,
 the account-totals checker, a pinned native Codex runtime, Docker isolation, and

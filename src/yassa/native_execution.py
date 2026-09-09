@@ -3,7 +3,6 @@
 import io
 import json
 import tarfile
-import time
 from pathlib import Path
 
 from inspect_ai import Task, eval
@@ -21,6 +20,7 @@ from .native_context import (
     validate_features,
     verify_builtins,
 )
+from .native_timing import Lifecycle
 from .records import canonical, digest, parse_json
 
 RUNTIME = Path(__file__).parent / "_native_runtime"
@@ -98,6 +98,7 @@ def execute_native(
     config: bytes,
     timeout: int,
     executable: tuple[str, ...] = (),
+    clock=None,
 ) -> dict:
     """One fresh sample/container; no automatic inference retries or resumed sessions."""
     for name in files:
@@ -130,10 +131,12 @@ def execute_native(
     }
     write_new(destination / "launch.json", canonical(launch))
     collected = {"native_started": False, "captures": {}}
+    lifecycle = Lifecycle(clock)
 
     @solver
     def native_cli():
-        async def solve(state, generate):
+        async def solve_attempt(state, generate):
+            lifecycle.start("adapter_setup")
             sb = sandbox()
 
             async def capture(label, *, output):
@@ -263,7 +266,8 @@ def execute_native(
             ]
             collected["command"] = command
             collected["native_started"] = True
-            started = time.monotonic()
+            lifecycle.finish("adapter_setup")
+            lifecycle.start("native_command")
             try:
                 result = await sb.exec(
                     [
@@ -282,8 +286,12 @@ def execute_native(
             except TimeoutError:
                 collected["exit_code"] = None
                 collected["status"] = "budget_exhausted"
-            collected["duration_seconds"] = time.monotonic() - started
+            finally:
+                collected["duration_seconds"] = lifecycle.finish(
+                    "native_command", collected.get("status", "failed")
+                )
             collected["native_status"] = collected["status"]
+            lifecycle.start("capture_acceptance")
             # Independent captures survive output-path rejection and collector failure.
             errors, logs = [], {}
             for name in ("events.jsonl", "stderr.txt", "final.txt"):
@@ -340,6 +348,14 @@ def execute_native(
             state.completed = True
             return state
 
+        async def solve(state, generate):
+            try:
+                return await solve_attempt(state, generate)
+            finally:
+                for phase in ("adapter_setup", "capture_acceptance"):
+                    if lifecycle.phases.get(phase, {}).get("status") == "running":
+                        lifecycle.finish(phase, "completed" if state.completed else "failed")
+
         return solve
 
     # Inspect owns lifecycle, isolation and logs; native Codex owns model calls.
@@ -353,31 +369,51 @@ def execute_native(
         model=inert,
         sandbox=SandboxEnvironmentSpec("docker", compose(image)),
     )
-    logs = eval(
-        task,
-        model=inert,
-        log_dir=str(destination / "inspect"),
-        sandbox_prebuilt=True,
-        log_format="eval",
-        display="none",
-        notification=False,
-        ctl_server=False,
-        log_shared=False,
-        log_realtime=False,
-        score=False,
-        epochs=1,
-        retry_on_error=0,
-        fail_on_error=False,
-        max_samples=1,
-        max_tasks=1,
-        time_limit=timeout + 180,
-    )
+    lifecycle.start("evaluation")
+    try:
+        logs = eval(
+            task,
+            model=inert,
+            log_dir=str(destination / "inspect"),
+            sandbox_prebuilt=True,
+            log_format="eval",
+            display="none",
+            notification=False,
+            ctl_server=False,
+            log_shared=False,
+            log_realtime=False,
+            score=False,
+            epochs=1,
+            retry_on_error=0,
+            fail_on_error=False,
+            max_samples=1,
+            max_tasks=1,
+            time_limit=timeout + 180,
+        )
+    except Exception as error:
+        lifecycle.finish_open("failed")
+        record = {
+            **launch,
+            **collected,
+            "status": "harness_failure",
+            "error": str(error),
+            "inspect_status": "unavailable",
+            "inspect_model_calls": 0,
+            "lifecycle": lifecycle.record(),
+        }
+        write_new(destination / "result.json", canonical(record))
+        return record
+    finally:
+        if lifecycle.phases["evaluation"]["status"] == "running":
+            lifecycle.finish("evaluation", "returned")
+        write_new(destination / "lifecycle.json", canonical(lifecycle.record()))
     log = logs[0]
     sample = log.samples[0] if log.samples else None
     error = sample.error if sample and sample.error else log.error
     record = {
         **launch,
         **collected,
+        "lifecycle": lifecycle.record(),
         "status": "harness_failure" if error else collected.get("status", "harness_failure"),
         "error": error.message if error else None,
         "inspect_log": Path(log.location).relative_to(root).as_posix(),
