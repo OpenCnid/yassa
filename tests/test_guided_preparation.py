@@ -115,14 +115,16 @@ def test_complete_request_shared_contracts_checker_evidence_and_determinism(tmp_
     material, provenance, original = prepare_files(study.task, study.conditions[0], root)
     assert provenance["route"] == "yassa-prepared"
     assert original == (root / "materials/prepared.json").read_bytes()
-    assert len(material.development) == 2 and len(material.evaluation) == 6
+    cases = len(FEATURES[family])
+    assert len(material.development) == (3 if family == "reconciliation-v2" else 2)
+    assert len(material.evaluation) == cases
     verification = parse_json((root / "validation.json").read_bytes())
     probes = verification["conditions"]["prepared"]["probes"]
     assert all(p["expected"] == p["observed"] for p in probes)
     assert {p["expected"] for p in probes} == {0, 1}
     plan = make_native_plan(study, {"prepared": material}, "review")
-    assert plan["reserved_attempts"] == 39
-    assert plan["reserved_native_seconds"] == 1260
+    assert plan["reserved_attempts"] == 3 + 6 * cases
+    assert plan["reserved_native_seconds"] == 180 + 180 * cases
     builder = canonical({n: b.decode() for n, b in builder_files(study.task, material).items()})
     assert all(c.id.encode() not in builder for c in material.evaluation)
     assert study.task.requirements in study.task.consumer_prompt

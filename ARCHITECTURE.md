@@ -1,9 +1,9 @@
 # Architecture
 
 Status: simulated fixtures, configurable native Codex file studies, and bounded
-guided preparation implemented, 2026-09-08. The implemented slice is identified
-below; the broader component
-design and explicitly proposed paths describe remaining work. Conceptual record
+guided preparation implemented, including event reconciliation, 2026-09-09. The
+implemented slice is identified below; the broader component design and explicitly
+proposed paths describe remaining work. Conceptual record
 names are not all public APIs.
 
 [SPEC.md](SPEC.md) owns the product requirements and measurement semantics.
@@ -365,6 +365,43 @@ scorer identities remain readable without rewriting their bytes. Future changes
 to a reviewed definition create a new preparation revision; changed checkers
 require renewed review and follow the existing scoring correction policy.
 See [guided preparation](docs/guided-preparation.md) for usage, limits and evidence.
+
+## Implemented event reconciliation preparation
+
+[reconciliation.py](src/yassa/reconciliation.py) implements the separately
+versioned `reconciliation-v2` contract, strict CSV/policy validation, semantic
+input identity, independent reference oracle and output checker. The existing
+checker registry and task schema dispatch to it with three input paths, in
+left/right/policy order. Main scores remain binary; schema, keys, amounts, counts
+and statuses are recorded diagnostic components. The runner's baseline, lineage,
+missingness and independent-build reporting contracts are unchanged.
+
+[reconciliation_templates.py](src/yassa/reconciliation_templates.py) constructs
+three development examples and eight selectable held-out scenarios. Streaming
+integer-string candidates are checked against Decimal/sort/filter references.
+Eleven deliberately faulty solvers probe plausible errors; equivalent outputs
+are retained as such. New verification records preserve exact probe work and
+case/fault detection alongside expected and observed verdicts. These controller
+recipes do not enter subject packages or trial inputs.
+
+Guided drafts accept the new family and its explicit contract hash. Prepared
+materials use the existing `reviewed-files-v1` binding and source pins; no second
+runner or legacy generator mode is added. The checker identity additionally pins
+`reconciliation.py`; the preparation identity pins the new constructor and its
+probes. Legacy semantic behavior remains unchanged. The shared dispatcher source
+identity changes, so offline v2 rescoring requires the existing explicit reason
+and creates a separate interpretation.
+
+The [sensitivity preparation](docs/reconciliation-sensitivity.md) uses the same
+builder-only development rendering, current-case consumer files and optional
+no-package baseline. Tests inspect those assembled inputs and preserve split,
+reference, source, admission and relocation checks. The root preflight and
+root/child postflight catalog gate and independent capture adapter are unchanged.
+Child checks occur after execution, not before every model request. Following
+preparation, the separately approved 68-attempt allocation completed with eight
+accepted packages and 60/60 passing consumers, including all 12 baselines. The
+offline general and capture audits passed, and repeat score bytes were identical;
+the original pilot's failed audit is unchanged.
 
 ## Component map and API boundaries
 
@@ -896,8 +933,9 @@ the account-totals checker, a pinned native Codex runtime, Docker isolation, and
 executable package transfer. These are bounded fixture capabilities; the wider
 product still needs:
 
-1. Preparation beyond the two implemented semantic families, including general
-   task synthesis and dataset research when required by a study.
+1. Preparation beyond the implemented totals and simple/event reconciliation
+   recipes, including general task synthesis and dataset research when required
+   by a study.
 2. Broader task semantics, binary attachments, and validated checker extensions.
 3. Additional vendor runtimes and separately verified adapter capabilities.
 4. Resource admission beyond deadlines, cancellation recovery, and local resume.
@@ -905,8 +943,8 @@ product still needs:
 6. A verified different-family grading route when deterministic checks are insufficient.
 
 The configurable native and bounded preparation milestones share the contracts
-above. Choose a more informative pilot's work, controls, and allocation through
-[SPEC section 13](SPEC.md#13-first-dovetail-study-decisions-still-open).
+above. The completed event-reconciliation allocation and its results are recorded in
+[SPEC section 13.2](SPEC.md#132-synthetic-reconciliation-condition-discovery-after-the-ceiling).
 The synthetic reconciliation pilot completed with both routes and a consumer
 baseline. All 46 recorded consumers passed, including all 10 baselines; one
 build-export failure left four uses missing. The fixed cases reached the score
@@ -914,7 +952,10 @@ ceiling. Its context audit failed on additional runtime plugin skill entries in
 five builder subagent catalogs and one consumer catalog. The subsequent
 [context milestone](docs/native-context.md) implemented preflight/postflight
 catalog control and independent captures, with passing authenticated validation.
-The pilot's original failure remains unchanged. Select work that can measure
-useful differences before another comparison. Per-request context interception
+The pilot's original failure remains unchanged. The separate event-reconciliation
+allocation completed with 60/60 passing consumers, including all 12 baselines:
+another correctness ceiling. Both offline audits and byte-identical repeat scoring
+passed, with 75 recorded root/child sessions and no missing outputs or audit gaps.
+Per-request context interception
 and broader upstream-context attestation remain outside the implemented gate.
 Broader preparation and representative-work studies remain future work.

@@ -48,6 +48,8 @@ def checker_identity(task: TaskContract) -> tuple[dict, dict[str, bytes]]:
         name: procedure[name]
         for name in ("native_checkers.py", "scoring.py", "records.py", "study.py")
     }
+    if task.checker == "reconciliation-v2":
+        files["reconciliation.py"] = procedure["reconciliation.py"]
     return {
         "method": "deterministic",
         "version": task.checker,

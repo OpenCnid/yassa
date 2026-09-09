@@ -2,7 +2,8 @@
 
 `study-draft` and `study-revise` develop a rough request into a reviewable native
 v2 study without subject or preparation model calls. This bounded implementation
-supports account totals and two-file reconciliation. It retains free-text facts
+supports account totals, simple reconciliation and event reconciliation with a
+per-case policy file. It retains free-text facts
 and decisions, asks at most two readiness questions per round, constructs missing
 synthetic examples and cases, and verifies references, checkers, splits, sources,
 and allocation. A complete request produces a study immediately.
@@ -74,7 +75,7 @@ Free-text facts that contradict the contract need resolution by the caller.
 Yassa does not claim to detect semantic contradictions in those statements.
 Choosing synthetic scope also does not silently clear open questions.
 
-Routine initial choices are a descriptive trial, prepared inputs, and all six
+Routine initial choices are a descriptive trial, prepared inputs, and all declared
 features of the selected template. The review identifies them; callers can
 override them. Build counts, deadlines, model and seeds are explicit choices.
 Supplied-only studies need no generation seed. Every arm needs a rationale;
@@ -99,6 +100,14 @@ These are constructed scenarios, not independently sampled briefs, domains, or
 a representative workload. The seed controls generated amounts; feature choices
 control behaviors. All selected cases are retained, with no outcome-based
 selection. The original v1 generators and existing v2 examples are unchanged.
+
+The separate `reconciliation-event-suite-v1` recipe for `reconciliation-v2`
+constructs three development examples and eight selectable scenarios: revision
+order, void/rekey, currency precision, tolerance boundaries, presence/zero, literal
+CSV, combined rules and bulk interactions. See the
+[post-ceiling preparation](reconciliation-sensitivity.md) for its task choices,
+eleven faulty-solver probes and frozen allocation. Verification for this recipe
+also preserves each probe's exact output text and per-case fault detection.
 
 Both routes produce `FileMaterials`. Validation recomputes every reference using
 the independent versioned oracle, checks disjoint IDs/groups and unique semantic

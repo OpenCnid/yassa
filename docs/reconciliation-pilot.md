@@ -18,6 +18,11 @@ about these cases' sensitivity, not evidence of equivalence.
 
 ## Work and comparisons
 
+The subsequent [sensitivity study](reconciliation-sensitivity.md) uses a new
+event-reconciliation contract. Its separately approved run completed with another
+ceiling: 60/60 passing consumers, including all 12 baselines. Both offline audits
+passed. This does not alter the original pilot or its failed audit.
+
 The accepted reconciliation contract sums duplicate IDs separately on each side,
 keeps literal case-sensitive IDs, includes the union with zero balances, and
 computes left minus right using signed integers. CSV quoting, Unicode and embedded

@@ -16,7 +16,7 @@ from .records import canonical, digest, identity, parse_json
 from .study import Condition, Hash, Record, Slug
 
 Text = Annotated[str, Field(min_length=1, max_length=20_000)]
-Checker = Literal["account-totals-v1", "reconciliation-v1", "json-exact-v1"]
+Checker = Literal["account-totals-v1", "reconciliation-v1", "reconciliation-v2", "json-exact-v1"]
 
 
 def paths_valid(names, prefix: str) -> None:
@@ -60,7 +60,12 @@ class TaskContract(Record):
         paths_valid([self.package_path, self.result_path], "output")
         paths_valid([self.brief_path], "input")
         paths_valid(self.checker_inputs, "input")
-        count = {"account-totals-v1": 1, "reconciliation-v1": 2, "json-exact-v1": 0}[self.checker]
+        count = {
+            "account-totals-v1": 1,
+            "reconciliation-v1": 2,
+            "reconciliation-v2": 3,
+            "json-exact-v1": 0,
+        }[self.checker]
         if len(self.checker_inputs) != count:
             raise ValueError(f"{self.checker} needs {count} checker input paths")
         if self.package_name == "boundary":
