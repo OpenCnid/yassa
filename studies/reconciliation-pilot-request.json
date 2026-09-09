@@ -1,0 +1,53 @@
+{
+  "id": "reconciliation-pilot-v1",
+  "request": "On constructed reconciliation cases, how do packages built with the pinned Codex-oriented Dovetail pack compare with packages built from the common request, and do either improve completion over a consumer with complete task facts and no generated package?",
+  "intended_use": "Discover contract-feature failures, score saturation, independent-build variation and observed resource use before deciding whether this task family merits a broader builder comparison.",
+  "family": "reconciliation-v1",
+  "scope": "synthetic-fixture",
+  "accepted_contract_sha256": "95c67a7d4ee314f4fb37fa2084530f5f4be6c71f6815563f3cd0b633a7afe19e",
+  "facts": [
+    "The user selected synthetic reconciliation cases for this implementation milestone.",
+    "This trial measures explicit use of generated skills in the pinned native runtime."
+  ],
+  "assumptions": [
+    "This is condition discovery on one synthetic task contract, with no population or general builder-ranking claim.",
+    "The supplied materials are Yassa-owned synthetic files with declared agent authorship; the route does not establish human authorship.",
+    "Supplied and prepared cases share development examples and the empty evaluation problem; they are related conditions, not independent workload samples.",
+    "Two builds per arm and condition investigate build variation; one use per package and case prioritizes coverage over estimating execution variability.",
+    "The 600-second build deadline gives each treatment more opportunity than the earlier 300-second fixture; no package selection or harness retries are permitted.",
+    "The 60-second consumer deadline bounds each small file task; native command reservations exclude setup/export, and hard token/spend caps are unavailable."
+  ],
+  "unresolved": [
+    "Pin the exact external Dovetail runtime snapshot and bind it to the dovetail arm before exporting a runnable study."
+  ],
+  "evidence": "descriptive",
+  "first_dovetail_study": true,
+  "routes": ["user-supplied", "yassa-prepared"],
+  "supplied": [{
+    "id": "supplied",
+    "source": {"path": "reconciliation-pilot-supplied.json", "sha256": "da08245992ba0b5df4a0d51e6ef46606b8626e54d36212ffad8a7837cdc7b89a"}
+  }],
+  "features": ["duplicates", "identifiers", "one-sided", "cancellation", "empty", "csv-quoting"],
+  "seed": 73027,
+  "sources": [],
+  "arms": [
+    {"id": "common-request", "builds": 2},
+    {"id": "dovetail", "builds": 2, "invocation": "Use $better-skill-creator to create the requested skill."}
+  ],
+  "consumer_baseline": {"id": "no-package", "repeats": 1},
+  "control_rationale": {
+    "common-request": "Contribution of the external builder pack compared with the same build request and pinned built-in skills; this is not an explicitly invoked official-creator comparison.",
+    "dovetail": "Contribution of the exact external Dovetail runtime pack and explicit creator invocation under the common build and use conditions.",
+    "no-package": "Contribution of generated-package assistance during execution when complete task facts, current input files, model and consumer deadline are shared."
+  },
+  "model": "gpt-6-astra",
+  "reasoning_effort": "xhigh",
+  "consumer_repeats": 1,
+  "schedule_seed": 260908,
+  "admission": {
+    "max_attempts": 58,
+    "max_scheduled_seconds": 7800,
+    "build_timeout_seconds": 600,
+    "consumer_timeout_seconds": 60
+  }
+}

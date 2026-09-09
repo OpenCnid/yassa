@@ -4,6 +4,8 @@ The native v2 path accepts task prompts, materials, output locations, checker
 selection, builder arms, pinned source files, independent build counts, and
 consumer repeats from a versioned study. It uses the existing Inspect Docker and
 Codex adapter. Native v1 and simulated v1 readers remain available.
+An optional consumer baseline adds fresh task executions without a generated
+package; see [the reconciliation pilot](reconciliation-pilot.md).
 
 This is a bounded file-processing milestone. A subsequent
 [guided preparation workflow](guided-preparation.md) produces these same contracts
@@ -138,10 +140,45 @@ reserves every planned build/use and its native command deadline. A plan exceedi
 The time reservation excludes sandbox setup/export and is not a total elapsed-time
 or spend cap. There are no harness retries or selection of the best build.
 
+### Consumer baseline
+
+Add `"consumer_baseline": {"id": "no-package", "repeats": 1}` to a native v2
+definition to measure execution without a generated package. The ID must differ
+from builder arm IDs. Repeats are explicit integers from 1 through 20; sources,
+invocations and build counts are forbidden on this control. Guided drafts accept
+the same field and require its ID in `control_rationale`.
+
+The planner adds one execution per condition/case/baseline repeat, independently
+of package builds and `consumer_repeats`. Baseline trials have role `consume`,
+with `parent` and `build` set to null; there is no placeholder build or package.
+They share the seeded consumer phase and consumer deadline, including admission.
+They launch even if builders fail. Their own task failures score zero and
+infrastructure failures remain missing.
+
+In studies with a baseline, all consumers receive the complete `task.requirements`
+and current case files in their common context. Authors must put every task fact
+needed for correctness in that contract or the shared consumer prompt/files.
+Assisted consumers additionally receive and explicitly invoke their exact parent
+package. Bindings retain a common input identity across assisted and baseline
+consumers for the same case. The baseline installs no external/generated skills;
+native built-in skills remain present in every session.
+
+Reports and `analysis.json` retain baseline counts separately from `by_build` in
+`by_baseline`. `by_case` shows coverage and possible score saturation, with raw
+passed/scored/planned/missing counts. Pooling uses within a case does not create
+more independent builds. Old definitions without the baseline retain their
+original prompt, plan, score and preparation-identity semantics.
+
 Failed builds contribute zero to every planned downstream use. CLI/harness
 failures leave downstream scores missing. A usable package produced before a
 builder deadline can proceed, with `budget_exhausted` retained in the native
-attempt record. Rejected export paths fail package acceptance or consumer scoring.
+attempt record. Collector-rejected export paths fail package acceptance or consumer
+scoring. A host artifact-path rejection becomes a harness failure. The
+[pilot incident](reconciliation-pilot.md#recorded-results) lost its entire bundle;
+the current adapter supports interior spaces and independently preserves raw
+exports, transcripts and logs before normalized output acceptance. It also
+rejects unexpected root/child catalogs. See [context control and capture limits](native-context.md)
+for the exact gate and unavailable-evidence cases.
 Reports show passed, scored, planned and missing counts separately for each
 condition, arm and independent build. Repeats never become independent builds.
 

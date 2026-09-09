@@ -7,6 +7,9 @@ default_permissions = "trial"
 
 [features]
 multi_agent = true
+plugins = false
+remote_plugin = false
+apps = false
 
 [permissions.trial]
 extends = ":workspace"

@@ -13,7 +13,15 @@ from inspect_ai.solver import solver
 from inspect_ai.util import ComposeConfig, ComposeService, SandboxEnvironmentSpec, sandbox
 
 from .evidence import EvidenceStore, read_regular, safe_name, write_new
-from .records import canonical, digest
+from .native_capture import archive_files, preserve_export, reject_secrets
+from .native_context import (
+    check_prompt,
+    check_sessions,
+    expected_catalog,
+    validate_features,
+    verify_builtins,
+)
+from .records import canonical, digest, parse_json
 
 RUNTIME = Path(__file__).parent / "_native_runtime"
 if not RUNTIME.is_dir():
@@ -24,10 +32,13 @@ COLLECT = r"""
 import base64, json, os, stat
 from pathlib import Path
 result = {"files": {}, "executable": [], "rejected": []}
+INCLUDE_OUTPUT = True
 total = 0
 for prefix, base in [("output", "/work/output"),
                      ("sessions", "/home/runtime/codex/sessions"),
                      ("builtin-skills", "/home/runtime/codex/skills/.system")]:
+    if prefix == "output" and not INCLUDE_OUTPUT:
+        continue
     if Path(base).is_symlink():
         result["rejected"].append(base)
         continue
@@ -42,9 +53,10 @@ for prefix, base in [("output", "/work/output"),
             if not stat.S_ISREG(info.st_mode) or info.st_size > 10_000_000:
                 result["rejected"].append(str(path))
                 continue
+            if total + info.st_size > 40_000_000:
+                result["rejected"].append(str(path))
+                continue
             total += info.st_size
-            if total > 40_000_000:
-                raise ValueError("export exceeds 40 MB")
             key = prefix + "/" + path.relative_to(base).as_posix()
             result["files"][key] = base64.b64encode(path.read_bytes()).decode()
             if info.st_mode & 0o111:
@@ -88,8 +100,6 @@ def execute_native(
     executable: tuple[str, ...] = (),
 ) -> dict:
     """One fresh sample/container; no automatic inference retries or resumed sessions."""
-    import base64
-
     for name in files:
         safe_name(name)
         if not (name.startswith("input/") or name.startswith(".agents/skills/")):
@@ -99,6 +109,11 @@ def execute_native(
     if auth_info.get("auth_mode") != "chatgpt" or not auth_info.get("tokens"):
         raise ValueError("native fixture requires saved ChatGPT CLI authentication")
     del auth_info
+    secrets = tuple(
+        value.encode()
+        for value in json.loads(auth)["tokens"].values()
+        if isinstance(value, str) and len(value) > 40
+    )
     destination = root / "attempts" / attempt_id
     destination.mkdir(parents=True, exist_ok=False)
     store = EvidenceStore(root)
@@ -114,12 +129,30 @@ def execute_native(
         "retry_of": None,
     }
     write_new(destination / "launch.json", canonical(launch))
-    collected = {}
+    collected = {"native_started": False, "captures": {}}
 
     @solver
     def native_cli():
         async def solve(state, generate):
             sb = sandbox()
+
+            async def capture(label, *, output):
+                script = (
+                    COLLECT
+                    if output
+                    else COLLECT.replace("INCLUDE_OUTPUT = True", "INCLUDE_OUTPUT = False")
+                )
+                result = await sb.exec(["python3", "-c", script], timeout=30, timeout_retry=False)
+                if not result.success:
+                    raise RuntimeError("native evidence collection failed: " + result.stderr)
+                raw = await sb.read_file("/home/runtime/export.json", text=False)
+                artifact, exported, data = preserve_export(store, raw, secrets)
+                collected["captures"][label] = {
+                    "archive_id": artifact,
+                    "rejected_paths": data["rejected"],
+                }
+                return exported, data
+
             version = await sb.exec(["codex", "--version"])
             collected["codex_version"] = version.stdout.strip()
             if version.stdout.strip() != "codex-cli 0.153.4":
@@ -171,6 +204,50 @@ def execute_native(
                 raise RuntimeError("Codex command boundary probe failed; no inference released")
             await sb.exec(["rm", "-rf", "/work/.agents/skills/boundary"])
             await sb.exec(["rm", "/work/input/boundary.txt", "/work/output/probe.txt"])
+            # Render context without inference. Expected entries come from byte-pinned
+            # built-ins and explicit inputs, never from the catalog being checked.
+            collected["failure_stage"] = "catalog_preflight"
+            features = await sb.exec(["codex", "features", "list"], timeout=30, timeout_retry=False)
+            rendered = await sb.exec(
+                ["sh", "-c", "codex debug prompt-input > /home/runtime/prompt-input.json"],
+                timeout=30,
+                timeout_retry=False,
+            )
+            prompt_input = await sb.read_file("/home/runtime/prompt-input.json", text=False)
+            preflight_files = {
+                "features.txt": features.stdout.encode(),
+                "features-stderr.txt": features.stderr.encode(),
+                "prompt-input.json": prompt_input,
+                "prompt-stderr.txt": rendered.stderr.encode(),
+            }
+            reject_secrets(preflight_files, secrets)
+            collected["preflight_id"] = archive_files(store, preflight_files)
+            builtins, preflight_data = await capture("preflight", output=False)
+            preflight = {"passed": False}
+            try:
+                if not features.success or not rendered.success or preflight_data["rejected"]:
+                    raise ValueError("native context preflight command or collection failed")
+                validate_features(config, features.stdout)
+                pins = parse_json(read_regular(RUNTIME / "builtin-skills.json"))
+                verify_builtins(builtins, pins)
+                expected = expected_catalog(builtins, files)
+                collected["expected_catalog_id"] = store.put_json(
+                    {
+                        "schema_version": 1,
+                        "entries": expected,
+                        "builtin_profile_sha256": digest(
+                            read_regular(RUNTIME / "builtin-skills.json")
+                        ),
+                    },
+                    "catalog.json",
+                )
+                preflight = check_prompt(prompt_input, expected)
+            except (ValueError, KeyError, TypeError, UnicodeError) as error:
+                preflight["error"] = str(error)
+            collected["preflight_check_id"] = store.put_json(preflight, "check.json")
+            if not preflight["passed"]:
+                raise RuntimeError("native catalog preflight failed; no inference released")
+            collected.pop("failure_stage")
             command = [
                 "codex",
                 "exec",
@@ -185,6 +262,7 @@ def execute_native(
                 "-",
             ]
             collected["command"] = command
+            collected["native_started"] = True
             started = time.monotonic()
             try:
                 result = await sb.exec(
@@ -205,28 +283,58 @@ def execute_native(
                 collected["exit_code"] = None
                 collected["status"] = "budget_exhausted"
             collected["duration_seconds"] = time.monotonic() - started
-            export = await sb.exec(["python3", "-c", COLLECT], timeout=30, timeout_retry=False)
-            if not export.success:
-                raise RuntimeError("native evidence export failed: " + export.stderr)
-            data = json.loads(await sb.read_file("/home/runtime/export.json"))
-            exported = {name: base64.b64decode(value) for name, value in data["files"].items()}
+            collected["native_status"] = collected["status"]
+            # Independent captures survive output-path rejection and collector failure.
+            errors, logs = [], {}
             for name in ("events.jsonl", "stderr.txt", "final.txt"):
                 try:
-                    exported[name] = await sb.read_file("/home/runtime/" + name, text=False)
+                    logs[name] = await sb.read_file("/home/runtime/" + name, text=False)
                 except FileNotFoundError:
-                    exported[name] = b""
-            # Defense against accidental credential disclosure in recorded logs.
-            secrets = [
-                v.encode()
-                for v in json.loads(auth)["tokens"].values()
-                if isinstance(v, str) and len(v) > 40
-            ]
-            if any(secret in body for secret in secrets for body in exported.values()):
-                raise RuntimeError("credential appeared in export; export withheld")
-            collected["output_id"] = store.put(exported, executable=data["executable"])
-            collected["rejected_paths"] = data["rejected"]
+                    logs[name] = b""
+                except Exception as error:
+                    errors.append(
+                        {"stage": "native_logs_capture", "file": name, "error": str(error)}
+                    )
+            try:
+                reject_secrets(logs, secrets)
+                collected["native_logs_id"] = archive_files(store, logs)
+            except ValueError as error:
+                errors.append({"stage": "native_logs_capture", "error": str(error)})
+                logs = {}
+            control = {}
+            try:
+                control, data = await capture("transcripts", output=False)
+                if data["rejected"]:
+                    raise ValueError("native transcript collection rejected paths")
+                collected["transcript_id"] = store.put(control)
+            except Exception as error:
+                errors.append({"stage": "transcript_capture", "error": str(error)})
+            try:
+                exported, data = await capture("output", output=True)
+                exported.update(logs)
+                collected["output_id"] = store.put(exported, executable=data["executable"])
+                collected["rejected_paths"] = data["rejected"]
+            except Exception as error:
+                errors.append({"stage": "output_capture", "error": str(error)})
+            postflight = {"passed": False}
+            try:
+                verify_builtins(control, pins)
+                postflight = check_sessions(control, expected)
+            except (ValueError, KeyError, TypeError, UnicodeError) as error:
+                postflight["error"] = str(error)
+            collected["catalog_check_id"] = store.put_json(postflight, "check.json")
+            if not postflight["passed"]:
+                errors.append(
+                    {"stage": "catalog_postflight", "error": "native session catalog mismatch"}
+                )
+            if errors:
+                collected["failures"] = errors
+                collected["failure_stage"] = errors[0]["stage"]
+                raise RuntimeError(
+                    "native acceptance failed; preserved captures and checks describe failures"
+                )
             state.output = ModelOutput.from_content(
-                "native-codex-cli", exported["final.txt"].decode("utf-8", errors="replace")
+                "native-codex-cli", logs["final.txt"].decode("utf-8", errors="replace")
             )
             state.metadata["native_attempt"] = collected.copy()
             state.completed = True

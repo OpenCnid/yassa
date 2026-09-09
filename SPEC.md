@@ -243,6 +243,15 @@ Controls are selected to answer the study's question:
 | Matched neutral instruction pack | Contribution beyond the specified additional-text control |
 | Component ablation | Effect of removing the named component under the remaining workflow |
 
+**Implemented bounded control, 2026-09-08.** Native v2 and guided preparation
+accept an optional consumer baseline without a generated package. All consumers
+in that study receive the same complete task facts and current input files;
+assisted consumers additionally receive and invoke the assigned frozen package.
+Baseline executions have their own repeat count, no build parent, and separate
+reported denominators. Existing definitions retain their original contexts.
+This measures package assistance under the declared native built-ins, not a
+skill-free runtime. See [baseline semantics](docs/configurable-native.md#consumer-baseline).
+
 Neutral controls record length, tokenizer, register, loading position, and
 construction rules. Their text must not introduce the method under investigation.
 Multiple neutral variants can test sensitivity to a particular wording choice.
@@ -801,7 +810,11 @@ contexts unless the study explicitly includes it.
 - [x] Generalize the native study definition beyond the fixed account-totals contract, two builder arms, and one build per arm/condition; see [the bounded v2 contracts](docs/configurable-native.md).
 - [x] Implement bounded preparation from a rough request into a validated, reviewable native study, with explicit decisions and extended deterministic feature suites; see [guided preparation](docs/guided-preparation.md).
 - [ ] Extend preparation beyond the two fixed semantic families, including general task synthesis or research where required by the selected study.
-- [ ] Run a more informative pilot on varied work and independent builds, with controls and budgets chosen for its question.
+- [x] Implement the no-package consumer control and prepare a synthetic reconciliation pilot with both input routes, distinct feature coverage, two builds per arm/condition and a concrete budget; see [pilot design](docs/reconciliation-pilot.md).
+- [x] Execute the selected synthetic reconciliation pilot with two builds per arm/condition and a no-package baseline: 46/46 recorded consumers passed; one harness export failure left four uses missing. The context audit failed on extra runtime plugin skill entries, and the cases reached the score ceiling; see [measured scope](docs/reconciliation-pilot.md#recorded-results).
+- [x] Enforce the declared native skill catalog through root preflight and acceptance checks on every recorded root/subagent catalog, with runtime plugins disabled; authenticated validation passed. This does not intercept every model request or attest all upstream context; see [implemented scope](docs/native-context.md#enforced-boundary).
+- [x] Preserve bounded raw native exports before path validation and collect independent transcripts/logs, retaining failure attribution and immutable evidence; malformed, credential-containing and uncollected content remain explicitly unavailable. See [capture limits](docs/native-context.md#evidence-when-capture-or-acceptance-fails).
+- [ ] Select more informative work after the pilot's score ceiling, with controls and budgets tied to the intended claim.
 - [ ] Implement the remaining resource controls, recovery, additional vendor/runtime support, and selected analysis or model-grading methods as their study scope requires.
 
 Research for this draft used primary statistical publications, framework

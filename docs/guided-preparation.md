@@ -63,6 +63,7 @@ The [StudyDraft schema](../src/yassa/guided_preparation.py) defines the fields:
 | `routes`, `supplied`, `first_dovetail_study` | Selected preparation conditions, original file pins, and the first-study requirement for both routes |
 | `features`, `seed` | Synthetic scenario selection and reproducible generation |
 | `sources`, `arms`, `control_rationale` | Existing pinned source/arm contracts plus the interpretation of each arm |
+| `consumer_baseline` | Optional distinct control ID and fresh repeats per case without a generated package; its rationale is required |
 | `model`, `reasoning_effort` | Explicit subject configuration; no model is silently selected |
 | `consumer_repeats`, `schedule_seed`, `admission` | Explicit execution allocation, ordering and limits |
 
@@ -78,8 +79,11 @@ features of the selected template. The review identifies them; callers can
 override them. Build counts, deadlines, model and seeds are explicit choices.
 Supplied-only studies need no generation seed. Every arm needs a rationale;
 one arm can describe its own outcome without establishing a comparative effect.
-The current runner measures builder treatments and generated-package use. It
-does not implement a consumer baseline without a package or automatic activation.
+The runner measures builder treatments and generated-package use, with an
+optional [consumer baseline](configurable-native.md#consumer-baseline) given the
+complete task facts. Automatic activation remains unimplemented.
+The [reconciliation pilot](reconciliation-pilot.md) exercises this preparation
+path with both routes and explicitly selected controls and resources.
 
 ## Case construction and checking
 
