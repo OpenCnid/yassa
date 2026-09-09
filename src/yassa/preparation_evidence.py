@@ -23,7 +23,11 @@ class PreparationManifest(Record):
 
 
 def study_identity(study: NativeStudyV2) -> str:
-    return identity(study.model_dump(mode="json", exclude={"preparation"}))
+    excluded = {"preparation"}
+    # Preserve identities of reviews made before the optional baseline existed.
+    if study.consumer_baseline is None:
+        excluded.add("consumer_baseline")
+    return identity(study.model_dump(mode="json", exclude=excluded))
 
 
 def load_preparation(study: NativeStudyV2, base: Path) -> dict[str, bytes] | None:

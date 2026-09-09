@@ -22,9 +22,10 @@ def safe_name(name: str) -> str:
     }
     if PurePosixPath(name).is_absolute() or any(
         part in {"", ".", ".."}
+        or part.startswith(" ")
         or part.endswith((".", " "))
-        or not re.fullmatch(r"[A-Za-z0-9_.-]+", part)
-        or part.split(".")[0].upper() in reserved
+        or not re.fullmatch(r"[A-Za-z0-9_. -]+", part)
+        or part.split(".")[0].rstrip(" ").upper() in reserved
         for part in parts
     ):
         raise ValueError(f"unsafe artifact path: {name!r}")

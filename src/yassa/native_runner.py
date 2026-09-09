@@ -16,6 +16,7 @@ from .evidence import (
     write_new,
 )
 from .native import native_package, native_usage
+from .native_capture import recorded_native_files
 from .native_checkers import check
 from .native_contracts import (
     FileMaterials,
@@ -54,7 +55,7 @@ def checker_identity(task: TaskContract) -> tuple[dict, dict[str, bytes]]:
     }, files
 
 
-def common_prompt(task: TaskContract, role: str) -> str:
+def common_prompt(task: TaskContract, role: str, *, complete_facts: bool = False) -> str:
     if role == "build":
         return (
             task.build_prompt + "\n\n"
@@ -67,6 +68,17 @@ def common_prompt(task: TaskContract, role: str) -> str:
             "Complete one package without asking questions. Native subagents share this trial's "
             "filesystem and deadline. Python 3, PyYAML and Node are installed; "
             "shell network is disabled."
+        )
+    if complete_facts:
+        facts = (
+            ""
+            if task.requirements in task.consumer_prompt
+            else "\n\nTask requirements:\n" + task.requirements
+        )
+        return (
+            task.consumer_prompt + facts + "\n\n"
+            f"Write the required JSON to /work/{task.result_path}. "
+            "Complete the work without asking questions. Python 3 and Node are available."
         )
     return (
         task.consumer_prompt + "\n\n"
@@ -145,7 +157,12 @@ def prepare_native_v2(study_path: Path, root: Path, image: str) -> Path:
         "design": {
             "retries": 0,
             "analysis": "descriptive; conditions and independent builds remain separate",
-            "consumer_context": "current case files and the exact parent package only",
+            "consumer_context": (
+                "complete task requirements and current case files for every consumer; "
+                "package consumers additionally receive and explicitly invoke their parent package"
+                if study.consumer_baseline
+                else "current case files and the exact parent package only"
+            ),
             "limitations": [
                 "Prepared cases are deterministic synthetic fixtures; "
                 "task coverage is declared, not inferred.",
@@ -237,7 +254,9 @@ def execute_native_v2(root: Path, auth_path: Path) -> Path:
             else:
                 case = next(c for c in material.evaluation if c.id == trial["case"])
                 inputs = {n: text.encode("utf-8") for n, text in case.files.items()}
-            prompt = common_prompt(study.task, trial["role"])
+            prompt = common_prompt(
+                study.task, trial["role"], complete_facts=study.consumer_baseline is not None
+            )
             common[key] = (inputs, prompt, store.put({"prompt.txt": prompt.encode(), **inputs}))
         inputs, prompt, common_id = common[key]
         files = dict(inputs)
@@ -256,11 +275,14 @@ def execute_native_v2(root: Path, auth_path: Path) -> Path:
                 modes.extend(".agents/skills/" + n for n in executable_paths(store, artifact))
             timeout = study.admission.build_timeout_seconds
         else:
-            artifact = parent["package_id"]
-            treatment.append(artifact)
-            prefix = f".agents/skills/{study.task.package_name}/"
-            files.update({prefix + n: data for n, data in store.get(artifact).items()})
-            modes.extend(prefix + n for n in executable_paths(store, artifact))
+            if parent:
+                artifact = parent["package_id"]
+                treatment.append(artifact)
+                prefix = f".agents/skills/{study.task.package_name}/"
+                files.update({prefix + n: data for n, data in store.get(artifact).items()})
+                modes.extend(prefix + n for n in executable_paths(store, artifact))
+                if study.consumer_baseline:
+                    prompt = f"Use ${study.task.package_name}.\n\n" + prompt
             timeout = study.admission.consumer_timeout_seconds
         binding = {
             "schema_version": 2,
@@ -349,7 +371,7 @@ def rescore_native_v2(root: Path, label: str, reason: str | None = None) -> Path
         result = results[trial["id"]]
         if result["status"] not in STATUSES:
             raise ValueError("unknown native result status")
-        files = store.get(result["output_id"]) if result.get("output_id") else {}
+        files = recorded_native_files(store, result)
         if files:
             try:
                 usage[trial["id"]] = native_usage(files)
@@ -384,7 +406,7 @@ def rescore_native_v2(root: Path, label: str, reason: str | None = None) -> Path
                 **verdict,
                 "status": result["status"],
                 "output_id": result.get("output_id"),
-                "package_id": results[trial["parent"]].get("package_id"),
+                "package_id": results.get(trial["parent"], {}).get("package_id"),
             }
         )
     score_record = {
@@ -417,12 +439,58 @@ def rescore_native_v2(root: Path, label: str, reason: str | None = None) -> Path
                         "missing": len(selected) - len(values),
                     }
                 )
+    baseline_summary = []
+    if study.consumer_baseline:
+        for condition in study.conditions:
+            selected = [
+                s
+                for s in scores
+                if s["condition"] == condition.id and s["arm"] == study.consumer_baseline.id
+            ]
+            values = [s["value"] for s in selected if s["value"] is not None]
+            baseline_summary.append(
+                {
+                    "condition": condition.id,
+                    "arm": study.consumer_baseline.id,
+                    "passed": sum(values),
+                    "scored": len(values),
+                    "planned": len(selected),
+                    "missing": len(selected) - len(values),
+                }
+            )
+    by_case = []
+    for condition in study.conditions:
+        for case in materials[condition.id].evaluation:
+            for arm in [a.id for a in study.arms] + (
+                [study.consumer_baseline.id] if study.consumer_baseline else []
+            ):
+                selected = [
+                    s
+                    for s in scores
+                    if s["condition"] == condition.id and s["case"] == case.id and s["arm"] == arm
+                ]
+                values = [s["value"] for s in selected if s["value"] is not None]
+                by_case.append(
+                    {
+                        "condition": condition.id,
+                        "case": case.id,
+                        "group": case.group,
+                        "arm": arm,
+                        "passed": sum(values),
+                        "scored": len(values),
+                        "planned": len(selected),
+                        "missing": len(selected) - len(values),
+                    }
+                )
     destination = root / "interpretations" / label
     reject_links(destination)
     destination.mkdir(parents=True, exist_ok=False)
     write_new(destination / "scores.json", canonical(score_record))
     write_new(destination / "usage.json", canonical(usage))
-    write_new(destination / "analysis.json", canonical({"schema_version": 2, "by_build": summary}))
+    analysis = {"schema_version": 2, "by_build": summary, "by_case": by_case}
+    if study.consumer_baseline:
+        analysis["by_baseline"] = baseline_summary
+    write_new(destination / "analysis.json", canonical(analysis))
     for name, data in scorer_files.items():
         write_new(destination / "scorer" / name, data)
     lines = [
@@ -441,8 +509,8 @@ def rescore_native_v2(root: Path, label: str, reason: str | None = None) -> Path
         "",
         "Each build below is an independent attempt; "
         "identical package bytes may share an artifact ID. "
-        "Consumers receive current case files and their parent package. "
-        "Built-in skills remain present.",
+        + frozen["design"]["consumer_context"]
+        + ". Built-in skills remain present.",
         "",
         "| Condition | Arm | Build | Passed | Scored | Planned | Missing |",
         "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
@@ -451,6 +519,41 @@ def rescore_native_v2(root: Path, label: str, reason: str | None = None) -> Path
         f"| {s['condition']} | {s['arm']} | {s['build']} | {s['passed']} | "
         f"{s['scored']} | {s['planned']} | {s['missing']} |"
         for s in summary
+    ]
+    if study.consumer_baseline:
+        lines += [
+            "",
+            "## Consumer baseline",
+            "",
+            f"`{study.consumer_baseline.id}` receives no generated package and has no build "
+            f"parent. It has {study.consumer_baseline.repeats} fresh repeat(s) per case, "
+            "independent of builder allocation. All consumers receive the same task "
+            "requirements and case files; package invocation is an explicit treatment difference.",
+            "",
+            "| Condition | Arm | Passed | Scored | Planned | Missing |",
+            "| --- | --- | ---: | ---: | ---: | ---: |",
+        ]
+        lines += [
+            f"| {s['condition']} | {s['arm']} | {s['passed']} | {s['scored']} | "
+            f"{s['planned']} | {s['missing']} |"
+            for s in baseline_summary
+        ]
+    lines += [
+        "",
+        "## Case coverage",
+        "",
+        "Counts below describe the fixed cases, pooling package uses within each builder "
+        "arm. They are not additional independent builds. Full success or failure across "
+        "these cases can reveal score saturation; it does not establish equivalence or "
+        "performance on a broader workload.",
+        "",
+        "| Condition | Case | Arm | Passed | Scored | Planned | Missing |",
+        "| --- | --- | --- | ---: | ---: | ---: | ---: |",
+    ]
+    lines += [
+        f"| {s['condition']} | {s['case']} | {s['arm']} | {s['passed']} | {s['scored']} | "
+        f"{s['planned']} | {s['missing']} |"
+        for s in by_case
     ]
     lines += [
         "",
@@ -462,9 +565,8 @@ def rescore_native_v2(root: Path, label: str, reason: str | None = None) -> Path
     for trial in plan["trials"]:
         result = results[trial["id"]]
         attempt = root / "attempts" / trial["id"] / "result.json"
-        native_status = (
-            parse_json(read_regular(attempt))["status"] if attempt.is_file() else "not launched"
-        )
+        native = parse_json(read_regular(attempt)) if attempt.is_file() else {}
+        native_status = native.get("native_status", native.get("status", "not launched"))
         totals = usage.get(trial["id"], {}).get("totals", {})
         lines.append(
             f"| {trial['id']} | {result['status']} | {native_status} | "
@@ -518,6 +620,19 @@ def rescore_native_v2(root: Path, label: str, reason: str | None = None) -> Path
         if result.get("package_id"):
             lines.append(
                 f"- [{trial['id']} package](../../artifacts/{result['package_id']}/files/SKILL.md)"
+            )
+        for key, file in (
+            ("preflight_check_id", "check.json"),
+            ("expected_catalog_id", "catalog.json"),
+            ("catalog_check_id", "check.json"),
+            ("native_logs_id", "archive.json"),
+        ):
+            if result.get(key):
+                lines.append(f"- [{trial['id']} {key}](../../artifacts/{result[key]}/files/{file})")
+        for phase, capture in result.get("captures", {}).items():
+            lines.append(
+                f"- [{trial['id']} {phase} capture]"
+                f"(../../artifacts/{capture['archive_id']}/files/archive.json)"
             )
     report = destination / "report.md"
     write_new(report, ("\n".join(lines) + "\n").encode("utf-8"))

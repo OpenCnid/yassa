@@ -22,6 +22,10 @@ from yassa.records import canonical
         "folder//alias.txt",
         "trailing.",
         "trailing ",
+        "refs/CON .txt",
+        "refs/LPT1 .log",
+        "refs/ leading.txt",
+        "refs/tab\tname.txt",
     ],
 )
 def test_package_path_escape_rejected(tmp_path, name):
@@ -54,6 +58,23 @@ def test_bundle_identity_survives_relocation_and_detects_tampering(tmp_path):
     (relocated / "artifacts" / artifact / "files/SKILL.md").write_bytes(b"modified")
     with pytest.raises(ValueError, match="content mismatch"):
         EvidenceStore(relocated).get(artifact)
+
+
+def test_native_check_files_with_internal_spaces_survive_export_and_relocation(tmp_path):
+    files = {
+        "output/package/SKILL.md": b"---\nname: sample\ndescription: Example.\n---\n",
+        "output/check-evidence/generated-24/left ledger.csv": b"id,cents\nleft,17\n",
+        "output/check-evidence/generated-24/right ledger.csv": b"id,cents\nright,9\n",
+        "output/check evidence/run checks.py": b"print('fixture')\n",
+        "sessions/session.jsonl": b"{}\n",
+    }
+    executable = ["output/check evidence/run checks.py"]
+    store = EvidenceStore(tmp_path / "original")
+    artifact = store.put(files, executable=executable)
+    relocated = tmp_path / "relocated"
+    shutil.copytree(store.root, relocated)
+    assert EvidenceStore(relocated).get(artifact) == files
+    assert EvidenceStore(relocated).put(files, executable=executable) == artifact
 
 
 def test_never_overwrites_evidence(tmp_path):

@@ -1,10 +1,34 @@
 # Development handoff
 
-Updated 2026-09-08 after the bounded guided preparation implementation.
-The full spec is not implemented. The next recommended milestone is to develop
-an informative pilot's work, controls and budget for its question, extending
-preparation/checker semantics where that work needs it. Follow the current user's
-request if it changes that direction.
+Updated 2026-09-08 (2026-09-09 UTC) after implementing native catalog control and
+independent failure captures. The user-approved authenticated diagnostic passed:
+two fresh roots and one child had exactly the expected catalogs, with no extra
+plugins, and produced correct outputs. Native commands used 66.938 seconds of a
+separately frozen 240-second reservation. No attempt was retried. See the
+[context milestone](docs/native-context.md) and
+[verified diagnostic report](C:/Users/Darian/yassa-runs/native-context-20260909-v1/interpretations/verified/report.md).
+
+The earlier user-approved synthetic reconciliation pilot remains unchanged.
+All 46 recorded consumers passed,
+including all 10 no-package baselines. One build-export failure left four planned
+uses missing. Native commands used 4,256.216 seconds (70.94 minutes) of the approved
+7,800-second reservation. The run is sealed; no attempts were retried.
+
+The declared-context audit failed: two unpinned plugin skill entries appeared in
+five Dovetail builder subagent catalogs and one Dovetail consumer catalog. Preserve
+the failed audit and the fuller follow-up findings. These observations prevent a
+clean controlled comparison. The score ceiling still describes the recorded
+outputs, without establishing equivalence or a builder ranking.
+The [pilot assessment](C:/Users/Darian/yassa-runs/reconciliation-pilot-20260908-v1/pilot-analysis.md)
+links to the original evidence, failed audit and correction checks.
+
+After execution, host storage was corrected to accept interior-space filenames
+such as `left ledger.csv`. Original output/transcript loss and the four missing
+uses remain unchanged. The current adapter now archives raw exports before path
+materialization, captures transcripts independently, and rejects unexpected
+catalogs. Its root preflight precedes inference; the child gate checks recorded
+context after execution and does not intercept each model request. The full spec
+is not implemented.
 
 ## Begin here
 
@@ -19,6 +43,10 @@ Read [AGENTS.md](AGENTS.md) and [README.md](README.md), then:
   examples, admission, compatibility, and integration evidence.
 - [Guided preparation](docs/guided-preparation.md) for draft/revision commands,
   explicit correctness choices, constructed feature suites and preparation evidence.
+- [Reconciliation pilot](docs/reconciliation-pilot.md) for the selected work,
+  controls, source profile, exact allocation, observed scores and audit failures.
+- [Native context control](docs/native-context.md) for catalog enforcement,
+  independent raw capture, authenticated checks and remaining limits.
 
 Inspect the current checkout and tools before choosing commands. This is a dated
 handoff, not evidence that a path, installed tool, or account connection is still
@@ -38,8 +66,14 @@ predates the implementation. The source checkout is portable; the external
 evidence and installed source pack described below are local to this machine.
 
 The original kickoff document has been retired in favor of this handoff.
-No experiment or helper container from this work remains running. Completed
-evidence is outside the repository. There is no unfinished live run to resume.
+The consumer-baseline implementation made no live subject calls. The user then
+approved launch of the frozen pilot; that run completed outside the repository.
+Do not launch it a second time. Authorization and console output are recorded
+beside the run in `execution-authorization.json` and `launch-console.txt`.
+The separately authorized native context diagnostic is also complete. Its plan,
+results, seal, and checks are under
+`C:/Users/Darian/yassa-runs/native-context-20260909-v1`. Do not relaunch either
+completed run or treat its allocation as standing authorization for new calls.
 
 ## What works
 
@@ -78,26 +112,40 @@ acceptance/rejection probes. Native freezing pins the review and materials, and
 native reports link to preparation evidence kept outside subject contexts.
 General natural-language synthesis and dataset research remain unimplemented.
 
+Native v2 and guided drafts now accept an optional no-package consumer baseline
+with a separate repeat count and null build/parent lineage. All consumers in
+that study share complete task requirements and current case files; package
+consumers additionally receive and invoke their parent package. Baseline calls
+are fully admitted, interleaved with consumers, and launched even when builders
+fail. Reports retain separate baseline and independent-build denominators and
+add per-case counts for coverage/saturation review. Old definitions keep their
+original prompts, plan, score and preparation-identity semantics. That baseline
+milestone did not change the adapter, access profile or deterministic checker.
+The subsequent context milestone adds the gate and independent evidence capture
+described above; the command permission profile and task checker remain unchanged.
+
 ## Next recommended implementation milestone
 
-**Completion target:** choose an informative pilot for the intended comparison,
-with explicit work coverage, controls, independent builds, resources and limits
-on interpretation, then run and audit it under the user's chosen scope.
+**Completion target:** prepare more informative synthetic reconciliation work
+and choose the intended claim before another comparison.
 
-1. Use SPEC sections 3, 7 and 13 to establish what the result should inform. A
-   descriptive trial can be complete; broader claims need an appropriate design.
-2. Assess whether the two supported task families fit. Extend semantic contracts
-   and preparation deliberately when they do not; do not recast a user's work as
-   the nearest fixture. Arbitrary natural-language task synthesis remains open.
-3. Choose and pin external builder sources and any adaptations. Verify their
-   native capabilities before using a study to compare their outcomes.
-4. Preserve both preparation routes for the first Dovetail study. The draft's
-   `first_dovetail_study` flag enforces this commitment; future trials may select
-   one route. Source authorship and preparation route remain separate facts.
-5. Select controls and resources for the question. The native runner currently
-   measures builder treatments with package consumers; a consumer control without
-   a package requires an explicit runner extension. Execute only once the study
-   and its resources are concrete and authorized, then preserve and audit evidence.
+1. Use the pilot's score ceiling to revise work coverage and difficulty. All
+   observed baselines passed these related cases; more repeats alone do not
+   address their limited sensitivity. Synthetic reconciliation remains the
+   user's accepted preference. Broader work, controls and claims remain open
+   under [SPEC section 13](SPEC.md#13-first-dovetail-study-decisions-still-open).
+2. Retain the current catalog gate and evidence contract. Plugin, remote-plugin
+   and app loading are now explicitly disabled; exact expected catalogs come
+   from pinned built-ins and declared inputs. The authenticated diagnostic and
+   preserved pilot replay passed. If a future study needs prevention before
+   every child request or attestation of all upstream context, implement and
+   validate that stronger boundary before claiming it.
+3. Preserve original pilot and diagnostic evidence, failed audits and correction
+   records. Raw capture now survives portable-path rejection, with independent
+   logs/control surviving output collection failures; malformed, withheld and
+   uncollected content still have explicit limits. General recovery is future
+   work. New subject calls require a separate reviewed allocation and launch
+   authorization; neither completed run authorizes further spending.
 
 The previous small comparison is complete; its case counts and deadlines, and
 the v2 example allocations, are not pilot defaults. Binary inputs, broader
@@ -119,6 +167,7 @@ Some details are proposals, not settled product requirements.
 | Native v2 freezing, execution, reporting | [native_runner.py](src/yassa/native_runner.py) |
 | Versioned file-task checkers | [native_checkers.py](src/yassa/native_checkers.py) |
 | Native Inspect execution boundary | [native_execution.py](src/yassa/native_execution.py) |
+| Exact native catalogs and raw failure captures | [native_context.py](src/yassa/native_context.py), [native_capture.py](src/yassa/native_capture.py), [built-in pins](runtime/codex/builtin-skills.json) |
 | Evidence and deterministic checking | [evidence.py](src/yassa/evidence.py), [scoring.py](src/yassa/scoring.py) |
 | Container and access profile | [Dockerfile](runtime/codex/Dockerfile), [config.toml](runtime/codex/config.toml), [boundary probe](runtime/codex/boundary_probe.py) |
 | Regression evidence | [tests](tests), [legacy auditor](tests/audit_native_run.py), [v2 auditor](tests/audit_native_v2_run.py) |
@@ -171,7 +220,11 @@ is at `C:/Users/Darian/yassa-runs/native-probe-01`. These are distinct runs.
 - The sandbox has no host workspace/home mounts or protected evaluation data.
   Saved ChatGPT authentication is injected privately and denied to subject commands.
   Shell network is disabled while Codex retains provider connectivity. No personal
-  config, rules, apps, or MCP connections are imported. Preserve this boundary.
+  config or rules are included in launch inputs. The pilot nevertheless exposed
+  runtime plugin catalog entries beyond the frozen sources; fixed-image and
+  boundary-probe checks alone do not establish a closed subject context. The
+  current explicit feature controls and exact catalog checks passed authenticated
+  validation, within the limits recorded in the context milestone.
 - Native calls use the CLI's saved-auth route, not Inspect Agent Bridge. Reported
   usage counts native response records, including subagents; aborted requests may
   leave unreported usage. Dollar cost and hard token/spend limits are unavailable.
@@ -185,7 +238,67 @@ is at `C:/Users/Darian/yassa-runs/native-probe-01`. These are distinct runs.
 
 ## Verification and delivery
 
-Current application verification: **130 tests passed, 1 skipped** in the full
+Current implementation verification: **163 tests passed, 1 skipped** in the full
+suite, including 11 context/capture tests and six Inspect adapter outcomes using
+a simulated sandbox. These checks make no model calls. Authenticated validation
+separately passed for two roots and one child. All 26 packaged source/runtime
+files matched checkout bytes; wheel and source builds passed. See the
+[diagnostic report](C:/Users/Darian/yassa-runs/native-context-20260909-v1/interpretations/verified/report.md)
+for final lint, documentation, distribution and compatibility checks.
+
+Offline replay of 53 preserved pilot exports detected all six unexpected
+catalogs across four attempts under the new gate. Pilot and native v1 offline
+rescores preserve their 50 and 12 score rows, original bytes and original seals.
+The diagnostic's original seal remains unchanged. A postprocessing helper was
+briefly written at its sealed root, then moved into `interpretations/verified`;
+no original evidence changed. The correction and successful seal recheck are
+recorded beside the diagnostic report.
+
+Previous consumer-baseline verification: **151 tests passed, 1 skipped** in the
+full suite after the exporter fix. The final catalog-audit refinement then passed
+all **3 focused audit tests**; Ruff lint/format and `git diff --check` passed.
+Wheel and source builds passed.
+The 14 new cases exercise baseline admission/context/failure/reporting behavior,
+review compatibility and pilot preparation. The earlier test run had two failures
+in a test that replaced hashing during material validation; the test was corrected
+to observe Docker admission directly, then the focused and full checks passed.
+No production checker correction was needed. The Windows symlink skip remains.
+All 23 packaged source/runtime files matched the corrected checkout bytes.
+The final documentation check resolved **594 local links/anchors** across 16
+files, including preparation reviews, all three reports and the pilot assessment.
+No pilot container remains running.
+Offline `consumer-baseline-compatibility` interpretations preserved the original
+36 simulated, 12 native v1, 4 native v2 totals and 4 native v2 reconciliation
+score rows. Their original bytes and seals remain unchanged. The previous guided
+preparation manifest also still validates. The external `compatibility.json`
+records those checks and the historical unstarted freeze identity.
+
+The local [ready pilot review](C:/Users/Darian/yassa-runs/reconciliation-pilot-20260908-v1/round-1/review.md)
+and [frozen plan](C:/Users/Darian/yassa-runs/reconciliation-pilot-20260908-v1/run/plan.json)
+preserve both input routes, independent reference/checker probes and the complete
+58-attempt allocation. The preparation script, source answers and source
+provenance are preserved beside the review. The completed run has 54 launched
+attempts (8 builds and 46 consumers) and four unlaunched dependencies. Seven
+packages were accepted. There were no native timeouts; the export failure remains
+a harness failure after a native exit code of 0. Original and offline repeat
+scores are byte-identical, including all four missing rows, and the original
+run seal remains unchanged.
+
+The audit first stopped at an unexpected consumer catalog; its source and
+traceback remain under `interpretations/audited`. The follow-up auditor checks
+all recorded root/subagent catalogs and reports violations with a **failed**
+verdict, separate from missing evidence. It never turns a catalog mismatch into
+a passing audit. The builder export gap remains unavailable, with no invented
+package, session identity or usage. See [pilot evidence](docs/reconciliation-pilot.md#recorded-results).
+
+The new space-path regression reproduced the native export rejection before the
+fix and passed afterward. A no-network, no-auth, no-model run of the pinned Linux
+collector preserved the same kind of filenames and an executable script. Its
+recorded export round-tripped through corrected Windows storage and relocation.
+`export-fix-verification.json` preserves byte/mode and distribution checks;
+`path-fix-compatibility.json` records the unchanged pilot seal and 50 score rows.
+
+Previous guided-preparation application verification: **130 tests passed, 1 skipped** in the full
 suite; the **28 preparation tests** passed again after final provenance and
 review-format refinements. Ruff checks and formatting passed, wheel and source
 distribution built, and 23 packaged source modules/runtime files matched their

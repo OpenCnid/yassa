@@ -40,7 +40,9 @@ Start with [README.md](README.md), then follow the relevant route:
 | Run or modify the implemented fixture path | [README usage](README.md#run-the-fixture) and [implemented boundaries](ARCHITECTURE.md#implemented-fixture-milestone) |
 | Run or modify the native Codex comparison | [Native usage](README.md#run-the-native-codex-fixture) and [native boundaries](ARCHITECTURE.md#implemented-native-codex-fixture) |
 | Configure or extend native file studies | [Native v2 guide](docs/configurable-native.md) and [implemented runner](ARCHITECTURE.md#implemented-configurable-native-runner) |
+| Native catalog enforcement and failed captures | [Context control and evidence](docs/native-context.md) and [implemented boundary](ARCHITECTURE.md#implemented-native-context-control) |
 | Guided preparation and answer rounds | [Preparation guide](docs/guided-preparation.md) and [implemented preparation](ARCHITECTURE.md#implemented-guided-preparation) |
+| Reconciliation pilot and consumer baseline | [Pilot design and evidence](docs/reconciliation-pilot.md) and [baseline contract](docs/configurable-native.md#consumer-baseline) |
 | Study preparation and user interaction | [SPEC section 3](SPEC.md#3-helping-the-user-define-a-study) |
 | First Dovetail study and its two input conditions | [SPEC section 13](SPEC.md#13-first-dovetail-study-decisions-still-open) |
 | Sampling, sensitivity, or scoring | [SPEC section 7](SPEC.md#7-experimental-sensitivity-and-selectable-inference-budgets) and [section 8](SPEC.md#8-scoring-recorded-work) |

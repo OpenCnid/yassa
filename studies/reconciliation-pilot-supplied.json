@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "task_id": "reconciliation-v1",
+  "brief": "Build a reusable skill implementing the complete declared reconciliation contract.",
+  "authorship": "Yassa development agent, constructed for the reconciliation pilot",
+  "source": "Versioned Yassa-owned synthetic supplied material; manually specified rows and references",
+  "synthetic": true,
+  "assumptions": [
+    "These are invented ledgers, not a sample of real accounting work.",
+    "The supplied route identifies an existing versioned file, not human authorship.",
+    "Cases combine contract features; they are not independent build briefs.",
+    "The empty case is shared with the prepared suite and is not an independent problem."
+  ],
+  "development": [
+    {
+      "id": "dev-basic",
+      "group": "development-basic",
+      "files": {
+        "input/left.csv": "id,cents\nshop,100\nshop,-25\n",
+        "input/right.csv": "id,cents\nshop,50\n"
+      },
+      "expected": {"balances": [{"id": "shop", "left_cents": 75, "right_cents": 50, "delta_cents": 25}]}
+    },
+    {
+      "id": "dev-separate",
+      "group": "development-separate",
+      "files": {
+        "input/left.csv": "id,cents\nrent,-80\n",
+        "input/right.csv": "id,cents\ncash,80\n"
+      },
+      "expected": {"balances": [
+        {"id": "rent", "left_cents": -80, "right_cents": 0, "delta_cents": -80},
+        {"id": "cash", "left_cents": 0, "right_cents": 80, "delta_cents": -80}
+      ]}
+    }
+  ],
+  "evaluation": [
+    {
+      "id": "heldout-duplicate-sides",
+      "group": "evaluation-duplicate-sides",
+      "files": {
+        "input/left.csv": "id,cents\nalpha,100\nalpha,-40\nalpha,100\nrefund,-25\nzero,33\nzero,-33\n",
+        "input/right.csv": "id,cents\nalpha,55\nalpha,-5\nrefund,-5\nzero,0\n"
+      },
+      "expected": {"balances": [
+        {"id": "alpha", "left_cents": 160, "right_cents": 50, "delta_cents": 110},
+        {"id": "refund", "left_cents": -25, "right_cents": -5, "delta_cents": -20},
+        {"id": "zero", "left_cents": 0, "right_cents": 0, "delta_cents": 0}
+      ]}
+    },
+    {
+      "id": "heldout-literal-csv",
+      "group": "evaluation-literal-csv",
+      "files": {
+        "input/left.csv": "id,cents\r\nCase,80\r\n case ,4\r\n\"comma,id\",12\r\n\"quote\"\"id\",-9\r\n",
+        "input/right.csv": "id,cents\ncase,11\nCase,5\n\"comma,id\",2\n\"line\nid\",8\ncafé,4\n"
+      },
+      "expected": {"balances": [
+        {"id": "Case", "left_cents": 80, "right_cents": 5, "delta_cents": 75},
+        {"id": " case ", "left_cents": 4, "right_cents": 0, "delta_cents": 4},
+        {"id": "case", "left_cents": 0, "right_cents": 11, "delta_cents": -11},
+        {"id": "comma,id", "left_cents": 12, "right_cents": 2, "delta_cents": 10},
+        {"id": "quote\"id", "left_cents": -9, "right_cents": 0, "delta_cents": -9},
+        {"id": "line\nid", "left_cents": 0, "right_cents": 8, "delta_cents": -8},
+        {"id": "café", "left_cents": 0, "right_cents": 4, "delta_cents": -4}
+      ]}
+    },
+    {
+      "id": "heldout-one-sided-zero",
+      "group": "evaluation-one-sided-zero",
+      "files": {
+        "input/left.csv": "id,cents\nleft,-300\nbalanced,75\n",
+        "input/right.csv": "id,cents\nright,50\nzero,0\nbalanced,75\n"
+      },
+      "expected": {"balances": [
+        {"id": "left", "left_cents": -300, "right_cents": 0, "delta_cents": -300},
+        {"id": "right", "left_cents": 0, "right_cents": 50, "delta_cents": -50},
+        {"id": "zero", "left_cents": 0, "right_cents": 0, "delta_cents": 0},
+        {"id": "balanced", "left_cents": 75, "right_cents": 75, "delta_cents": 0}
+      ]}
+    },
+    {
+      "id": "heldout-empty",
+      "group": "evaluation-empty",
+      "files": {"input/left.csv": "id,cents\n", "input/right.csv": "id,cents\n"},
+      "expected": {"balances": []}
+    }
+  ]
+}

@@ -19,6 +19,14 @@ See [the native fixture](docs/native-fixture.md) for its design and measured sco
 The configurable native v2 route also supports declared file tasks, checker
 selection, pinned source bindings, multiple builds, and consumer repeats; see
 [configurable native studies](docs/configurable-native.md).
+The optional consumer baseline receives complete task facts without a generated
+package. The [synthetic reconciliation pilot](docs/reconciliation-pilot.md)
+completed with 46/46 recorded consumers passing, including all 10 baselines;
+one build-export failure left four planned uses missing.
+Its context audit failed after detecting extra runtime plugin skill entries.
+The subsequent [native context milestone](docs/native-context.md) adds exact
+catalog checks and independent failure evidence. Authenticated root and child
+validation passed; the original pilot's failed audit remains unchanged.
 
 ## Run the fixture
 
@@ -75,6 +83,10 @@ Only its inputs and assigned skills enter `/work`. The credential file is
 injected separately, denied to subject commands, and excluded from evidence.
 The command boundary is probed before every attempt. Native transcripts and
 Inspect logs preserve actual skill loading, tool work, usage, and output bytes.
+The current profile disables plugins, remote plugins, and apps; it checks the
+rendered root catalog before inference and all recorded root/child catalogs
+before accepting outputs. See [the enforced scope](docs/native-context.md#enforced-boundary)
+for the built-in pins and the limits of this acceptance gate.
 
 The example plans four builds and twelve consumer runs. Deadlines are 300 seconds
 per build and 120 seconds per consumer, excluding sandbox setup and export.

@@ -275,6 +275,21 @@ and file bundles are frozen separately from treatments, and each binding records
 their identities together with build/group/case/repeat lineage. The underlying
 adapter retains a new Inspect sandbox and native process for every attempt.
 
+An optional `ConsumerBaseline` adds case executions with null build/parent lineage
+and its own repeats. Whole-plan admission includes these calls at the consumer
+deadline; they interleave with other consumers and do not depend on builder
+success. When enabled, `common_prompt` supplies the complete task requirements
+to every consumer, and package invocation becomes an explicit treatment prefix.
+Baseline bindings contain no treatment artifacts or skill files. The shared
+common artifact therefore has the same identity across all consumers of a case.
+The underlying Inspect adapter and access profile are unchanged.
+
+Reports keep baseline totals in `by_baseline`, distinct from `by_build`, and add
+`by_case` counts for coverage review. Legacy definitions omit the new control;
+their generated plans and score rows are unchanged. Preparation identity also
+omits an absent baseline, preserving earlier reviewed manifests. See the
+[pilot design](docs/reconciliation-pilot.md) for its current validation boundary.
+
 The planner reserves the whole allocation against an attempt count and the sum
 of native command deadlines. It rejects excess allocation before calls, without
 dropping groups. There are no harness retries. Setup/export time, token/spend
@@ -283,9 +298,41 @@ preserve planned/scored/missing denominators per condition, arm and independent
 build, with native deadline status separate from package readiness.
 
 The output collector also rejects a symlink at an export root, as well as nested
-non-regular paths. The command permission profile and credential injection remain
+non-regular paths. Following the reconciliation pilot, host artifact paths allow
+interior ASCII spaces while retaining traversal, device-name, collision and link
+checks. This corrects an observed collector/store mismatch. Unsupported paths can
+still prevent normalized output acceptance, but the raw export and independent
+transcripts are now captured first, as described below.
+The command permission profile and credential injection remain
 unchanged. See [the v2 guide and evidence](docs/configurable-native.md) for schema
 limits, usage, verification, and compatibility details.
+
+## Implemented native context control
+
+The shared native adapter disables `plugins`, `remote_plugin`, and `apps` in the
+trial configuration and verifies their effective values. Before inference it
+captures the rendered root prompt, verifies the pinned built-in skill bytes, and
+derives the expected catalog from those bytes and declared trial skill inputs.
+[native_context.py](src/yassa/native_context.py) compares exact names, normalized
+descriptions and resolved paths. After native execution, it checks every recorded
+root and child catalog and built-in bytes again. A mismatch is a harness failure
+with outputs excluded from successful acceptance and dependent uses missing.
+Native completion status and duration remain separately recorded.
+
+This gate prevents release after a failed root preflight and rejects unexpected
+recorded catalogs after execution. It does not intercept each child request or
+attest all upstream instructions and tool definitions. Authenticated validation
+covered two fresh roots and one child in the pinned image, all with exact
+catalogs and correct outputs; see [the evidence and limits](docs/native-context.md).
+
+[native_capture.py](src/yassa/native_capture.py) stores bounded raw exports as
+indexed byte chunks with original paths as metadata before path materialization.
+The adapter captures native logs and control evidence independently of outputs.
+Capture references and failed checks remain in the attempt result even when
+Inspect records an error. Reports link those records, and usage can fall back to
+separately captured transcripts. Credential-containing captures are withheld.
+Collector limits, malformed exports, filesystem failure and process crashes can
+still leave explicit gaps; this is not general recovery or lossless collection.
 
 ## Implemented guided preparation
 
@@ -860,4 +907,14 @@ product still needs:
 The configurable native and bounded preparation milestones share the contracts
 above. Choose a more informative pilot's work, controls, and allocation through
 [SPEC section 13](SPEC.md#13-first-dovetail-study-decisions-still-open).
-Broader preparation and the pilot remain future work.
+The synthetic reconciliation pilot completed with both routes and a consumer
+baseline. All 46 recorded consumers passed, including all 10 baselines; one
+build-export failure left four uses missing. The fixed cases reached the score
+ceiling. Its context audit failed on additional runtime plugin skill entries in
+five builder subagent catalogs and one consumer catalog. The subsequent
+[context milestone](docs/native-context.md) implemented preflight/postflight
+catalog control and independent captures, with passing authenticated validation.
+The pilot's original failure remains unchanged. Select work that can measure
+useful differences before another comparison. Per-request context interception
+and broader upstream-context attestation remain outside the implemented gate.
+Broader preparation and representative-work studies remain future work.

@@ -20,6 +20,7 @@ from .evidence import (
     verify_run,
     write_new,
 )
+from .native_capture import recorded_native_files
 from .native_execution import RUNTIME, execute_native
 from .prepare import prepare_condition
 from .records import canonical, digest, identity, parse_json
@@ -444,9 +445,12 @@ def rescore_native(root: Path, label: str, reason: str | None = None) -> Path:
     usage = {}
     for trial in plan["trials"]:
         result = results[trial["id"]]
-        files = store.get(result["output_id"]) if result.get("output_id") else {}
+        files = recorded_native_files(store, result)
         if files:
-            usage[trial["id"]] = native_usage(files)
+            try:
+                usage[trial["id"]] = native_usage(files)
+            except (ValueError, UnicodeError, KeyError, TypeError) as error:
+                usage[trial["id"]] = {"unavailable": str(error)}
         if trial["role"] == "build":
             continue
         case = next(c for c in materials[trial["condition"]].evaluation if c.id == trial["case"])

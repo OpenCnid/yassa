@@ -9,6 +9,7 @@ from .app import external_root
 from .evidence import inventory, read_regular, safe_name, write_new
 from .native_contracts import (
     Admission,
+    ConsumerBaseline,
     FileBinding,
     FileMaterials,
     NativeArm,
@@ -59,6 +60,7 @@ class StudyDraft(Record):
     sources: tuple[SourceBinding, ...] = ()
     arms: tuple[NativeArm, ...] = ()
     control_rationale: dict[Slug, Text] = Field(default_factory=dict)
+    consumer_baseline: ConsumerBaseline | None = None
     model: str | None = None
     reasoning_effort: Literal["low", "medium", "high", "xhigh"] | None = None
     consumer_repeats: Annotated[StrictInt, Field(ge=1, le=20)] | None = None
@@ -126,11 +128,15 @@ def readiness(draft: StudyDraft) -> list[dict]:
         )
     if "yassa-prepared" in draft.routes and draft.seed is None:
         need("seed", "Choose a seed for reproducible synthetic case construction.")
-    if not draft.arms or set(draft.control_rationale) != {a.id for a in draft.arms}:
+    controls = {a.id for a in draft.arms}
+    if draft.consumer_baseline:
+        controls.add(draft.consumer_baseline.id)
+    if not draft.arms or set(draft.control_rationale) != controls:
         need(
             "arms/control_rationale",
             "Choose the builder arms, independent builds per arm, and "
-            "what each control or treatment lets you interpret. External packs need file pins.",
+            "what each control or treatment, including any consumer baseline, lets you "
+            "interpret. External packs need file pins.",
         )
     if not draft.model or draft.reasoning_effort is None:
         need("model/reasoning_effort", "Choose the native subject model and reasoning effort.")
@@ -233,6 +239,17 @@ def _review(draft, missing, template, materials, plan, validation) -> bytes:
         f"invocation: {a.invocation or '(common request)'}"
         for a in draft.arms
     ]
+    if draft.consumer_baseline:
+        baseline = draft.consumer_baseline
+        lines += [
+            f"- {baseline.id}: {baseline.repeats} fresh execution(s) per case, no build or "
+            "generated package. "
+            + draft.control_rationale.get(baseline.id, "Rationale unresolved."),
+            "",
+            "Every consumer receives the same complete task requirements and current input "
+            "files. Package consumers additionally receive and explicitly invoke their "
+            "assigned package. Built-in skills remain present in all sessions.",
+        ]
     if plan:
         lines += [
             "",
@@ -358,6 +375,7 @@ def prepare_draft(input_path: Path, destination: Path, previous: Path | None = N
             task=task,
             sources=draft.sources,
             arms=draft.arms,
+            consumer_baseline=draft.consumer_baseline,
             conditions=conditions,
             model=draft.model,
             reasoning_effort=draft.reasoning_effort,

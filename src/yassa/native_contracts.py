@@ -164,6 +164,13 @@ class NativeArm(Record):
     builds: Annotated[StrictInt, Field(ge=1, le=20)]
 
 
+class ConsumerBaseline(Record):
+    """Fresh executions without a generated package; never independent builds."""
+
+    id: Slug
+    repeats: Annotated[StrictInt, Field(ge=1, le=20)]
+
+
 class Admission(Record):
     max_attempts: Annotated[StrictInt, Field(ge=1, le=2000)]
     max_scheduled_seconds: Annotated[StrictInt, Field(ge=1)]
@@ -187,6 +194,7 @@ class NativeStudyV2(Record):
     schedule_seed: StrictInt
     admission: Admission
     preparation: FileBinding | None = None
+    consumer_baseline: ConsumerBaseline | None = None
 
     @model_validator(mode="after")
     def dimensions(self):
@@ -194,6 +202,8 @@ class NativeStudyV2(Record):
             if len({item.id for item in values}) != len(values):
                 raise ValueError("duplicate source, arm or condition ID")
         sources = {s.id: s for s in self.sources}
+        if self.consumer_baseline and self.consumer_baseline.id in {a.id for a in self.arms}:
+            raise ValueError("consumer baseline ID must differ from builder arm IDs")
         used = set()
         for arm in self.arms:
             if len(set(arm.sources)) != len(arm.sources) or not set(arm.sources) <= sources.keys():
@@ -389,6 +399,10 @@ def make_native_plan(
         * study.consumer_repeats
         for c in study.conditions
     )
+    if study.consumer_baseline:
+        uses += sum(len(materials[c.id].evaluation) for c in study.conditions) * (
+            study.consumer_baseline.repeats
+        )
     attempts = build_count + uses
     seconds = (
         build_count * study.admission.build_timeout_seconds
@@ -426,6 +440,20 @@ def make_native_plan(
                             "repeat": repeat,
                         }
                         trials.append({"id": "consume-" + identity(use)[:20], **use})
+        if study.consumer_baseline:
+            for case in materials[condition.id].evaluation:
+                for repeat in range(1, study.consumer_baseline.repeats + 1):
+                    use = {
+                        "condition": condition.id,
+                        "arm": study.consumer_baseline.id,
+                        "build": None,
+                        "role": "consume",
+                        "parent": None,
+                        "case": case.id,
+                        "group": case.group,
+                        "repeat": repeat,
+                    }
+                    trials.append({"id": "consume-" + identity(use)[:20], **use})
     trials.sort(key=lambda t: (t["role"] != "build", identity([study.schedule_seed, t["id"]])))
     body = {
         "schema_version": 2,
