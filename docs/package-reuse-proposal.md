@@ -1,8 +1,10 @@
 # After the reconciliation ceiling: assessment and next proposal
 
-Implementation update: the requested offline harness work is now implemented;
-see [the implemented guide](package-reuse.md). The assessment below remains the
-proposal as reviewed; future study choices and launch authorization stay separate.
+Implementation and execution update: the offline harness was implemented, then
+the user separately authorized its exact frozen allocation. The
+[guide and recorded results](package-reuse.md) describe the completed 90-attempt
+run. The assessment below preserves the proposal as reviewed before that launch;
+its dated zero-authorization statements describe that earlier stage.
 
 2026-09-09. **Evidence review complete; next design proposed, not accepted or
 launch-ready.** This work makes no experimental model calls. The checkout began
@@ -247,7 +249,7 @@ by reporting a success-only latency mean. No retries or automatic extensions.
 
 ## Required harness work and acceptance
 
-The [technical design](../ARCHITECTURE.md#proposed-package-reuse-efficiency-milestone)
+The [technical design](../ARCHITECTURE.md#package-reuse-efficiency-milestone)
 identifies changes against the existing runner. The bounded work is:
 
 | Change | Acceptance evidence before a launch review |

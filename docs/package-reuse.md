@@ -1,10 +1,12 @@
-# Offline package reuse milestone
+# Package reuse milestone
 
-Implemented 2026-09-09 from the [proposal](package-reuse-proposal.md). This adds
-offline preparation, ordering, resource interpretation and timing evidence to
-the existing native v2 runner. **No new experimental attempts are authorized or
-executed.** The proposed one-brief study and its allocation still need a separate
-concrete launch review. No completed run or consumed approval is reused.
+Implemented offline on 2026-09-09 from the [proposal](package-reuse-proposal.md),
+then separately authorized and executed against the exact frozen launch review.
+All 90 attempts completed; all six packages were accepted and all 84 consumers
+passed, including 12 baselines. Repeat scoring and all three evidence/timing
+audits passed. [Recorded results](#recorded-results) describe this narrow synthetic
+comparison. The completed allocation is consumed; no further attempts or merge
+are authorized by this document.
 
 ## Resource interpretation
 
@@ -74,9 +76,9 @@ by arm, then orders case/repeat blocks with a seeded hash. Each block includes
 one use of every planned package and one shared baseline. It chooses seeded ring
 rotations to reduce accumulated squared arm-position counts, and freezes actual
 orders and balance counts. This is a deterministic balancing heuristic, not a
-promise of globally optimal balance for every possible allocation. The proposed
-six-build/twelve-block fixture has at most two counts of positional spread per
-arm. Execution stays serial. Failed dependencies leave their planned slots
+promise of globally optimal balance for every possible allocation. The executed
+six-build/twelve-block fixture achieved at most one count of positional spread
+per arm. Execution stays serial. Failed dependencies leave their planned slots
 unlaunched, while baselines execute independently; the schedule is not rewritten.
 
 ## Timing boundaries
@@ -101,8 +103,9 @@ Offsets, durations and completion/failure status are recorded in each attempt's
 `lifecycle.json` and result. Unreached phases are unavailable. Setup, capture and
 evaluation exceptions retain timing evidence; native duration and acceptance
 semantics are unchanged. Controlled-clock tests cover success, deadline overshoot
-and setup/capture/evaluation failures. These additions have **no new live
-validation**. They do not measure first-correct-output time, full user latency,
+and setup/capture/evaluation failures. The separately authorized run validated
+the recorded live phase contract across 90 roots, including five native
+deadlines. It does not measure first-correct-output time, full user latency,
 or an enforced whole-session elapsed cap.
 
 ## Synthetic material recipe
@@ -136,23 +139,65 @@ Each preparation records the eleven faulty-solvers' exact outputs and verdicts;
 observationally equivalent faults pass the relevant cases. Existing recipes,
 supplied fixture bytes and checker identity remain unchanged.
 
-## Separate launch review
+## Frozen launch review
 
-The external review is under
-`C:/Users/Darian/yassa-runs/package-reuse-efficiency-20260909-v1`.
-It freezes the candidate material/source/runtime identities and records offline
-validation. The proposed allocation is six builds, 72 package consumers and
-12 baselines: **90 root attempts**, **11,160 native seconds**, with 600/90-second
-deadlines and a primary hypothetical reuse scenario of 20. Horizons 1, 5 and 50
-are additional scenarios. The 60-minute operational allowance is planning
-headroom, not a cap. Model alias availability has not been tested with a new
-authenticated request. No launch authorization record is created.
+The [original review](C:/Users/Darian/yassa-runs/package-reuse-efficiency-20260909-v1/launch-review.md) freezes six builds, 72 package consumers and
+12 baselines: 90 root attempts and 11,160 reserved native seconds, with 600/90-second
+deadlines. H=20 is primary; 1, 5 and 50 are additional arithmetic scenarios.
+The 60-minute operational allowance is planning headroom, not a hard cap.
+The user subsequently authorized one execution of this exact freeze. A
+byte-identical copy ran in a new external directory, preserving the original
+review seal and unexecuted candidate. No retries, replacements or extensions ran.
 
-The previously audited 83-file Dovetail snapshot remains external and byte-pinned;
-fresh verification precedes freezing. Its upstream commit remains unknown.
-Common-request is not an explicitly invoked official-creator arm. No best-of
-selection, replacement builds, retries, outcome-driven extension, general builder
-ranking or equivalence claim is included. Exact root preflight, recorded
-root/child postflight and independent captures remain acceptance gates; child
-checks remain after execution. Original pilot failures, audits, scores and seals
-remain historical facts.
+The verified external 83-file Dovetail snapshot remains byte-pinned; its upstream
+commit is unknown. Model alias `gpt-6-astra` with xhigh is not an immutable weight
+pin. Codex 0.153.4, Inspect 0.3.263 and the reviewed immutable Docker image were
+retained. Common-request is not an explicitly invoked official-creator arm.
+Exact root preflight, recorded root/child postflight and independent captures
+remain acceptance gates. Child checks occur after execution.
+
+## Recorded results
+
+The [complete external assessment](C:/Users/Darian/yassa-runs/package-reuse-execution-20260909-v1/results.md) links authorization, exact
+identities, original/audited scores, every attempt, audit sources and machine-
+readable resource curves. Run seal: `964e058c04594cebb56249b22aec4558d4c1074b6f9698d0e8d5cca4db525769`.
+
+| Arm | Passed consumers | Missing | Accepted builds | Native consumer timeouts |
+| --- | ---: | ---: | ---: | ---: |
+| common-request | 36/36 | 0 | 3/3 | 0 |
+| dovetail | 36/36 | 0 | 3/3 | 0 |
+| no-package | 12/12 | 0 | null | 5 |
+
+Native command time was **7,545.795 seconds (125.76 minutes)**. Launch
+elapsed through original reporting was **165.16 minutes**. All six builds
+finished within their deadlines. Five baselines reached 90 seconds with usable
+correct outputs; their observed overshoot and timeout status remain recorded.
+
+The primary comparison charges one build plus 20 times that build's equal-case
+mean use time. It averages repeats within case, six cases equally within build,
+then the three builds equally within arm. The 12 baseline executions are shared
+comparison evidence; they have zero build cost and null build/parent lineage.
+
+| Package arm | H=20 mean native seconds | Range across three builds | Shared baseline H=20 seconds | Difference from baseline |
+| --- | ---: | --- | ---: | ---: |
+| common-request | 1,449.25 | 1,408.03–1,477.15 | 1,652.99 | -203.74 |
+| dovetail | 1,515.03 | 1,484.72–1,540.17 | 1,652.99 | -137.97 |
+
+All six build curves meet the recorded correctness, coverage and audit gates.
+Additional H=1/5/50 scenarios and each build's crossover are in the assessment.
+These are descriptive extrapolations of the configured budgeted protocol, not
+observed deployments at every horizon or uncapped session completion times.
+Research expenditure includes all actual builds and uses separately. Recorded
+token totals may omit aborted/unreported work; no dollar-cost metric is inferred.
+
+General evidence, raw-capture/catalog and live schedule/lifecycle audits passed
+without violations or evidence gaps. Repeat score bytes are identical; an
+independent arithmetic check verifies case/build weights and every curve.
+The original review's 289 files, six historical run seals, original scores,
+failed pilot audits and read-only proposal files reverified unchanged.
+
+This is another observed correctness ceiling on one synthetic brief and six
+related cases. It does not establish equivalent reliability or a general builder
+ranking. Retained ordinary scripts and instruction/code ablations were outside
+the comparison, so these results do not isolate skill packaging. The broader
+multi-domain and explicitly invoked official-builder study remains unimplemented.

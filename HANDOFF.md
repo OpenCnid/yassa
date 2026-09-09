@@ -1,19 +1,27 @@
 # Development handoff
 
-Updated 2026-09-09: the [offline package reuse milestone](docs/package-reuse.md)
-implements versioned resource interpretation, opt-in case/repeat scheduling,
-controller lifecycle timing and a separate synthetic recipe under the unchanged
-event contract. It began from PR #6 at `7c362caa` and integrated the seven
-uncommitted proposal documents from the read-only `5040` worktree. No experimental
-model calls were made.
+Updated 2026-09-09: the separately authorized [package reuse allocation](docs/package-reuse.md#recorded-results)
+completed all 90 attempts: six accepted packages, 72 package consumers and 12
+no-package baselines. All 84 consumers passed; no scores are missing. Native
+command time was 7,545.795 seconds (125.76 minutes); elapsed launch time
+through original reporting was 165.16 minutes. Five baselines reached their
+90-second deadlines with usable correct outputs. No builds or package consumers
+timed out. No retries, replacement builds or added attempts ran.
 
-The candidate review is external at
-`C:/Users/Darian/yassa-runs/package-reuse-efficiency-20260909-v1`. Its one-brief
-scope, 20-use primary scenario, 90-root allocation and 11,160-second reservation
-remain proposals requiring separate concrete launch authorization. Do not merge
-or launch as a consequence of this handoff.
+Repeat scoring is byte-identical. General evidence, raw-capture/context and live
+schedule/lifecycle audits passed, as did independent resource arithmetic checks.
+The original frozen review, six historical seals and read-only proposal files
+remain unchanged. The [result assessment](C:/Users/Darian/yassa-runs/package-reuse-execution-20260909-v1/results.md) links the complete
+external evidence under `C:/Users/Darian/yassa-runs/package-reuse-execution-20260909-v1`.
+The copied execution preserves the [original review](C:/Users/Darian/yassa-runs/package-reuse-efficiency-20260909-v1/launch-review.md) and its
+unexecuted candidate. Do not relaunch this allocation or merge as a consequence
+of this handoff. Further studies need their own concrete scope and authorization.
 
-Completed execution status: the user-approved reconciliation sensitivity allocation
+The preceding offline implementation began from PR #6 at `7c362caa`, integrated
+the seven proposal documents from the read-only `5040` worktree and made no
+experimental calls. The user then separately authorized this exact frozen run.
+
+Earlier execution status: the user-approved reconciliation sensitivity allocation
 completed all 68 attempts under
 `C:/Users/Darian/yassa-runs/reconciliation-sensitivity-20260909-v1`. All eight
 packages were accepted and all 60 consumers passed, including all 12 no-package
@@ -181,34 +189,29 @@ Every reference passes an independent oracle, and 476 recorded checker probes
 cover legitimate alternatives, structural errors and eleven faulty solvers.
 Diagnostic components stay in score records; the primary outcome remains binary.
 
-## Next step: review the implementation and frozen launch proposal
+## Next step: review the completed reuse study
 
-**The approved allocation, audits and requested assessment are complete.** The
+**The earlier sensitivity allocation and its assessment are complete.** Its
 60/60 correctness ceiling gives no builder separation or equivalence result.
 Assisted consumers used less native command time, but build costs were not
 recovered at the four/eight uses actually assigned per package. The post hoc
 15-19-use crossover calculation is an extrapolation, not a measured result.
 
-1. Review [the implemented guide](docs/package-reuse.md) and
-   [the proposal](docs/package-reuse-proposal.md). The latter recommends a
-   prospective resource comparison over new inputs under the existing contract,
-   ahead of repository-repair or constraint-planning workloads. The proposed
-   decision, reuse horizon, synthetic scope and budget remain open. The broader
-   multi-domain/official-builder program remains unimplemented.
-2. The offline PR implements prepared material provenance, opt-in case/repeat
-   blocking, versioned resource interpretation and lifecycle timing. Review
-   [SPEC section 13.3](SPEC.md#133-proposed-package-reuse-efficiency-follow-up) and
-   [the proposed technical boundary](ARCHITECTURE.md#proposed-package-reuse-efficiency-milestone).
-   New lifecycle fields remain unvalidated live until a separately authorized run.
-3. Proposed future allocation: one brief, six held-out cases, three builds per
-   arm and two consumer repeats including baseline repeats; 6 builds + 72 package
-   uses + 12 baselines = 90 attempts, 11,160 reserved native seconds. Budget and
-   model/source assumptions require a new frozen review and separate launch
-   authorization. No live smoke calls are included in the offline milestone.
-4. Retain the current root preflight and recorded root/child postflight gates,
-   raw captures, failed/missing denominators and immutable history. Child checks
-   remain after execution. Preserve all original pilot, context and sensitivity
-   evidence; do not reuse consumed approvals or restart completed runs.
+1. Review [the completed package reuse results](docs/package-reuse.md#recorded-results)
+   and their external evidence. The primary H=20 arithmetic contrasts are
+   conditional on one synthetic brief and case mixture. Package uses are nested
+   in builds; the shared baseline is not independent evidence for each contrast.
+2. The broader multi-domain/official-builder program remains unimplemented.
+   Retained ordinary scripts and instruction-versus-code ablations were outside
+   this study. Define any further comparison before seeking a new allocation;
+   this completed run does not authorize outcome-driven extensions.
+3. Lifecycle timing now has live evidence for evaluation, adapter setup, native
+   command and capture/acceptance. Separate provisioning/cleanup and
+   first-correct-output time remain unavailable. See
+   [the technical boundary](ARCHITECTURE.md#package-reuse-efficiency-milestone).
+4. Retain exact root preflight, recorded root/child postflight, raw captures,
+   unsuccessful denominators and immutable history. Child checks remain after
+   execution. Preserve the pilot's failed audits and four missing uses.
 
 The previous small comparison is complete; its case counts and deadlines, and
 the v2 example allocations, are not pilot defaults. Binary inputs, broader
@@ -308,15 +311,17 @@ The existing Windows symlink skip remains. The focused reuse/resource/timing
 checks passed 21 tests, including failed-build baseline independence and byte-
 identical relocated scores/resource interpretations. `uv sync --locked`, Ruff
 lint/format and whitespace checks passed. No authenticated smoke or model calls
-ran; lifecycle timing has controlled-clock evidence only.
+ran during that implementation stage. The later separately authorized run adds
+the live evidence linked at the top of this handoff.
 
 The separate historical resource replay reconciled 68 roots, 354 native response
 records and 6,198.559 native seconds. The external candidate preparation freezes
 90 roots and 11,160 native seconds with the same checker/runtime and verified
 83-file external pack as sensitivity. See the
 [launch review](C:/Users/Darian/yassa-runs/package-reuse-efficiency-20260909-v1/launch-review.md)
-for exact identities, validation, history preservation and unresolved launch
-choices. This review grants no execution authorization.
+for exact identities, validation and history preservation at freeze time.
+Separate user authorization subsequently launched its exact copied candidate;
+the completed allocation and new audits are linked at the top of this handoff.
 
 Offline proposal review: resource arithmetic and original/audited score bytes
 agree; six run seals were reverified, and the pilot's failed audits and diagnostic

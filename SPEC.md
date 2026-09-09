@@ -821,50 +821,50 @@ audits passed, repeat scoring was byte-identical and the previous evidence was
 reverified unchanged. These results do not establish equivalence or authorize
 outcome-driven extensions.
 
-### 13.3 Proposed package reuse efficiency follow-up
+### 13.3 Package reuse efficiency follow-up
 
-**Offline harness implemented; future study proposed, 2026-09-09.** The user
-authorized the bounded offline implementation following the assessment. No new experimental attempts are
-authorized. The [assessment and allocation](docs/package-reuse-proposal.md)
-compare reuse efficiency, repository repair and constraint-planning designs.
-They recommend prospectively investigating the observed build/use resource
-tradeoff on the existing event contract. This is not an accepted replacement for
-the broader multi-domain study or evidence that harder tasks will discriminate.
+**Implemented and separately executed, 2026-09-09.** The user first authorized
+the bounded offline implementation, then explicitly authorized the exact frozen
+launch review. The [assessment](docs/package-reuse-proposal.md) remains the
+historical proposal; the [implemented guide and results](docs/package-reuse.md)
+record the accepted allocation and observed evidence.
 
-Proposed scope: one Yassa-prepared synthetic brief, three development examples,
+Accepted scope: one Yassa-prepared synthetic brief, three development examples,
 six new held-out cases in three equally weighted profiles, three independent
 builds per common-request/Dovetail arm, and two executions per package/case and
-per baseline/case. This reserves 6 builds and 84 consumers: 90 attempts and
-11,160 native seconds at 600/90-second deadlines. All figures are review choices,
-not product defaults or launch permission. Baselines have null build/parent
-lineage; repeated uses and related template cases are not independent builds or
-briefs. Common-request is not an explicitly invoked official-creator comparator.
+per baseline/case. The frozen allocation reserved six builds and 84 consumers:
+90 attempts and 11,160 native seconds at 600/90-second deadlines. These are
+study-specific choices, not product defaults. Baselines have null build/parent
+lineage; repeated uses and related cases are not independent builds or briefs.
+Common-request is not an explicitly invoked official-creator comparator.
 
 The intended decision is whether to invest in a broader efficiency comparison.
-Report each package arm against the no-package control using complete-task
-correctness and per-build native-time curves, with a proposed primary reuse
-scenario of 20 and additional horizons 1, 5 and 50. The builder-to-builder contrast
-is secondary. These curves extrapolate observed per-use time; they do not
-constitute actual executions at every horizon. Keep experimental expenditure,
-build cost, consumer time, timeout status and available token usage distinct.
-No billing-cost, equivalence, non-inferiority or general-ranking claim is planned.
+The primary contrasts compare each package arm with the no-package control using
+complete-task correctness and per-build native-time curves at H=20; horizons 1,
+5 and 50 are additional scenarios. Builder-to-builder is secondary. Curves
+extrapolate observed per-use time under the budgeted protocol; they are not
+actual executions at every horizon or uncapped completion-time estimates.
+Research expenditure, one build's cost, consumer time, timeouts and recorded
+token usage remain distinct. No dollar-cost, equivalence, non-inferiority or
+general builder-ranking claim follows. Retained scripts and instruction/code
+ablations were not included, so the result does not isolate skill packaging.
 
-Implemented offline acceptance requirements: preserve the existing checker semantics and
-validate legitimate alternatives and plausible faults on the new cases; record
-construction/selection provenance and disjoint semantic inputs; give consumers
-equal complete facts; enforce the existing context/capture boundary; retain all
-planned denominators and unsuccessful builds; qualify resource claims by
-correctness and missingness rather than selecting successful attempts. Record
-and test scheduling, weighting and measurement scope before any launch. Keep
-historical source pins, artifacts, scores, audits and seals unchanged.
+Acceptance requirements preserve checker semantics, legitimate alternatives and
+fault probes; record construction/selection provenance and disjoint histories;
+give consumers equal complete facts; enforce the existing context/capture
+boundary; retain every planned denominator; and qualify efficiency claims by
+correctness, missingness and audits. Scheduling, weights and timing scope were
+frozen and tested before launch. Historical artifacts, scores, audits and seals
+remain unchanged. The [technical boundary](ARCHITECTURE.md#package-reuse-efficiency-milestone)
+records implemented behavior and remaining limits.
 
-The offline implementation adds materials, opt-in case/repeat blocking, versioned
-resource interpretation and lifecycle timing; see [the implemented guide](docs/package-reuse.md).
-Its technical boundary
-is in [ARCHITECTURE](ARCHITECTURE.md#proposed-package-reuse-efficiency-milestone).
-The primary question, reuse horizon, synthetic scope and resource reservation
-remain open for review. Any resulting frozen launch requires separate concrete
-authorization; the offline milestone includes zero authenticated smoke attempts.
+Observed execution: all six packages were accepted and all 84 consumers passed,
+including 12 baselines, with no missing scores. Five baselines reached their
+deadlines with correct usable outputs. Repeat scores are byte-identical; general,
+capture/context and live timing/order audits passed. Per-build curves, actual
+resources and exact evidence identities are in
+[the recorded results](docs/package-reuse.md#recorded-results). This consumed
+allocation does not authorize further calls or replace the broader study design.
 
 ## 14. Documentation responsibilities
 
@@ -913,9 +913,9 @@ contexts unless the study explicitly includes it.
 - [x] Preserve bounded raw native exports before path validation and collect independent transcripts/logs, retaining failure attribution and immutable evidence; malformed, credential-containing and uncollected content remain explicitly unavailable. See [capture limits](docs/native-context.md#evidence-when-capture-or-acceptance-fails).
 - [x] Prepare more informative synthetic reconciliation work after the pilot ceiling, with a separate checker, validated alternatives/faults, frozen materials and a descriptive 68-attempt budget; see [prepared scope](docs/reconciliation-sensitivity.md).
 - [x] Obtain separate approval and execute the frozen 68-attempt reconciliation allocation: 60/60 consumers passed, including all 12 baselines; both audits and byte-identical repeat scoring passed. See [recorded results](docs/reconciliation-sensitivity.md#recorded-results).
-- [x] Review the repeated ceiling, resources, deadlines and audits; compare bounded follow-ups and produce an offline proposal. See [the assessment](docs/package-reuse-proposal.md); its recommended allocation is not accepted or authorized.
+- [x] Review the repeated ceiling, resources, deadlines and audits; compare bounded follow-ups and produce an offline proposal. See [the assessment](docs/package-reuse-proposal.md); its allocation was only a proposal at that stage.
 - [x] Implement the bounded offline reuse-efficiency milestone in section 13.3, preserving checker semantics and prior evidence; prepare a new external frozen launch review.
-- [ ] Review and separately authorize any proposed reuse-efficiency study launch. No new experimental attempts are authorized.
+- [x] Obtain separate authorization and execute the exact frozen 90-attempt reuse study; 84/84 consumers passed, repeat scoring and all evidence/timing audits passed. Preserve its completed allocation and historical review.
 - [ ] Implement the remaining resource controls, recovery, additional vendor/runtime support, and selected analysis or model-grading methods as their study scope requires.
 
 Research for this draft used primary statistical publications, framework

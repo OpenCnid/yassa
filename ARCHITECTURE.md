@@ -403,16 +403,20 @@ accepted packages and 60/60 passing consumers, including all 12 baselines. The
 offline general and capture audits passed, and repeat score bytes were identical;
 the original pilot's failed audit is unchanged.
 
-## Proposed package reuse efficiency milestone
+## Package reuse efficiency milestone
 
-**Offline harness implemented, 2026-09-09; future study still proposed.** The
+**Harness implemented and separately executed, 2026-09-09.** The
 [proposal](docs/package-reuse-proposal.md) and
-[measurement requirements](SPEC.md#133-proposed-package-reuse-efficiency-follow-up)
+[measurement requirements](SPEC.md#133-package-reuse-efficiency-follow-up)
 describe a prospective resource comparison after the repeated correctness
 ceiling. The implementation uses the native v2 execution route and unchanged
 `reconciliation-v2` checker. The [implemented guide](docs/package-reuse.md)
-defines the records, CLI, measurement boundaries and limitations. No experimental
-model attempts are authorized or executed by this milestone.
+defines the records, CLI, measurement boundaries and limitations. Offline
+implementation made no experimental calls. The user later authorized its frozen
+90-attempt allocation; all 84 consumers passed, repeat scoring was byte-identical,
+and general, capture/context and live timing/order audits passed. The completed
+allocation is consumed; [recorded results](docs/package-reuse.md#recorded-results)
+link the external evidence.
 
 | Boundary | Implemented change | Compatibility and acceptance |
 | --- | --- | --- |
@@ -421,7 +425,7 @@ model attempts are authorized or executed by this milestone.
 | `native_execution.py` and `native_timing.py` | Lifecycle offsets/durations around public Inspect evaluation, solver and sandbox boundaries, in addition to native command duration | Versioned evidence; unchanged native timeout semantics; controlled-clock tests for success, timeout, setup/capture/evaluation errors and unavailable phases |
 | `native_resources.py` and CLI `native-resources` | Separate versioned interpretation joining frozen plan, raw results/session usage and an existing score interpretation | Every planned root retained; equal case/build weights; baseline zero build cost/null lineage; correctness and missingness qualify crossovers; original interpretations untouched |
 
-For the proposed allocation, all six builds precede consumer execution. Twelve
+For the executed allocation, all six builds preceded consumer execution. Twelve
 case/repeat blocks each contain the six package uses and one baseline, with a
 seeded order that balances arm positions as closely as possible. Freeze actual
 ordering and balance counts. The implementation uses seeded ring rotations with
@@ -459,9 +463,12 @@ resource/failure fixtures, clocked adapter tests, protected-context assertions,
 relocated rescoring and historical seal/score/audit preservation. The complete
 no-live-call test suite and normal lint/format/documentation checks apply to the
 implementation PR. Exact results are recorded in HANDOFF and the external review.
-New live timing evidence remains outstanding until separately
-authorized execution. The current root preflight, root/child postflight and raw
-capture gates stay in force; no stronger per-request attestation is claimed.
+The separately authorized execution validated the recorded live timing/order
+contract across all 90 roots. Timing phases reconcile across raw results,
+lifecycle files and sealed results, including the five baseline deadlines.
+Separate framework provisioning/cleanup remain unavailable. The current root
+preflight, root/child postflight and raw capture gates stay in force; no stronger
+per-request attestation is claimed.
 
 ## Component map and API boundaries
 
