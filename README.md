@@ -9,6 +9,25 @@ Users can bring study materials or start with a rough request. Yassa is intended
 to help clarify the work and prepare missing tasks and examples, supporting both
 small descriptive trials and studies requiring stronger evidence.
 
+**Product status: the full specification is not implemented.** The current
+foundation is a CLI execution and evidence backend for simulated fixtures and
+native Codex file studies, with bounded preparation from structured JSON.
+General conversational preparation, broader task/rubric preparation, additional
+vendor roles, model grading, inferential planning/analysis, and complete resource
+and recovery controls remain partial or missing. Some recent study preparation,
+launch coordination and assessment were performed by the development agent and
+external scripts, rather than supplied as Yassa product operations.
+
+The delivery target remains the full spec. See the
+[capability coverage map](SPEC.md#151-capability-coverage),
+[development sequence](SPEC.md#152-development-sequence), and
+[current implementation priority](HANDOFF.md#current-development-priority).
+The next milestone is a product preparation workflow for user-described work
+beyond the existing totals/reconciliation recipes, connected to execution and
+reporting. The milestones below establish only their recorded scope.
+
+## Implemented foundation and study history
+
 The first implementation runs **synthetic fixtures with a simulated provider**
 through Inspect AI. It supports direct tasks and a complete builder-to-consumer
 path for both supplied and Yassa-prepared inputs. It preserves frozen plans,

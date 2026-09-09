@@ -37,6 +37,7 @@ Start with [README.md](README.md), then follow the relevant route:
 | Work | Starting point |
 | --- | --- |
 | Continue development in a fresh session | [HANDOFF.md](HANDOFF.md) |
+| Full product scope and development priority | [Capability coverage](SPEC.md#151-capability-coverage), [development sequence](SPEC.md#152-development-sequence), and [current priority](HANDOFF.md#current-development-priority) |
 | Run or modify the implemented fixture path | [README usage](README.md#run-the-fixture) and [implemented boundaries](ARCHITECTURE.md#implemented-fixture-milestone) |
 | Run or modify the native Codex comparison | [Native usage](README.md#run-the-native-codex-fixture) and [native boundaries](ARCHITECTURE.md#implemented-native-codex-fixture) |
 | Configure or extend native file studies | [Native v2 guide](docs/configurable-native.md) and [implemented runner](ARCHITECTURE.md#implemented-configurable-native-runner) |
@@ -64,6 +65,16 @@ guide in every directory or require unrelated documents for each task.
   the study definition when working on an experiment.
 - Keep accepted requirements, proposals, open decisions, and observed results
   distinguishable. Hypothetical examples do not establish defaults or findings.
+- The delivery target is the full specification. Use the capability IDs in
+  [SPEC section 15.1](SPEC.md#151-capability-coverage) to connect implementation
+  milestones to that target. A bounded implementation or completed experiment
+  does not reduce the agreed product scope.
+- Distinguish operations implemented in Yassa from work performed manually by a
+  development agent or external study scripts. Demonstrate the required behavior
+  through a supported product interface before marking the capability complete.
+- Follow the current product development priority. Do not default to another
+  benchmark allocation; live validation must serve a named capability claim or
+  user-requested study and use the applicable existing authorization.
 - If a referenced document is absent, identify any material information gap and
   continue work supported by the current request and repository evidence.
 - Maintain requirements in `SPEC.md` and technical design in `ARCHITECTURE.md`;
@@ -122,3 +133,6 @@ revision needs a deliberate new hash. Do not write run artifacts into this check
 Report what changed, which checks actually ran and their observed results, and
 any material unresolved limitation. Distinguish planned checks from executed
 checks and proposed architecture from implemented behavior.
+For product milestones, report the capability IDs advanced, the new behavior
+available to the user, and the remaining gap. Keep software checks, experimental
+findings, and full-product completion separate.

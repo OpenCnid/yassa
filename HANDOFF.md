@@ -1,6 +1,52 @@
 # Development handoff
 
-Updated 2026-09-09: the separately authorized [package reuse allocation](docs/package-reuse.md#recorded-results)
+Updated 2026-09-09: **the delivery target is the full specification, and the
+product is incomplete.** The user clarified that their build approvals were for
+that target. The completed fixture milestones and study runs remain useful
+evidence, but do not substitute for the missing product capabilities.
+
+## Current development priority
+
+Build the general preparation-to-study workflow described in
+[SPEC section 15.2](SPEC.md#152-development-sequence), advancing Y01, Y02, Y03 and
+Y10 in the [capability coverage map](SPEC.md#151-capability-coverage). The next
+milestone must let Yassa turn user-described work outside the existing
+totals/reconciliation recipes into a reviewed, executable study. Another fixed
+benchmark or external developer-written study script does not complete it.
+
+Start with the existing guided draft and expert study contracts, then connect
+preparation to the implemented freezing, execution, scoring and reporting path.
+The [architecture priority](ARCHITECTURE.md#current-implementation-priority)
+identifies the code boundaries. Completion evidence must demonstrate:
+
+- A sufficient task request proceeds; material gaps produce focused questions,
+  with assumptions and revisions visible to the user.
+- Both supplied materials and Yassa-prepared materials reach a reviewed task,
+  rubric, verified references and held-out cases beyond the current recipes.
+- Guided and expert routes resolve to the same supported study definition,
+  retaining source provenance and the declared input/access boundaries.
+- A resulting study reaches recorded execution, scoring and reporting through
+  supported product interfaces. The development agent does not manually replace
+  missing preparation or orchestration code for the acceptance demonstration.
+- Behavioral checks cover the newly supported contracts and failure cases;
+  any live validation identifies the specific capability, claimed scope and
+  resource allocation, using the applicable authorization.
+
+The broader sequence adds required execution/vendor/grading roles, complete
+resource and recovery operations, compatible planning and analysis, then full
+workflow acceptance and the substantive first study. These remain commitments
+subject to the proposals and open choices recorded in the spec. Resolve ordinary
+engineering choices within existing authorization; do not ask the user to
+reapprove the overall goal or routine reversible implementation work.
+
+Report each milestone in terms of the behavior users can now exercise, coverage
+IDs advanced and remaining work. Test counts and successful experimental outputs
+are separate evidence; neither is a full-product completion measure. This
+realignment changes documentation and development priority, not runtime behavior.
+
+## Latest completed experiment
+
+The separately authorized [package reuse allocation](docs/package-reuse.md#recorded-results)
 completed all 90 attempts: six accepted packages, 72 package consumers and 12
 no-package baselines. All 84 consumers passed; no scores are missing. Native
 command time was 7,545.795 seconds (125.76 minutes); elapsed launch time
@@ -78,7 +124,9 @@ is not implemented.
 
 Read [AGENTS.md](AGENTS.md) and [README.md](README.md), then:
 
-- [SPEC next work](SPEC.md#15-next-work) for completed and outstanding scope.
+- [SPEC capability coverage](SPEC.md#151-capability-coverage) and
+  [development sequence](SPEC.md#152-development-sequence) for remaining product
+  work; completed milestones are recorded separately in section 15.3.
 - [Architecture: implemented native fixture](ARCHITECTURE.md#implemented-native-codex-fixture)
   and [remaining decisions](ARCHITECTURE.md#open-implementation-decisions).
 - [Native milestone evidence](docs/native-fixture.md) for the actual experiment,
@@ -189,7 +237,11 @@ Every reference passes an independent oracle, and 476 recorded checker probes
 cover legitimate alternatives, structural errors and eleven faulty solvers.
 Diagnostic components stay in score records; the primary outcome remains binary.
 
-## Next step: review the completed reuse study
+## Interpretation of completed studies
+
+These results are historical context for development. The
+[current implementation priority](#current-development-priority) owns the next
+product work.
 
 **The earlier sensitivity allocation and its assessment are complete.** Its
 60/60 correctness ceiling gives no builder separation or equivalence result.
@@ -197,14 +249,15 @@ Assisted consumers used less native command time, but build costs were not
 recovered at the four/eight uses actually assigned per package. The post hoc
 15-19-use crossover calculation is an extrapolation, not a measured result.
 
-1. Review [the completed package reuse results](docs/package-reuse.md#recorded-results)
-   and their external evidence. The primary H=20 arithmetic contrasts are
+1. [The completed package reuse results](docs/package-reuse.md#recorded-results)
+   and their external evidence record primary H=20 arithmetic contrasts that are
    conditional on one synthetic brief and case mixture. Package uses are nested
    in builds; the shared baseline is not independent evidence for each contrast.
 2. The broader multi-domain/official-builder program remains unimplemented.
    Retained ordinary scripts and instruction-versus-code ablations were outside
-   this study. Define any further comparison before seeking a new allocation;
-   this completed run does not authorize outcome-driven extensions.
+   this study. Further experimental work needs a concrete purpose and allocation;
+   it must not displace unfinished product work by default. This completed run
+   does not authorize outcome-driven extensions.
 3. Lifecycle timing now has live evidence for evaluation, adapter setup, native
    command and capture/acceptance. Separate provisioning/cleanup and
    first-correct-output time remain unavailable. See

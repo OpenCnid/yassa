@@ -6,6 +6,12 @@ implemented slice is identified below; the broader component design and explicit
 proposed paths describe remaining work. Conceptual record
 names are not all public APIs.
 
+The full specification remains the delivery target. The
+[capability coverage map](SPEC.md#151-capability-coverage) records unfinished
+behavior, and the [development sequence](SPEC.md#152-development-sequence)
+sets implementation priority. Completed native studies validate portions of this
+architecture; they do not establish completion of the product workflow.
+
 [SPEC.md](SPEC.md) owns the product requirements and measurement semantics.
 [AGENTS.md](AGENTS.md) is the development entry point. This document explains how
 the system is divided, how information moves, and which invariants each boundary
@@ -14,8 +20,8 @@ must preserve. Its structure follows the user's pinned
 
 ## Bird's-eye view
 
-Yassa turns a user's comparison question into a recorded experiment. Preparation
-accepts supplied materials and may use AI to clarify the task, propose a rubric,
+The target product turns a user's comparison question into a recorded experiment.
+Preparation accepts supplied materials and may use AI to clarify the task, propose a rubric,
 and find or construct cases. A resolved study and sampling plan then specify the
 work to run through Inspect. Execution produces evidence; scoring and analysis
 produce versioned interpretations of it.
@@ -39,8 +45,10 @@ flowchart TD
     S --> A
 ```
 
-The diagram shows information dependencies. It does not require a separate
-process for every box or delay all scoring until every trial has completed.
+The diagram describes the target workflow. General preparation and analysis
+remain partial, as identified in the implemented sections below. It shows
+information dependencies and does not require a separate process for every box
+or delay all scoring until every trial has completed.
 Scoring can happen as soon as the required evidence for an attempt is sealed.
 
 The ground records are the resolved conditions and observed work. Scores,
@@ -54,6 +62,32 @@ silently revise the conditions of a running experiment.
 **Architecture invariant:** a report's numerical claims originate in recorded
 scores and analysis. Report generation does not invent measurements or decide
 which unsuccessful attempts disappear.
+
+## Current implementation priority
+
+The next product milestone advances Y01, Y02, Y03 and Y10 in the
+[coverage map](SPEC.md#151-capability-coverage): general preparation connected to
+a runnable study. Start from `StudyDraft` and `prepare_draft` in
+[guided_preparation.py](src/yassa/guided_preparation.py), the task/material/study
+contracts in [native_contracts.py](src/yassa/native_contracts.py), and the existing
+freeze, execution and reporting path in [native_runner.py](src/yassa/native_runner.py).
+
+The implementation must accept work outside the current recipes, expose material
+questions and proposed assumptions, and produce reviewed task, rubric and case
+records. Guided and expert preparation must resolve to the same executable
+definition. Separate effectful preparation operations, including model calls or
+source access when needed, from contract validation and plan construction.
+Preserve originals, reference verification, provenance and held-out access
+boundaries through both supplied and prepared routes. Add the corresponding
+checker/evidence interfaces as required by the chosen task contract, while
+preserving existing v1/v2 readers and reproducibility.
+
+This is remaining design work, not an implemented general preparation API.
+Developer-authored study files, external launch helpers and manually written
+assessments do not fill these product boundaries. Acceptance must exercise the
+supported preparation-to-report interfaces, with explicit evidence for each
+newly claimed live capability. The proposed expanded layout below is optional
+organization for this work, not a requirement to create every module first.
 
 ## Repository map
 
@@ -994,6 +1028,10 @@ integration points below still require verification before use:
   enforcement granularity for every accounted model role and adapter.
 
 ## Open implementation decisions
+
+Use the [capability coverage map](SPEC.md#151-capability-coverage) for the full
+product backlog and completion criteria. The list below summarizes technical
+choices and gaps; it is not a separate delivery scope.
 
 The implemented paths resolve packaging, JSON serialization, local evidence,
 the account-totals checker, a pinned native Codex runtime, Docker isolation, and
