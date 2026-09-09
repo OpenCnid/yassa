@@ -1,7 +1,7 @@
 # Architecture
 
 Status: simulated fixtures, configurable native Codex file studies, and bounded
-guided preparation implemented, including event reconciliation, 2026-09-09. The
+guided preparation implemented, including declarative JSON task preparation, 2026-09-09. The
 implemented slice is identified below; the broader component design and explicitly
 proposed paths describe remaining work. Conceptual record
 names are not all public APIs.
@@ -65,29 +65,16 @@ which unsuccessful attempts disappear.
 
 ## Current implementation priority
 
-The next product milestone advances Y01, Y02, Y03 and Y10 in the
-[coverage map](SPEC.md#151-capability-coverage): general preparation connected to
-a runnable study. Start from `StudyDraft` and `prepare_draft` in
-[guided_preparation.py](src/yassa/guided_preparation.py), the task/material/study
-contracts in [native_contracts.py](src/yassa/native_contracts.py), and the existing
-freeze, execution and reporting path in [native_runner.py](src/yassa/native_runner.py).
+The general preparation milestone implements the bounded JSON path for Y01,
+Y02, Y03 and Y10 described in [the guide](docs/general-preparation.md). The next
+implementation priority is broader execution and grading roles in
+[SPEC step 2](SPEC.md#152-development-sequence). Full capability coverage remains
+incomplete; live synthesis quality for the new preparer has not been validated.
 
-The implementation must accept work outside the current recipes, expose material
-questions and proposed assumptions, and produce reviewed task, rubric and case
-records. Guided and expert preparation must resolve to the same executable
-definition. Separate effectful preparation operations, including model calls or
-source access when needed, from contract validation and plan construction.
-Preserve originals, reference verification, provenance and held-out access
-boundaries through both supplied and prepared routes. Add the corresponding
-checker/evidence interfaces as required by the chosen task contract, while
-preserving existing v1/v2 readers and reproducibility.
-
-This is remaining design work, not an implemented general preparation API.
-Developer-authored study files, external launch helpers and manually written
-assessments do not fill these product boundaries. Acceptance must exercise the
-supported preparation-to-report interfaces, with explicit evidence for each
-newly claimed live capability. The proposed expanded layout below is optional
-organization for this work, not a requirement to create every module first.
+Keep extending the shared task/material/native runner boundaries. Direct native
+comparison, additional runtime/vendor roles, measured activation/clarification
+and different-family final grading remain to be implemented for the wider task
+contracts. Necessary resource controls belong alongside each new effectful role.
 
 ## Repository map
 
@@ -399,6 +386,48 @@ scorer identities remain readable without rewriting their bytes. Future changes
 to a reviewed definition create a new preparation revision; changed checkers
 require renewed review and follow the existing scoring correction policy.
 See [guided preparation](docs/guided-preparation.md) for usage, limits and evidence.
+
+## Implemented general preparation
+
+Version 2 preparation requests dispatch from `prepare_draft` to
+[general_preparation.py](src/yassa/general_preparation.py). Public request,
+proposal, case/calibration and expert review records live in
+[general_contracts.py](src/yassa/general_contracts.py). `study-schema` exposes them.
+Effectful synthesis and review calls use Inspect Task/Sample/generate in
+[preparation_model.py](src/yassa/preparation_model.py); contracts, verification
+and native plan construction remain separate pure operations.
+
+The task call sees only specification sources. Separate case calls receive one
+route and split; each candidate records source IDs and selection. Deterministic
+validation checks domains, reference feasibility, groups, normalized input
+uniqueness, positive alternatives and negative calibration against every score
+criterion. A fresh independent preparation review inspects semantic coverage and
+source adaptation. Experts import the same proposal and review it through the
+same operation, or bind an explicit supplied reviewer attestation to its bytes.
+Material gaps and review findings withhold a runnable export. The implementation
+contains no domain-specific case recipe for these operations.
+
+Successful rounds compile to `NativeStudyV2`, `TaskContract` and `FileMaterials`,
+with existing preparation manifests, source pins and admission. `json-predicates-v1`
+adds a protected declarative rubric to TaskContract; absent rubric fields are
+omitted so existing serialized contracts retain their identities. `check_task`
+dispatches the new interpreter over frozen case inputs and recorded output;
+legacy checker sources are untouched. New identities bind both rubric and code.
+The existing freeze/execution/score/report path handles the resulting study.
+
+Rounds retain source originals, adaptations, exact requests and answers, model
+responses/Inspect logs, component checks, review findings and preparer code.
+Compact aliases preserve original log bytes when freezing deeply nested Windows
+paths. Immutable history survives relocation and revision. Reports link the
+review and distinguish predicate compliance from semantic or real-world coverage.
+
+The [general guide](docs/general-preparation.md) specifies limits, resource caps,
+expert import semantics and acceptance evidence. Tests use actual Inspect with a
+simulated preparer and a native output adapter for record selection and feasible
+assignment; they establish software composition, not live synthesis quality.
+No new live calls or benchmark allocation were consumed. General semantic
+judgment, remote dataset research, direct native studies, vendor/grading roles,
+full recovery and public/redacted derivatives remain incomplete.
 
 ## Implemented event reconciliation preparation
 

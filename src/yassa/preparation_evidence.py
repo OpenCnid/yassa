@@ -32,6 +32,8 @@ def study_identity(study: NativeStudyV2) -> str:
 
 def load_preparation(study: NativeStudyV2, base: Path) -> dict[str, bytes] | None:
     if study.preparation is None:
+        if study.task.rubric:
+            raise ValueError("declarative rubrics require a pinned preparation review")
         if any(c.generator == "reviewed-files-v1" for c in study.conditions):
             raise ValueError("reviewed materials require a pinned preparation record")
         return None

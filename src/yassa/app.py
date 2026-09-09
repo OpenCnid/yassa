@@ -336,6 +336,10 @@ def main() -> int:
             command.add_argument("--reason")
     command = commands.add_parser("intake")
     command.add_argument("request", type=Path)
+    command = commands.add_parser("study-schema", help="print a general preparation JSON schema")
+    command.add_argument(
+        "kind", choices=("request", "task", "cases", "proposal", "review", "native")
+    )
     command = commands.add_parser("study-draft", help="develop a rough request into a native study")
     command.add_argument("request", type=Path)
     command.add_argument("--draft-dir", required=True, type=Path)
@@ -366,7 +370,26 @@ def main() -> int:
     command.add_argument("--output-dir", required=True, type=Path)
     args = parser.parse_args()
     try:
-        if args.command in {"study-draft", "study-revise"}:
+        if args.command == "study-schema":
+            from .general_contracts import (
+                CaseBatch,
+                ExpertReview,
+                GeneralRequest,
+                StudyProposal,
+                TaskProposal,
+            )
+            from .native_contracts import NativeStudyV2
+
+            schemas = {
+                "request": GeneralRequest,
+                "task": TaskProposal,
+                "cases": CaseBatch,
+                "proposal": StudyProposal,
+                "review": ExpertReview,
+                "native": NativeStudyV2,
+            }
+            output = canonical(schemas[args.kind].model_json_schema()).decode().strip()
+        elif args.command in {"study-draft", "study-revise"}:
             from .guided_preparation import prepare_draft
 
             output = (

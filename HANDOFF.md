@@ -7,42 +7,30 @@ evidence, but do not substitute for the missing product capabilities.
 
 ## Current development priority
 
-Build the general preparation-to-study workflow described in
-[SPEC section 15.2](SPEC.md#152-development-sequence), advancing Y01, Y02, Y03 and
-Y10 in the [capability coverage map](SPEC.md#151-capability-coverage). The next
-milestone must let Yassa turn user-described work outside the existing
-totals/reconciliation recipes into a reviewed, executable study. Another fixed
-benchmark or external developer-written study script does not complete it.
+Continue with broader execution and grading roles in
+[SPEC step 2](SPEC.md#152-development-sequence), advancing Y03, Y04, Y05 and Y07.
+The preceding [general preparation implementation](docs/general-preparation.md)
+now advances Y01, Y02, Y03 and Y10 for declarative JSON work. It accepts ordinary
+task descriptions, prepares/reviews tasks and cases, preserves both material
+routes, and compiles to the existing native freeze/execution/report workflow.
+Expert imports share the same validation and compilation.
 
-Start with the existing guided draft and expert study contracts, then connect
-preparation to the implemented freezing, execution, scoring and reporting path.
-The [architecture priority](ARCHITECTURE.md#current-implementation-priority)
-identifies the code boundaries. Completion evidence must demonstrate:
+This is bounded implementation coverage, not full-product completion. The new
+acceptance uses a simulated Inspect preparation provider and native test adapter;
+live preparation synthesis quality and provider behavior remain unverified.
+Native direct comparison, additional vendor/runtime roles, measured activation
+and clarification, final model grading, semantic tasks outside JSON predicates,
+source research, inferential planning, resource/recovery operations and the
+substantive first study remain gaps. See the updated
+[capability map](SPEC.md#151-capability-coverage) and
+[implemented boundary](ARCHITECTURE.md#implemented-general-preparation).
 
-- A sufficient task request proceeds; material gaps produce focused questions,
-  with assumptions and revisions visible to the user.
-- Both supplied materials and Yassa-prepared materials reach a reviewed task,
-  rubric, verified references and held-out cases beyond the current recipes.
-- Guided and expert routes resolve to the same supported study definition,
-  retaining source provenance and the declared input/access boundaries.
-- A resulting study reaches recorded execution, scoring and reporting through
-  supported product interfaces. The development agent does not manually replace
-  missing preparation or orchestration code for the acceptance demonstration.
-- Behavioral checks cover the newly supported contracts and failure cases;
-  any live validation identifies the specific capability, claimed scope and
-  resource allocation, using the applicable authorization.
-
-The broader sequence adds required execution/vendor/grading roles, complete
-resource and recovery operations, compatible planning and analysis, then full
-workflow acceptance and the substantive first study. These remain commitments
-subject to the proposals and open choices recorded in the spec. Resolve ordinary
-engineering choices within existing authorization; do not ask the user to
-reapprove the overall goal or routine reversible implementation work.
-
-Report each milestone in terms of the behavior users can now exercise, coverage
-IDs advanced and remaining work. Test counts and successful experimental outputs
-are separate evidence; neither is a full-product completion measure. This
-realignment changes documentation and development priority, not runtime behavior.
+The new work began from PR #7's merge `8a7158259e6cc31240d7fda301946391cbd21131`
+in `C:/Users/Darian/.codex/worktrees/cdb4/yassa`, on branch
+`codex/general-preparation`. No prior benchmark allocation was reused. The
+90-attempt reuse study remains consumed; new live validation needs a named
+capability claim, concrete resource allocation and applicable authorization.
+Do not merge the new milestone PR without authorization.
 
 ## Latest completed experiment
 
@@ -278,6 +266,7 @@ Some details are proposals, not settled product requirements.
 | --- | --- |
 | CLI and simulated composition | [app.py](src/yassa/app.py) |
 | Schemas, preparation, planning | [study.py](src/yassa/study.py), [prepare.py](src/yassa/prepare.py), [planning.py](src/yassa/planning.py) |
+| General model preparation and expert review | [general_preparation.py](src/yassa/general_preparation.py), [general_contracts.py](src/yassa/general_contracts.py), [preparation_model.py](src/yassa/preparation_model.py), [json_rubric.py](src/yassa/json_rubric.py) |
 | Guided draft schema, readiness and revision | [guided_preparation.py](src/yassa/guided_preparation.py) |
 | Constructed feature cases and checker probes | [preparation_templates.py](src/yassa/preparation_templates.py) |
 | Event reconciliation semantics and faulty-solver probes | [reconciliation.py](src/yassa/reconciliation.py), [reconciliation_templates.py](src/yassa/reconciliation_templates.py) |
@@ -358,6 +347,29 @@ is at `C:/Users/Darian/yassa-runs/native-probe-01`. These are distinct runs.
   already verified evidence.
 
 ## Verification and delivery
+
+General preparation verification: **234 passed, 1 skipped** in the full suite;
+the **17 new tests** passed again after the final checker-identity binding change.
+Ruff checks, formatting and patch whitespace passed. Wheel/source distributions
+built outside the checkout; 36 packaged source/runtime files matched source bytes.
+The documentation check resolved 663 links across owning documents and generated
+reviews at that check. The existing Windows symlink-permission skip remains.
+
+The [acceptance record](C:/Users/Darian/yassa-runs/general-preparation-20260909-v1/acceptance-final.json)
+links the product-generated review and report under
+`C:/Users/Darian/yassa-runs/general-preparation-20260909-v1`. The tracked CLI test
+made six simulated preparation calls, then recorded two native-adapter builds
+and four passing consumers across supplied/prepared assignment work. Consumers
+used valid alternative assignments. Repeat and relocated scores were identical.
+Separate tests cover selection, revisions, failures, source boundaries and
+byte-identical guided/expert executable definitions. No live calls were made.
+
+Historical v1 and v2 compatibility replays preserve original score rows and
+all prior interpretations, including failed audits. Older v2 frozen checkers
+already differed from the pre-milestone source; their replays record an explicit
+reason. The [follow-up verification](C:/Users/Darian/yassa-runs/general-preparation-20260909-v1/historical-compatibility-followup.json)
+records those checks and the context diagnostic's unchanged seal. No original
+run, score, failed capture or benchmark allocation was replaced.
 
 Offline reuse implementation: **217 tests passed, 1 skipped** in 353.69 seconds.
 The existing Windows symlink skip remains. The focused reuse/resource/timing

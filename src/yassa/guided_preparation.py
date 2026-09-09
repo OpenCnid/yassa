@@ -331,6 +331,14 @@ def _review(draft, missing, template, materials, plan, validation) -> bytes:
 
 def prepare_draft(input_path: Path, destination: Path, previous: Path | None = None) -> Path:
     """Create a new immutable round. A complete request needs no additional interview."""
+    initial = parse_json(read_regular(input_path))
+    prior = _read_draft(previous)[0] if previous else {}
+    if (type(initial) is dict and initial.get("schema_version") == 2) or prior.get(
+        "preparation_kind"
+    ) == "general":
+        from .general_preparation import prepare_general
+
+        return prepare_general(input_path, destination, previous)
     destination = external_root(destination)
     raw = read_regular(input_path)
     patch = parse_json(raw)
