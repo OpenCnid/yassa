@@ -9,7 +9,8 @@ package; see [the reconciliation pilot](reconciliation-pilot.md).
 
 This is a bounded file-processing milestone. A subsequent
 [guided preparation workflow](guided-preparation.md) produces these same contracts
-for two task families. General task synthesis, inferential analysis, arbitrary
+for account totals and simple/event reconciliation. General task synthesis,
+inferential analysis, arbitrary
 checker execution, additional vendor runtimes, recovery, and token/spend limits
 remain outside the implemented scope.
 
@@ -89,12 +90,21 @@ It never imports or executes submitted packages on the controller.
 | --- | --- | --- |
 | `account-totals-v1` | One declared JSON file with `rows` | Existing normalized totals semantics; unordered totals; independent oracle validates every candidate |
 | `reconciliation-v1` | Two declared CSV files, in left/right order | Aggregate duplicate IDs separately, retain the union including zero balances, report left/right and left-minus-right; unordered balances; independent oracle validates every candidate |
+| `reconciliation-v2` | Left CSV, right CSV, then JSON policy | Latest event revisions, voids, literal ID/currency keys, exact decimals, event counts and inclusive tolerance statuses; independent oracle; unordered balances |
 | `json-exact-v1` | Arbitrary declared case files; `checker_inputs` is empty | Supplied expected JSON; object key order and whitespace ignored; array order and JSON numeric representation preserved; booleans differ from integers |
 
-Reconciliation CSV requires exactly `id,cents` columns. IDs are nonempty and
+Reconciliation v1 CSV requires exactly `id,cents` columns. IDs are nonempty and
 case-sensitive without trimming; CSV quoting is supported. Cents are signed
 integers. Extra fields, duplicate output IDs, missing zero entries, wrong-side
 amounts, and boolean amounts fail. Header-only inputs are valid.
+
+Event reconciliation v2 is implemented in
+[reconciliation.py](../src/yassa/reconciliation.py). It requires exactly
+`event_id,revision,id,currency,amount,state` columns and a per-case currency
+policy. Its [preparation design](reconciliation-sensitivity.md) defines coverage,
+diagnostic components, checker alternatives and interpretation limits. Use the
+guided `reviewed-files-v1` path or pinned supplied materials; there is no new
+legacy `NativeCondition.generator` mode.
 
 The exact JSON matcher supports new file tasks with author-verified expected
 answers without runner changes. It validates JSON representation, not the truth

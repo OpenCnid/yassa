@@ -190,8 +190,14 @@ def test_pre_baseline_preparation_identity_stays_compatible():
     assert study_identity(study) == identity(old)
 
 
-def test_pilot_preparation_pins_supplied_work_coverage_controls_and_budget(tmp_path):
-    pending = prepare_draft(STUDIES / "reconciliation-pilot-request.json", tmp_path / "pending")
+@pytest.mark.parametrize(
+    "study_name,attempts,seconds,baselines",
+    [("reconciliation-pilot", 58, 7800, 10), ("reconciliation-sensitivity", 68, 10200, 12)],
+)
+def test_pilot_preparation_pins_supplied_work_coverage_controls_and_budget(
+    tmp_path, study_name, attempts, seconds, baselines
+):
+    pending = prepare_draft(STUDIES / f"{study_name}-request.json", tmp_path / "pending")
     assert not (pending.parent / "study.json").exists()
     # A fixture source tests binding mechanics; it is not Dovetail evidence.
     source = tmp_path / "fixture-source"
@@ -213,22 +219,22 @@ def test_pilot_preparation_pins_supplied_work_coverage_controls_and_budget(tmp_p
     review = prepare_draft(path, tmp_path / "ready", pending.parent)
     validation = parse_json((review.parent / "validation.json").read_bytes())
     plan = validation["plan"]
-    assert (plan["reserved_attempts"], plan["reserved_native_seconds"]) == (58, 7800)
+    assert (plan["reserved_attempts"], plan["reserved_native_seconds"]) == (attempts, seconds)
     assert len([t for t in plan["trials"] if t["role"] == "build"]) == 8
-    assert len([t for t in plan["trials"] if t["arm"] == "no-package"]) == 10
+    assert len([t for t in plan["trials"] if t["arm"] == "no-package"]) == baselines
     assert all(
         p["expected"] == p["observed"]
         for c in validation["conditions"].values()
         for p in c["probes"]
     )
     assert (review.parent / "history/000-supplied-supplied.json").read_bytes() == (
-        STUDIES / "reconciliation-pilot-supplied.json"
+        STUDIES / f"{study_name}-supplied.json"
     ).read_bytes()
     changed = dict(
         answers,
         admission={
-            "max_attempts": 57,
-            "max_scheduled_seconds": 7800,
+            "max_attempts": attempts - 1,
+            "max_scheduled_seconds": seconds,
             "build_timeout_seconds": 600,
             "consumer_timeout_seconds": 60,
         },

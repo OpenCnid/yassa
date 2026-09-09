@@ -1,7 +1,30 @@
 # Development handoff
 
-Updated 2026-09-08 (2026-09-09 UTC) after implementing native catalog control and
-independent failure captures. The user-approved authenticated diagnostic passed:
+Updated 2026-09-09: the user-approved reconciliation sensitivity allocation
+completed all 68 attempts under
+`C:/Users/Darian/yassa-runs/reconciliation-sensitivity-20260909-v1`. All eight
+packages were accepted and all 60 consumers passed, including all 12 no-package
+baselines. There are no missing scores. Native command time was 6,198.559 seconds
+(103.31 minutes); elapsed launch time including setup, export, sealing and original
+reporting was 134.54 minutes. One build and the bulk baseline reached their
+deadlines with usable outputs. No retries, replacement builds or added cases ran.
+
+Repeat scoring is byte-identical, and both general and raw-capture audits passed
+with no violations or evidence gaps across 75 recorded root/child sessions.
+Historical seals, original scores, the pilot's failed audits and the context
+diagnostic were reverified unchanged. The external
+[result assessment](C:/Users/Darian/yassa-runs/reconciliation-sensitivity-20260909-v1/results.md)
+links the complete evidence.
+Do not relaunch any completed allocation or request its already-granted approval.
+
+Preparation state before the approved launch:
+The [new preparation](docs/reconciliation-sensitivity.md) adds a separate event
+contract, interacting cases and checker diagnostics. Its frozen plan reserves
+68 attempts and 10,200 native command seconds: 8 builds, 48 package consumers and
+12 baselines. [Reviewed launch plan](C:/Users/Darian/yassa-runs/reconciliation-sensitivity-20260909-v1/launch-review.md).
+
+The previously implemented native catalog controls and independent captures
+remain unchanged. The user-approved authenticated diagnostic passed:
 two fresh roots and one child had exactly the expected catalogs, with no extra
 plugins, and produced correct outputs. Native commands used 66.938 seconds of a
 separately frozen 240-second reservation. No attempt was retried. See the
@@ -47,6 +70,8 @@ Read [AGENTS.md](AGENTS.md) and [README.md](README.md), then:
   controls, source profile, exact allocation, observed scores and audit failures.
 - [Native context control](docs/native-context.md) for catalog enforcement,
   independent raw capture, authenticated checks and remaining limits.
+- [Reconciliation sensitivity study](docs/reconciliation-sensitivity.md)
+  for the frozen materials, checker contract, completed allocation and new ceiling.
 
 Inspect the current checkout and tools before choosing commands. This is a dated
 handoff, not evidence that a path, installed tool, or account connection is still
@@ -58,6 +83,9 @@ in ARCHITECTURE; update those documents as implementation advances.
 The implementation and this handoff advance together. Begin from the revision
 containing this milestone or a later default-branch revision. Inspect
 `git status --short` and preserve additional local changes before beginning work.
+This preparation began from merged PR #5, `0919307`, in
+`C:/Users/Darian/.codex/worktrees/e3cc/yassa`. New run/preparation outputs are at
+`C:/Users/Darian/yassa-runs/reconciliation-sensitivity-20260909-v1`.
 
 The original development workspace was
 `C:/Users/Darian/.codex/worktrees/68a6/yassa`, based on `95666e2`
@@ -124,16 +152,30 @@ milestone did not change the adapter, access profile or deterministic checker.
 The subsequent context milestone adds the gate and independent evidence capture
 described above; the command permission profile and task checker remain unchanged.
 
-## Next recommended implementation milestone
+The new `reconciliation-v2` contract adds event revision/void processing, exact
+decimals, policy-driven currency precision/tolerances, composite keys, counts and
+statuses. Its separate recipe constructs three development examples and eight
+held-out scenarios; the new supplied fixture has three examples and four cases.
+Every reference passes an independent oracle, and 476 recorded checker probes
+cover legitimate alternatives, structural errors and eleven faulty solvers.
+Diagnostic components stay in score records; the primary outcome remains binary.
 
-**Completion target:** prepare more informative synthetic reconciliation work
-and choose the intended claim before another comparison.
+## Next step: review the repeated ceiling
 
-1. Use the pilot's score ceiling to revise work coverage and difficulty. All
-   observed baselines passed these related cases; more repeats alone do not
-   address their limited sensitivity. Synthetic reconciliation remains the
-   user's accepted preference. Broader work, controls and claims remain open
-   under [SPEC section 13](SPEC.md#13-first-dovetail-study-decisions-still-open).
+**The approved allocation and its audit are complete.** Review the results within
+the declared descriptive scope. The added event interactions still
+produced a correctness ceiling, including the no-package baselines. Do not extend
+the cases or reuse the consumed launch authorization.
+
+1. Read the [launch review](C:/Users/Darian/yassa-runs/reconciliation-sensitivity-20260909-v1/launch-review.md)
+   and [frozen plan](C:/Users/Darian/yassa-runs/reconciliation-sensitivity-20260909-v1/run/plan.json).
+   The selected claim is descriptive condition discovery on 12 constructed cases,
+   with two builds per arm/condition and one baseline per case. Keep baseline and
+   independent-build denominators separate; no general ranking or preparation-route
+   causal claim. The observed ceiling gives no correctness separation at this
+   model and deadlines. Review the recorded resource and deadline outcomes. A
+   future comparison needs a separately selected workload and reviewed allocation;
+   greater complexity alone is not evidence that it will discriminate builders.
 2. Retain the current catalog gate and evidence contract. Plugin, remote-plugin
    and app loading are now explicitly disabled; exact expected catalogs come
    from pinned built-ins and declared inputs. The authenticated diagnostic and
@@ -145,7 +187,7 @@ and choose the intended claim before another comparison.
    logs/control surviving output collection failures; malformed, withheld and
    uncollected content still have explicit limits. General recovery is future
    work. New subject calls require a separate reviewed allocation and launch
-   authorization; neither completed run authorizes further spending.
+   authorization; no completed run authorizes further spending.
 
 The previous small comparison is complete; its case counts and deadlines, and
 the v2 example allocations, are not pilot defaults. Binary inputs, broader
@@ -161,6 +203,7 @@ Some details are proposals, not settled product requirements.
 | Schemas, preparation, planning | [study.py](src/yassa/study.py), [prepare.py](src/yassa/prepare.py), [planning.py](src/yassa/planning.py) |
 | Guided draft schema, readiness and revision | [guided_preparation.py](src/yassa/guided_preparation.py) |
 | Constructed feature cases and checker probes | [preparation_templates.py](src/yassa/preparation_templates.py) |
+| Event reconciliation semantics and faulty-solver probes | [reconciliation.py](src/yassa/reconciliation.py), [reconciliation_templates.py](src/yassa/reconciliation_templates.py) |
 | Review/material byte pins and portable provenance | [preparation_evidence.py](src/yassa/preparation_evidence.py) |
 | Native version dispatch and legacy fixture | [native.py](src/yassa/native.py) |
 | Native v2 schemas, preparation, allocation | [native_contracts.py](src/yassa/native_contracts.py) |
@@ -238,7 +281,41 @@ is at `C:/Users/Darian/yassa-runs/native-probe-01`. These are distinct runs.
 
 ## Verification and delivery
 
-Current implementation verification: **163 tests passed, 1 skipped** in the full
+Prelaunch preparation verification: **196 tests passed, 1 skipped** in 239.73
+seconds. The existing Windows symlink skip remains. Focused preparation/event
+checks passed 60 tests before the full suite. Ruff lint/format, wheel/source
+builds and whitespace checks passed; final distribution and documentation details
+are in the external [verification report](C:/Users/Darian/yassa-runs/reconciliation-sensitivity-20260909-v1/verification.md).
+
+The subsequent approved native launch completed 68/68 attempts, with 60/60
+passing consumer scores, no missing uses, 75 recorded sessions and two usable
+deadline outputs. Both general and capture audits passed, and offline rescoring
+reproduced original score bytes. The
+[postlaunch history check](C:/Users/Darian/yassa-runs/reconciliation-sensitivity-20260909-v1/history-after-launch.json)
+reverified the prior seals, original scores and failed audit artifacts unchanged.
+These authenticated results are separate from the prelaunch offline test suite.
+The offline tests, compatibility rescores and postprocessing checks made no
+experimental model calls. The unchanged native execution adapter and
+catalog/capture implementation were exercised by the approved 68-attempt study
+in addition to the separately completed diagnostic.
+
+The ready review records 179 supplied and 297 prepared checker probes. All eleven
+faulty solvers are detected by at least one prepared evaluation case. The freeze
+pins exact materials, sources, checker/preparer bytes, dependencies and runtime
+files. Freeze ID is
+`821a2153d927614ffa363433d84c228e71c85bb7792717adf5b49fef4cf03b28`.
+The completed attempts and results are sealed under that frozen allocation. If
+implementation/dependencies change, create a separately identified new freeze;
+never edit this one.
+
+Offline `sensitivity-preparation-compatibility` interpretations preserved all
+50 pilot, 12 native v1, 4 native v2 reconciliation and 4 native v2 totals score
+rows. The original score files and seals are unchanged. New interpretation
+metadata records the changed checker dispatcher and explicit reason, so whole
+rescore files are not byte-identical. The pilot's initial/follow-up failed audits
+and four missing rows remain intact. The diagnostic's seal still verifies.
+
+Previous context implementation verification: **163 tests passed, 1 skipped** in the full
 suite, including 11 context/capture tests and six Inspect adapter outcomes using
 a simulated sandbox. These checks make no model calls. Authenticated validation
 separately passed for two roots and one child. All 26 packaged source/runtime

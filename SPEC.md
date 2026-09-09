@@ -1,6 +1,6 @@
 # yassa specification
 
-Status: working draft for discussion, 2026-09-08.
+Status: working draft for discussion, updated 2026-09-09.
 
 This document records the accepted product direction and proposes requirements
 that make it implementable. Sections marked **Accepted direction** reflect the
@@ -22,6 +22,9 @@ task/file contracts, declared checker selection, pinned source bindings, multipl
 builds and repeats, and full-plan attempt/deadline admission.
 [Guided preparation](docs/guided-preparation.md) now develops rough requests through
 explicit JSON decisions into that definition for totals and reconciliation.
+The [post-ceiling study](docs/reconciliation-sensitivity.md) adds a separate
+event-reconciliation contract. Its approved allocation completed with 60/60
+consumers passing, including 12/12 baselines; both offline audits passed.
 General task synthesis and broader task/checker semantics remain outstanding.
 
 ## 1. Purpose
@@ -769,6 +772,55 @@ verified runtime and design comparisons within that runtime before attributing
 cross-runtime differences to a builder. Cross-family consumption of generated
 packages is a further transfer question when that is the intended comparison.
 
+### 13.2 Synthetic reconciliation condition discovery after the ceiling
+
+**Accepted scope, 2026-09-09:** prepare more informative synthetic reconciliation
+work autonomously using the existing descriptive condition-discovery purpose.
+Prepare a reviewable launch; do not reuse consumed pilot/diagnostic approvals.
+The user subsequently reviewed and approved the exact frozen 68-attempt plan;
+that execution is complete. General multi-domain builder ranking remains open.
+
+**Prepared design, not observed performance:** the separate `reconciliation-v2`
+contract combines event revision selection, voids and rekeying, literal composite
+keys, exact decimal units, event counts, per-case precision/tolerances and status
+precedence. Three development examples per condition teach the complete declared
+rules; four supplied and eight prepared held-out cases exercise individual rules,
+interactions, policy changes and scale. The exact rules are preparer choices for
+synthetic work, recorded with their hash and provenance. Increased sensitivity
+is a hypothesis to test, not a finding inferred from checker probes.
+
+Retain two independent builds per arm/condition, common-request and the pinned
+Dovetail pack with explicit invocation, one use per package/case, and one fresh
+no-package baseline per case. The frozen allocation reserves 8 builds at 600
+seconds and 60 consumers at 90 seconds: **68 attempts, 10,200 native seconds**,
+excluding setup/export. No retries, replacement builds or outcome-driven
+extensions are included. The separate launch authorization was granted on
+2026-09-09 and is recorded with the external launch evidence.
+
+The primary score is complete-task success. Diagnostic key, amount, count and
+status components explain recorded failures without creating additional
+independent measurements. Report by condition, independent build and case;
+baseline executions retain separate denominators and no build lineage. This is
+not a causal comparison of preparation routes or a ranking of builders generally.
+Report another ceiling or floor without extending the allocation automatically.
+
+Preserve the first pilot's failed audit, four missing uses, original artifacts
+and seals, and the separately passing native context diagnostic. Root preflight
+and recorded root/child postflight remain the required gate for this launch.
+Child checks occur after execution; interception before every model request is
+neither implemented nor a prerequisite for this preparation milestone. Exact
+materials, checker calibration, source pins, budget rationale and launch review
+are linked in [the preparation design](docs/reconciliation-sensitivity.md).
+
+**Observed result, 2026-09-09:** all 68 attempts launched and all eight packages
+were accepted. All 48 package uses and 12 baselines passed, with no missing scores.
+Native commands used 6,198.559 seconds. One build and the bulk-case baseline
+reached their deadlines with usable outputs; timeout statuses remain recorded.
+The correctness ceiling persists at the selected model and deadlines. Both offline
+audits passed, repeat scoring was byte-identical and the previous evidence was
+reverified unchanged. These results do not establish equivalence or authorize
+outcome-driven extensions.
+
 ## 14. Documentation responsibilities
 
 **Accepted direction from the documentation discussion.**
@@ -809,12 +861,14 @@ contexts unless the study explicitly includes it.
 - [x] Validate the account-totals checker and descriptive reporting; execute and audit the separately identified native fixture comparison.
 - [x] Generalize the native study definition beyond the fixed account-totals contract, two builder arms, and one build per arm/condition; see [the bounded v2 contracts](docs/configurable-native.md).
 - [x] Implement bounded preparation from a rough request into a validated, reviewable native study, with explicit decisions and extended deterministic feature suites; see [guided preparation](docs/guided-preparation.md).
-- [ ] Extend preparation beyond the two fixed semantic families, including general task synthesis or research where required by the selected study.
+- [ ] Extend preparation beyond the implemented totals and simple/event reconciliation recipes, including general task synthesis or research where required by the selected study.
 - [x] Implement the no-package consumer control and prepare a synthetic reconciliation pilot with both input routes, distinct feature coverage, two builds per arm/condition and a concrete budget; see [pilot design](docs/reconciliation-pilot.md).
 - [x] Execute the selected synthetic reconciliation pilot with two builds per arm/condition and a no-package baseline: 46/46 recorded consumers passed; one harness export failure left four uses missing. The context audit failed on extra runtime plugin skill entries, and the cases reached the score ceiling; see [measured scope](docs/reconciliation-pilot.md#recorded-results).
 - [x] Enforce the declared native skill catalog through root preflight and acceptance checks on every recorded root/subagent catalog, with runtime plugins disabled; authenticated validation passed. This does not intercept every model request or attest all upstream context; see [implemented scope](docs/native-context.md#enforced-boundary).
 - [x] Preserve bounded raw native exports before path validation and collect independent transcripts/logs, retaining failure attribution and immutable evidence; malformed, credential-containing and uncollected content remain explicitly unavailable. See [capture limits](docs/native-context.md#evidence-when-capture-or-acceptance-fails).
-- [ ] Select more informative work after the pilot's score ceiling, with controls and budgets tied to the intended claim.
+- [x] Prepare more informative synthetic reconciliation work after the pilot ceiling, with a separate checker, validated alternatives/faults, frozen materials and a descriptive 68-attempt budget; see [prepared scope](docs/reconciliation-sensitivity.md).
+- [x] Obtain separate approval and execute the frozen 68-attempt reconciliation allocation: 60/60 consumers passed, including all 12 baselines; both audits and byte-identical repeat scoring passed. See [recorded results](docs/reconciliation-sensitivity.md#recorded-results).
+- [ ] Review the repeated ceiling and recorded resource outcomes before selecting another workload and reviewing a new allocation; no further launch is authorized.
 - [ ] Implement the remaining resource controls, recovery, additional vendor/runtime support, and selected analysis or model-grading methods as their study scope requires.
 
 Research for this draft used primary statistical publications, framework

@@ -9,6 +9,12 @@ The original pilot remains sealed with its failed audit and four missing uses.
 
 ## Enforced boundary
 
+The subsequent [reconciliation study](reconciliation-sensitivity.md)
+retains this gate and independent capture path unchanged. Its separately approved
+68-attempt run completed with passing catalog checks across 75 recorded sessions;
+both offline audits passed without violations or evidence gaps. It does not
+require per-request context interception.
+
 [config.toml](../runtime/codex/config.toml) explicitly disables `plugins`,
 `remote_plugin`, and `apps`. Before each native attempt, the adapter verifies both
 the configured values and the effective `codex features list` values, captures

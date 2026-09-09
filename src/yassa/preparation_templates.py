@@ -6,6 +6,7 @@ import io
 import json
 import random
 
+from . import reconciliation, reconciliation_templates
 from .native_checkers import RECONCILIATION_CONTRACT, check, reconciliation_candidate
 from .native_contracts import FileMaterials, TaskContract, validate_materials
 from .records import canonical, digest
@@ -29,6 +30,7 @@ FEATURES = {
         "empty",
         "csv-quoting",
     ),
+    "reconciliation-v2": reconciliation_templates.FEATURES,
 }
 
 
@@ -37,12 +39,16 @@ def task_contract(family: str) -> TaskContract:
         raise ValueError(f"unsupported preparation family: {family}")
     totals = family == "account-totals-v1"
     paths = ("input/rows.json",) if totals else ("input/left.csv", "input/right.csv")
+    if family == "reconciliation-v2":
+        paths += ("input/policy.json",)
     requirements = (
         "Read UTF-8 JSON with exactly a rows array. Each row has exactly account and cents. "
         "Accounts contain 1-80 ASCII letters, digits, underscores, hyphens or spaces and "
         "at least one non-space character. Cents are integers from -1000000000 to 1000000000. "
         + CONTRACT
         if totals
+        else reconciliation.CONTRACT
+        if family == "reconciliation-v2"
         else RECONCILIATION_CONTRACT
     )
     return TaskContract(
@@ -109,7 +115,9 @@ def generate_suite(task: TaskContract, seed: int, features: tuple[str, ...]) -> 
             expected = reconciliation_candidate(left, right)
         return {"id": name, "group": group, "files": files, "expected": expected}
 
-    if task.checker == "account-totals-v1":
+    if task.checker == "reconciliation-v2":
+        development, evaluation = reconciliation_templates.generate_cases(task, seed, features)
+    elif task.checker == "account-totals-v1":
         samples = {
             "normalization": [(" Fund_A ", amount), ("fund_a", 13), ("FUND-B", 9)],
             "signed-amounts": [("debit", -amount), ("debit", 17), ("credit", 31)],
@@ -145,7 +153,7 @@ def generate_suite(task: TaskContract, seed: int, features: tuple[str, ...]) -> 
         task_id=task.id,
         brief="Build a reusable skill implementing the complete declared contract.",
         authorship="yassa deterministic synthetic generator",
-        source=VERSION,
+        source=template_version(task.checker),
         synthetic=True,
         assumptions=(
             "Invented scenarios and accepted task rules; no claim of real-work coverage.",
@@ -158,11 +166,17 @@ def generate_suite(task: TaskContract, seed: int, features: tuple[str, ...]) -> 
     return material
 
 
+def template_version(family: str) -> str:
+    return reconciliation_templates.VERSION if family == "reconciliation-v2" else VERSION
+
+
 def verify_checker(task: TaskContract, material: FileMaterials) -> dict:
     """Verify references with an oracle and probe accepted alternatives and wrong outputs."""
     if task.checker not in FEATURES:
         raise ValueError("guided preparation requires an independent semantic oracle")
     validate_materials(task, material)
+    if task.checker == "reconciliation-v2":
+        return reconciliation_templates.verify_probes(task, material, check)
     records = []
     key = "totals" if task.checker == "account-totals-v1" else "balances"
     number = "net_cents" if key == "totals" else "delta_cents"

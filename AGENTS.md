@@ -43,6 +43,7 @@ Start with [README.md](README.md), then follow the relevant route:
 | Native catalog enforcement and failed captures | [Context control and evidence](docs/native-context.md) and [implemented boundary](ARCHITECTURE.md#implemented-native-context-control) |
 | Guided preparation and answer rounds | [Preparation guide](docs/guided-preparation.md) and [implemented preparation](ARCHITECTURE.md#implemented-guided-preparation) |
 | Reconciliation pilot and consumer baseline | [Pilot design and evidence](docs/reconciliation-pilot.md) and [baseline contract](docs/configurable-native.md#consumer-baseline) |
+| Reconciliation work after the pilot ceiling | [Sensitivity preparation](docs/reconciliation-sensitivity.md), [event checker](src/yassa/reconciliation.py), and [constructed cases](src/yassa/reconciliation_templates.py) |
 | Study preparation and user interaction | [SPEC section 3](SPEC.md#3-helping-the-user-define-a-study) |
 | First Dovetail study and its two input conditions | [SPEC section 13](SPEC.md#13-first-dovetail-study-decisions-still-open) |
 | Sampling, sensitivity, or scoring | [SPEC section 7](SPEC.md#7-experimental-sensitivity-and-selectable-inference-budgets) and [section 8](SPEC.md#8-scoring-recorded-work) |

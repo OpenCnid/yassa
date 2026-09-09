@@ -5,11 +5,12 @@ import io
 import re
 from collections import defaultdict
 
+from . import reconciliation
 from .records import canonical, parse_json
 from .scoring import check_work, reference_totals
 from .study import Row
 
-CHECKERS = {"account-totals-v1", "reconciliation-v1", "json-exact-v1"}
+CHECKERS = {"account-totals-v1", "reconciliation-v1", "reconciliation-v2", "json-exact-v1"}
 RECONCILIATION_CONTRACT = (
     "Read two UTF-8 CSV files with exactly the columns id,cents. IDs are nonempty "
     "case-sensitive strings; do not trim or normalize them. Cents are signed integers. "
@@ -38,6 +39,8 @@ def csv_rows(text: str) -> list[tuple[str, int]]:
 
 def oracle(checker: str, files: dict[str, str], input_paths: tuple[str, ...]):
     """Validate specialized inputs and independently recompute reference candidates."""
+    if checker == "reconciliation-v2":
+        return reconciliation.oracle(files, input_paths)
     if checker == "account-totals-v1":
         value = parse_json(files[input_paths[0]])
         if type(value) is not dict or set(value) != {"rows"} or type(value["rows"]) is not list:
@@ -61,6 +64,8 @@ def oracle(checker: str, files: dict[str, str], input_paths: tuple[str, ...]):
 
 def input_identity(checker: str, files: dict[str, str], input_paths: tuple[str, ...]):
     """Do not let row ordering or account spelling bypass fixture held-out splits."""
+    if checker == "reconciliation-v2":
+        return reconciliation.input_identity(files, input_paths)
     if checker == "account-totals-v1":
         rows = parse_json(files[input_paths[0]])["rows"]
         return sorted((r["account"].strip(" ").lower(), r["cents"]) for r in rows)
@@ -87,6 +92,8 @@ def _balances(value) -> dict:
 
 
 def check(checker: str, work: bytes, expected) -> dict:
+    if checker == "reconciliation-v2":
+        return reconciliation.check(work, expected)
     if checker == "account-totals-v1":
         if type(expected) is not dict or set(expected) != {"totals"}:
             raise ValueError("account reference requires exactly totals")

@@ -27,6 +27,11 @@ Its context audit failed after detecting extra runtime plugin skill entries.
 The subsequent [native context milestone](docs/native-context.md) adds exact
 catalog checks and independent failure evidence. Authenticated root and child
 validation passed; the original pilot's failed audit remains unchanged.
+The subsequent [reconciliation study](docs/reconciliation-sensitivity.md) adds
+event revisions, voids, exact decimals, per-case policies and interacting cases.
+Its approved 68-attempt run completed with 60/60 consumers passing, including all
+12 baselines: another correctness ceiling. Both offline evidence audits passed,
+and repeat scoring was byte-identical.
 
 ## Run the fixture
 
@@ -167,7 +172,8 @@ The `native-codex-cli` route exercises native skill loading and executable
 packages in fresh Docker sandboxes. Native v2 supports UTF-8 file tasks with
 account-totals, reconciliation, or exact-JSON checkers, configurable arms, and
 independent builds/repeats. Guided preparation now produces that same definition
-for two explicit task families. Legacy runs remain verifiable and rescorable.
+for account totals, simple reconciliation and event reconciliation. Legacy runs
+remain verifiable and rescorable.
 General task synthesis, broader semantic checkers, additional native CLIs, model
 grading, and inferential comparisons remain future work.
 

@@ -23,10 +23,10 @@ from .native_contracts import (
 from .preparation_evidence import PreparationManifest, load_preparation, study_identity
 from .preparation_templates import (
     FEATURES,
-    VERSION,
     generate_suite,
     task_contract,
     template_description,
+    template_version,
     verify_checker,
 )
 from .records import canonical, digest, parse_json
@@ -43,7 +43,7 @@ class StudyDraft(Record):
     id: Slug = "guided-study"
     request: Text
     intended_use: Text | None = None
-    family: Literal["account-totals-v1", "reconciliation-v1"] | None = None
+    family: Literal["account-totals-v1", "reconciliation-v1", "reconciliation-v2"] | None = None
     scope: Literal["synthetic-fixture", "user-defined"] | None = None
     accepted_contract_sha256: Hash | None = None
     facts: tuple[Text, ...] = ()
@@ -96,7 +96,10 @@ def readiness(draft: StudyDraft) -> list[dict]:
     if not draft.intended_use:
         need("intended_use", "What decision should this result inform, and whose work matters?")
     if draft.family is None:
-        need("family", "Which supported task fits: account totals or two-file reconciliation?")
+        need(
+            "family",
+            "Which task fits: account totals, simple reconciliation, or event reconciliation?",
+        )
     if draft.scope is None:
         need("scope", "Should this describe invented scenarios or supplied real-work materials?")
     if (
@@ -398,12 +401,16 @@ def prepare_draft(input_path: Path, destination: Path, previous: Path | None = N
                 "native_contracts.py",
             )
         }
+        if task.checker == "reconciliation-v2":
+            preparer["reconciliation_templates.py"] = read_regular(
+                Path(__file__).parent / "reconciliation_templates.py"
+            )
         files.update({"preparer/" + name: body for name, body in preparer.items()})
 
         validation = {
             "checker": checker,
             "generator": {
-                "version": VERSION,
+                "version": template_version(task.checker),
                 "code": {name: digest(body) for name, body in preparer.items()},
             },
             "model": None,
