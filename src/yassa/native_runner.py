@@ -17,12 +17,12 @@ from .evidence import (
 )
 from .native import native_package, native_usage
 from .native_capture import recorded_native_files
-from .native_checkers import check
 from .native_contracts import (
     FileMaterials,
     NativeStudyV2,
     TaskContract,
     builder_files,
+    check_task,
     make_native_plan,
     prepare_files,
     resolve_sources,
@@ -50,6 +50,12 @@ def checker_identity(task: TaskContract) -> tuple[dict, dict[str, bytes]]:
     }
     if task.checker == "reconciliation-v2":
         files["reconciliation.py"] = procedure["reconciliation.py"]
+    if task.rubric:
+        files = {
+            name: procedure[name]
+            for name in ("json_rubric.py", "native_contracts.py", "records.py", "study.py")
+        }
+        files["rubric.json"] = canonical(task.rubric.model_dump(mode="json"))
     return {
         "method": "deterministic",
         "version": task.checker,
@@ -399,9 +405,7 @@ def rescore_native_v2(root: Path, label: str, reason: str | None = None) -> Path
             case = next(
                 c for c in materials[trial["condition"]].evaluation if c.id == trial["case"]
             )
-            verdict = check(
-                study.task.checker, files.get(study.task.result_path, b""), case.expected
-            )
+            verdict = check_task(study.task, files.get(study.task.result_path, b""), case)
         scores.append(
             {
                 **trial,
@@ -517,6 +521,14 @@ def rescore_native_v2(root: Path, label: str, reason: str | None = None) -> Path
         "| Condition | Arm | Build | Passed | Scored | Planned | Missing |",
         "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
     ]
+    if study.task.rubric:
+        lines[2:2] = [
+            "Scores require all declared JSON predicates to pass on the recorded output and "
+            "frozen case inputs. Reference witnesses do not restrict legitimate alternatives. "
+            "These scores establish compliance with the modeled constraints only. "
+            + study.task.rubric.limitations,
+            "",
+        ]
     lines += [
         f"| {s['condition']} | {s['arm']} | {s['build']} | {s['passed']} | "
         f"{s['scored']} | {s['planned']} | {s['missing']} |"

@@ -336,13 +336,47 @@ def main() -> int:
             command.add_argument("--reason")
     command = commands.add_parser("intake")
     command.add_argument("request", type=Path)
+    command = commands.add_parser("study-schema", help="print a general preparation JSON schema")
+    command.add_argument(
+        "kind", choices=("request", "task", "cases", "proposal", "review", "native")
+    )
     command = commands.add_parser("study-draft", help="develop a rough request into a native study")
     command.add_argument("request", type=Path)
     command.add_argument("--draft-dir", required=True, type=Path)
+    command.add_argument("--auth-file", type=Path, help="native preparation only; never frozen")
+    command = commands.add_parser("direct-prepare", help="freeze a direct study on a pinned task")
+    command.add_argument("request", type=Path)
+    command.add_argument("--run-dir", required=True, type=Path)
+    command = commands.add_parser(
+        "direct-execute", help="execute a frozen native or API direct study"
+    )
+    command.add_argument("run_dir", type=Path)
+    command.add_argument("--auth-file", type=Path)
+    command = commands.add_parser(
+        "direct-rescore", help="score recorded direct work without model calls"
+    )
+    command.add_argument("run_dir", type=Path)
+    command.add_argument("--label", required=True)
+    command.add_argument("--reason")
     command = commands.add_parser("study-revise", help="record answers in a new preparation round")
     command.add_argument("previous", type=Path)
     command.add_argument("answers", type=Path)
     command.add_argument("--draft-dir", required=True, type=Path)
+    command.add_argument("--auth-file", type=Path, help="native preparation only; never frozen")
+    command = commands.add_parser(
+        "role-schema", help="print direct-study or external grading schemas"
+    )
+    command.add_argument("kind", choices=("direct", "grading"))
+    command = commands.add_parser("grade-prepare", help="freeze external grading of recorded work")
+    command.add_argument("run_dir", type=Path)
+    command.add_argument("request", type=Path)
+    command.add_argument("--grade-dir", required=True, type=Path)
+    command = commands.add_parser("grade-execute", help="calibrate and grade frozen recorded work")
+    command.add_argument("grade_dir", type=Path)
+    command.add_argument("--auth-file", type=Path, help="Claude Code OAuth only; never frozen")
+    command = commands.add_parser("grade-report", help="replay recorded judgments without calls")
+    command.add_argument("grade_dir", type=Path)
+    command.add_argument("--label", required=True)
     for name in ("native-prepare", "native-run"):
         command = commands.add_parser(name)
         command.add_argument("study", type=Path)
@@ -366,14 +400,59 @@ def main() -> int:
     command.add_argument("--output-dir", required=True, type=Path)
     args = parser.parse_args()
     try:
-        if args.command in {"study-draft", "study-revise"}:
+        if args.command == "study-schema":
+            from .general_contracts import (
+                CaseBatch,
+                ExpertReview,
+                GeneralRequest,
+                StudyProposal,
+                TaskProposal,
+            )
+            from .native_contracts import NativeStudyV2
+
+            schemas = {
+                "request": GeneralRequest,
+                "task": TaskProposal,
+                "cases": CaseBatch,
+                "proposal": StudyProposal,
+                "review": ExpertReview,
+                "native": NativeStudyV2,
+            }
+            output = canonical(schemas[args.kind].model_json_schema()).decode().strip()
+        elif args.command in {"study-draft", "study-revise"}:
             from .guided_preparation import prepare_draft
 
             output = (
-                prepare_draft(args.request, args.draft_dir)
+                prepare_draft(args.request, args.draft_dir, auth_path=args.auth_file)
                 if args.command == "study-draft"
-                else (prepare_draft(args.answers, args.draft_dir, args.previous))
+                else prepare_draft(
+                    args.answers, args.draft_dir, args.previous, auth_path=args.auth_file
+                )
             )
+        elif args.command == "role-schema":
+            from .direct_contracts import DirectRequest
+            from .grading import GradeRequest
+
+            schema = DirectRequest if args.kind == "direct" else GradeRequest
+            output = canonical(schema.model_json_schema()).decode().strip()
+        elif args.command.startswith("grade-"):
+            from .grading import execute_grades, prepare_grades, report_grades
+
+            if args.command == "grade-prepare":
+                output = prepare_grades(args.run_dir.resolve(), args.request, args.grade_dir)
+            elif args.command == "grade-execute":
+                output = execute_grades(args.grade_dir.resolve(), args.auth_file)
+            else:
+                output = report_grades(args.grade_dir.resolve(), args.label)
+        elif args.command.startswith("direct-"):
+            from .direct_runner import execute_direct, prepare_direct, rescore_direct
+
+            if args.command == "direct-prepare":
+                output = prepare_direct(args.request, args.run_dir)
+            elif args.command == "direct-execute":
+                output = execute_direct(args.run_dir.resolve(), args.auth_file)
+            else:
+                output = rescore_direct(args.run_dir.resolve(), args.label, args.reason)
         elif args.command.startswith("native-"):
             from .native import execute_native_study, prepare_native, rescore_native
 

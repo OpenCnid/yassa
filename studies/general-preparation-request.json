@@ -1,0 +1,32 @@
+{
+  "schema_version": 2,
+  "id": "record-selection",
+  "request": "Describe how a reusable skill performs at selecting records. Each input JSON file has items with unique string IDs and integer scores, and an integer minimum. Return a JSON array containing each ID whose score is at least the minimum exactly once, in any order. Include empty selections and scores on either side of the threshold. Construct synthetic work for this descriptive trial.",
+  "intended_use": "Check the workflow and describe its behavior on these constructed conditions.",
+  "scope": "synthetic-fixture",
+  "routes": ["yassa-prepared"],
+  "development_cases": 2,
+  "evaluation_cases": 3,
+  "seed": 17,
+  "preparation": {
+    "model": "provider/preparer-model",
+    "reviewer_model": "provider/reviewer-model",
+    "max_calls": 4,
+    "max_output_tokens": 16000,
+    "timeout_seconds": 120
+  },
+  "execution": {
+    "model": "subject-model",
+    "reasoning_effort": "medium",
+    "arms": [{"id": "common", "builds": 1}],
+    "control_rationale": {"common": "Describe one builder's generated package; this is not a ranking."},
+    "consumer_repeats": 1,
+    "schedule_seed": 17,
+    "admission": {
+      "max_attempts": 4,
+      "max_scheduled_seconds": 240,
+      "build_timeout_seconds": 120,
+      "consumer_timeout_seconds": 40
+    }
+  }
+}

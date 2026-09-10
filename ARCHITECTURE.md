@@ -1,7 +1,7 @@
 # Architecture
 
 Status: simulated fixtures, configurable native Codex file studies, and bounded
-guided preparation implemented, including event reconciliation, 2026-09-09. The
+guided preparation implemented, including declarative JSON task preparation, 2026-09-09. The
 implemented slice is identified below; the broader component design and explicitly
 proposed paths describe remaining work. Conceptual record
 names are not all public APIs.
@@ -65,29 +65,62 @@ which unsuccessful attempts disappear.
 
 ## Current implementation priority
 
-The next product milestone advances Y01, Y02, Y03 and Y10 in the
-[coverage map](SPEC.md#151-capability-coverage): general preparation connected to
-a runnable study. Start from `StudyDraft` and `prepare_draft` in
-[guided_preparation.py](src/yassa/guided_preparation.py), the task/material/study
-contracts in [native_contracts.py](src/yassa/native_contracts.py), and the existing
-freeze, execution and reporting path in [native_runner.py](src/yassa/native_runner.py).
+The general preparation milestone implements the bounded JSON path for Y01,
+Y02, Y03 and Y10 described in [the guide](docs/general-preparation.md), with a
+subsequent separately scoped native live acceptance. [Execution roles](docs/execution-roles.md)
+advance SPEC step 2 through direct native/API comparisons and calibrated external
+grading, including live native-direct and Claude Code OAuth grading acceptance on
+one bounded task. This remains partial capability coverage: API live inference,
+additional native subject/builder roles, activation/clarification measurement and
+broader grading validation remain open. Necessary resource and recovery controls belong alongside
+each new effectful role; the full specification remains the delivery target.
 
-The implementation must accept work outside the current recipes, expose material
-questions and proposed assumptions, and produce reviewed task, rubric and case
-records. Guided and expert preparation must resolve to the same executable
-definition. Separate effectful preparation operations, including model calls or
-source access when needed, from contract validation and plan construction.
-Preserve originals, reference verification, provenance and held-out access
-boundaries through both supplied and prepared routes. Add the corresponding
-checker/evidence interfaces as required by the chosen task contract, while
-preserving existing v1/v2 readers and reproducibility.
+## Implemented execution and grading roles
 
-This is remaining design work, not an implemented general preparation API.
-Developer-authored study files, external launch helpers and manually written
-assessments do not fill these product boundaries. Acceptance must exercise the
-supported preparation-to-report interfaces, with explicit evidence for each
-newly claimed live capability. The proposed expanded layout below is optional
-organization for this work, not a requirement to create every module first.
+`direct_contracts.py` defines a direct request over a pinned native v2 task source,
+explicit host/model, pinned source packs, arms, repeats and admission caps.
+`direct_runner.py` resolves the source task/material/preparation records and freezes
+a separate direct plan. It gives each fresh attempt complete task facts, current
+case files and its declared treatment, with no build or package parent. An explicit
+execution instruction distinguishes the current case deliverable from the preserved
+source study's skill-building language; this fixed a live direct-role failure. Native
+attempts reuse `native_execution.py`; closed API attempts use `role_api.py` with
+two explicit messages, no tools and first-party endpoint/model identities.
+Native v1/v2 definitions and planner/checker identities are unchanged.
+
+`grading.py` reads sealed native v2 or direct work, then freezes a separate rubric,
+calibration allocation, exact input/output evidence and source seal. The grading role
+must belong to a different vendor/model family. It gates all work on calibration,
+withholds treatment labels and expected judgments, retains raw responses and
+missingness, and reports components and counts independently of deterministic
+scores. Offline grade reporting checks stored judgments without inference.
+Supplied calibration labels are not authenticated semantic truth. Full model
+grading across arbitrary evidence, mixed-family authorship and scorer corrections
+remains a broader interface requirement.
+
+`role_claude.py` adds a closed native Claude Code grading host using saved CLI
+OAuth. A pinned container receives only the declared messages and private login;
+CLI safe/restricted settings remove operational tools and customizations. Its
+sole tool submits a schema-constrained response. Native init/response records
+gate acceptance on that sole tool, empty other catalogs, exact selected model
+usage and declared turn/repair caps. One explicitly requested schema-format repair
+may follow a recorded native validation error; the default permits none. API and
+attempt retries remain disabled. The terminal structured result must match the
+final response-tool input. Background title generation is disabled. Raw captures, rejected
+work and available usage remain evidence. The CLI may refresh its private login;
+credential bytes never belong to the grading freeze or report. This host supports
+grading only, not native Claude direct subjects/builders or arbitrary agent tools.
+The [live roles acceptance](docs/execution-roles.md#live-native-direct-and-claude-grading)
+records 8/8 corrected direct outputs, 6/6 independent Claude calibration judgments
+and 8/8 grades, with matching offline replay and passed raw-evidence audits. Earlier
+failed integrations and calibrations remain sealed; this is bounded validation.
+
+`preparation_native.py` supplies the same native boundary to preparation calls.
+Credentials enter only at execution. Exact raw captures stay in the draft; bounded
+ZIP copies plus member hashes make preparation history portable without expanding
+Windows path depth. ZIP evidence is never extracted or executed by the product.
+Source visibility is explicit in the task and reviewer payloads so a route-local
+absence cannot silently become a global source claim.
 
 ## Repository map
 
@@ -399,6 +432,50 @@ scorer identities remain readable without rewriting their bytes. Future changes
 to a reviewed definition create a new preparation revision; changed checkers
 require renewed review and follow the existing scoring correction policy.
 See [guided preparation](docs/guided-preparation.md) for usage, limits and evidence.
+
+## Implemented general preparation
+
+Version 2 preparation requests dispatch from `prepare_draft` to
+[general_preparation.py](src/yassa/general_preparation.py). Public request,
+proposal, case/calibration and expert review records live in
+[general_contracts.py](src/yassa/general_contracts.py). `study-schema` exposes them.
+Effectful synthesis and review calls use Inspect Task/Sample/generate in
+[preparation_model.py](src/yassa/preparation_model.py); contracts, verification
+and native plan construction remain separate pure operations.
+
+The task call sees only specification sources. Separate case calls receive one
+route and split; each candidate records source IDs and selection. Deterministic
+validation checks domains, reference feasibility, groups, normalized input
+uniqueness, positive alternatives and negative calibration against every score
+criterion. A fresh independent preparation review inspects semantic coverage and
+source adaptation. Experts import the same proposal and review it through the
+same operation, or bind an explicit supplied reviewer attestation to its bytes.
+Material gaps and review findings withhold a runnable export. The implementation
+contains no domain-specific case recipe for these operations.
+
+Successful rounds compile to `NativeStudyV2`, `TaskContract` and `FileMaterials`,
+with existing preparation manifests, source pins and admission. `json-predicates-v1`
+adds a protected declarative rubric to TaskContract; absent rubric fields are
+omitted so existing serialized contracts retain their identities. `check_task`
+dispatches the new interpreter over frozen case inputs and recorded output;
+legacy checker sources are untouched. New identities bind both rubric and code.
+The existing freeze/execution/score/report path handles the resulting study.
+
+Rounds retain source originals, adaptations, exact requests and answers, model
+responses/Inspect logs, component checks, review findings and preparer code.
+Compact aliases preserve original log bytes when freezing deeply nested Windows
+paths. Immutable history survives relocation and revision. Reports link the
+review and distinguish predicate compliance from semantic or real-world coverage.
+
+The [general guide](docs/general-preparation.md) specifies limits, resource caps,
+expert import semantics and acceptance evidence. Tests use actual Inspect with a
+simulated preparer and a native output adapter for record selection and feasible
+assignment; they establish software composition. Initial implementation consumed
+no live allocation. The subsequent [native live acceptance](docs/general-preparation.md#live-native-preparation)
+adds evidence for one booking task. [Execution roles](docs/execution-roles.md) add
+direct studies and grading with a subsequent bounded native live acceptance.
+API live inference, broader semantic judgment, remote research, full recovery and
+public/redacted derivatives remain incomplete.
 
 ## Implemented event reconciliation preparation
 

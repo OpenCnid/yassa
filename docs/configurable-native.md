@@ -9,8 +9,9 @@ package; see [the reconciliation pilot](reconciliation-pilot.md).
 
 This is a bounded file-processing milestone. A subsequent
 [guided preparation workflow](guided-preparation.md) produces these same contracts
-for account totals and simple/event reconciliation. General task synthesis,
-inferential analysis, arbitrary
+for account totals and simple/event reconciliation. The subsequent
+[general preparer](general-preparation.md) adds user-described JSON tasks and
+declarative rubrics. Broader semantic synthesis, inferential analysis, arbitrary
 checker execution, additional vendor runtimes, recovery, and token/spend limits
 remain outside the implemented scope.
 
@@ -92,6 +93,7 @@ It never imports or executes submitted packages on the controller.
 | `reconciliation-v1` | Two declared CSV files, in left/right order | Aggregate duplicate IDs separately, retain the union including zero balances, report left/right and left-minus-right; unordered balances; independent oracle validates every candidate |
 | `reconciliation-v2` | Left CSV, right CSV, then JSON policy | Latest event revisions, voids, literal ID/currency keys, exact decimals, event counts and inclusive tolerance statuses; independent oracle; unordered balances |
 | `json-exact-v1` | Arbitrary declared case files; `checker_inputs` is empty | Supplied expected JSON; object key order and whitespace ignored; array order and JSON numeric representation preserved; booleans differ from integers |
+| `json-predicates-v1` | 1–20 declared JSON files and a `rubric` | Recorded outputs must satisfy all declared input/output predicates; references are feasible witnesses, not unique answer keys; pinned preparation review required |
 
 Reconciliation v1 CSV requires exactly `id,cents` columns. IDs are nonempty and
 case-sensitive without trimming; CSV quoting is supported. Cents are signed
@@ -112,6 +114,13 @@ of supplied answers; reports disclose that distinction. A new semantic matcher
 requires a versioned checker implementation, contract selection, and acceptance
 and rejection fixtures. That work stays outside Python orchestration. There is
 no arbitrary external-code checker loader in this milestone.
+
+Declarative rubrics are implemented separately in
+[json_rubric.py](../src/yassa/json_rubric.py), through `check_task` in the shared
+contracts. Guided synthesis and expert imports use the same reference,
+calibration and review gates. The [general guide](general-preparation.md) records
+supported operations and semantic limitations. Existing checker source identities
+remain unchanged; the new identity additionally binds the rubric and interpreter.
 
 ## Arms, sources, and allocation
 

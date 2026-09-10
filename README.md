@@ -11,9 +11,10 @@ small descriptive trials and studies requiring stronger evidence.
 
 **Product status: the full specification is not implemented.** The current
 foundation is a CLI execution and evidence backend for simulated fixtures and
-native Codex file studies, with bounded preparation from structured JSON.
-General conversational preparation, broader task/rubric preparation, additional
-vendor roles, model grading, inferential planning/analysis, and complete resource
+native Codex file studies, with recipe preparation and model-assisted preparation
+of user-described JSON work. It also supports direct native/API studies and
+calibrated external model grading. Broader semantic preparation, additional native
+vendor/builder roles, inferential planning/analysis, and complete resource
 and recovery controls remain partial or missing. Some recent study preparation,
 launch coordination and assessment were performed by the development agent and
 external scripts, rather than supplied as Yassa product operations.
@@ -22,9 +23,16 @@ The delivery target remains the full spec. See the
 [capability coverage map](SPEC.md#151-capability-coverage),
 [development sequence](SPEC.md#152-development-sequence), and
 [current implementation priority](HANDOFF.md#current-development-priority).
-The next milestone is a product preparation workflow for user-described work
-beyond the existing totals/reconciliation recipes, connected to execution and
-reporting. The milestones below establish only their recorded scope.
+The [general preparation milestone](docs/general-preparation.md) connects
+user-described work, rubrics and cases to native execution and reporting through
+product commands. A subsequent bounded live room-booking acceptance exercises
+native preparation and the connected builder/consumer workflow; its exact outcome
+and corrections are recorded in the guide. [Execution and grading roles](docs/execution-roles.md)
+add existing-skill comparisons and a different-family grading gate. A separate
+[live roles acceptance](docs/execution-roles.md#live-native-direct-and-claude-grading)
+passed 8/8 native-direct cases, 6/6 Claude calibration cases and 8/8 recorded grades
+using saved Claude Code authentication. API inference and broader cross-vendor
+quality remain unverified. The milestones below establish only their recorded scope.
 
 ## Implemented foundation and study history
 
@@ -126,6 +134,13 @@ the exact source profile, runtime boundaries, and interpretation limits.
 
 ## Configure a small trial
 
+Version 2 preparation requests use ordinary task descriptions with explicit model
+and resource settings. `study-schema request` prints their schema. Yassa prepares
+and reviews declarative JSON rubrics, examples and held-out cases; supplied and
+constructed materials use the same native definition. See
+[general preparation](docs/general-preparation.md) for model configuration,
+expert imports, provenance and the complete preparation-to-report commands.
+
 For a rough request, `study-draft REQUEST.json --draft-dir DIRECTORY` creates a
 preparation review. `study-revise PREVIOUS_DIRECTORY ANSWERS.json --draft-dir
 NEW_DIRECTORY` records focused answers in a new round. Complete inputs produce
@@ -161,8 +176,9 @@ the route describes how it enters the harness, separately from its authorship.
 
 `uv run --locked yassa intake REQUEST.json` provides up to two focused readiness
 questions. This legacy helper is separate from the native guided workflow.
-Neither path interprets arbitrary natural language into task semantics,
-researches datasets, or generates model-based rubrics.
+The legacy helper and version 1 recipe path do not interpret arbitrary task
+descriptions. Version 2 preparation supports the declarative JSON scope above;
+dataset research remains unimplemented.
 
 ## Verify changes
 
@@ -190,17 +206,21 @@ this does **not** exercise native skill discovery, scripts, or activation.
 The fixture output cap uses UTF-8 byte units, and Inspect applies per-sample time
 limits. Token prices and real model token usage are unavailable. Counts stay
 separate by preparation condition and execution stage; repeated uses of one
-package do not become independent builder measurements. No inferential analysis
-or cross-vendor claim is supported yet.
+package do not become independent builder measurements. This fixture provides
+no inferential analysis or cross-vendor evidence.
 
 The `native-codex-cli` route exercises native skill loading and executable
 packages in fresh Docker sandboxes. Native v2 supports UTF-8 file tasks with
-account-totals, reconciliation, or exact-JSON checkers, configurable arms, and
+account-totals, reconciliation, exact-JSON or declarative JSON checkers, configurable arms, and
 independent builds/repeats. Guided preparation now produces that same definition
 for account totals, simple reconciliation and event reconciliation. Legacy runs
 remain verifiable and rescorable.
-General task synthesis, broader semantic checkers, additional native CLIs, model
-grading, and inferential comparisons remain future work.
+The general preparer adds model-assisted tasks within a bounded JSON predicate
+contract. [Direct execution and external grading](docs/execution-roles.md) add
+separately frozen native/API role studies and live-validated Claude Code grading
+through saved OAuth. Broader semantic checkers, native subject/builder hosts,
+API live inference, broader grading validation and inferential comparisons remain
+future work.
 
 ## Design navigation
 

@@ -10,13 +10,20 @@ from typing import Annotated, Any, Literal
 from pydantic import Field, StrictInt, model_validator
 
 from .evidence import read_regular, reject_links, safe_name
+from .json_rubric import JsonRubric, check_rubric, parsed_inputs
 from .native_checkers import check, input_identity, oracle, reconciliation_candidate
 from .prepare import generate_materials
 from .records import canonical, digest, identity, parse_json
 from .study import Condition, Hash, Record, Slug
 
 Text = Annotated[str, Field(min_length=1, max_length=20_000)]
-Checker = Literal["account-totals-v1", "reconciliation-v1", "reconciliation-v2", "json-exact-v1"]
+Checker = Literal[
+    "account-totals-v1",
+    "reconciliation-v1",
+    "reconciliation-v2",
+    "json-exact-v1",
+    "json-predicates-v1",
+]
 
 
 def paths_valid(names, prefix: str) -> None:
@@ -54,18 +61,24 @@ class TaskContract(Record):
     consumer_prompt: Text
     checker: Checker
     checker_inputs: tuple[str, ...]
+    rubric: JsonRubric | None = Field(default=None, exclude_if=lambda v: v is None)
 
     @model_validator(mode="after")
     def boundaries(self):
         paths_valid([self.package_path, self.result_path], "output")
         paths_valid([self.brief_path], "input")
         paths_valid(self.checker_inputs, "input")
+        if (self.checker == "json-predicates-v1") != (self.rubric is not None):
+            raise ValueError("json-predicates-v1 requires a rubric; other checkers forbid it")
         count = {
             "account-totals-v1": 1,
             "reconciliation-v1": 2,
             "reconciliation-v2": 3,
             "json-exact-v1": 0,
+            "json-predicates-v1": len(self.checker_inputs),
         }[self.checker]
+        if self.rubric and not 1 <= count <= 20:
+            raise ValueError("JSON predicates require 1 to 20 JSON input paths")
         if len(self.checker_inputs) != count:
             raise ValueError(f"{self.checker} needs {count} checker input paths")
         if self.package_name == "boundary":
@@ -295,16 +308,29 @@ def validate_materials(task: TaskContract, materials: FileMaterials) -> None:
     for case in materials.development + materials.evaluation:
         if not set(task.checker_inputs) <= case.files.keys():
             raise ValueError("missing checker input file")
-        target = oracle(task.checker, case.files, task.checker_inputs)
-        verdict = check(
-            task.checker, canonical(case.expected), case.expected if target is None else target
-        )
+        if task.rubric:
+            verdict = check_task(task, canonical(case.expected), case)
+        else:
+            target = oracle(task.checker, case.files, task.checker_inputs)
+            verdict = check(
+                task.checker, canonical(case.expected), case.expected if target is None else target
+            )
         if not verdict["value"]:
             raise ValueError(f"invalid reference for {case.id}: {verdict['reason']}")
-        signature = identity(input_identity(task.checker, case.files, task.checker_inputs))
+        signature = identity(
+            parsed_inputs(case.files, task.checker_inputs)
+            if task.rubric
+            else input_identity(task.checker, case.files, task.checker_inputs)
+        )
         if signature in seen:
             raise ValueError("duplicate semantic case inputs across the split")
         seen.add(signature)
+
+
+def check_task(task: TaskContract, work: bytes, case: FileCase) -> dict:
+    if task.rubric:
+        return check_rubric(task.rubric, work, parsed_inputs(case.files, task.checker_inputs))
+    return check(task.checker, work, case.expected)
 
 
 def generate_files(task: TaskContract, condition: NativeCondition) -> dict:
@@ -409,7 +435,9 @@ def prepare_files(task: TaskContract, condition: NativeCondition, base: Path):
             "source": materials.source,
             "synthetic": materials.synthetic,
             "assumptions": materials.assumptions,
-            "verification": "independent deterministic oracle; all cases checked"
+            "verification": "declarative input/output predicates; feasibility, not a unique oracle"
+            if task.rubric
+            else "independent deterministic oracle; all cases checked"
             if task.checker != "json-exact-v1"
             else "reference JSON validated; semantic correctness supplied by author",
         }

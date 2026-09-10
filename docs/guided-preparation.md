@@ -1,5 +1,9 @@
 # Guided native study preparation
 
+This page describes version 1 preparation requests and the original recipe path.
+Version 2 requests add [general model-assisted preparation](general-preparation.md)
+for user-described JSON work, with the same native study/export commands.
+
 `study-draft` and `study-revise` develop a rough request into a reviewable native
 v2 study without subject or preparation model calls. This bounded implementation
 supports account totals, simple reconciliation and event reconciliation with a
