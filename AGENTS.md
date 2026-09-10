@@ -43,6 +43,7 @@ Start with [README.md](README.md), then follow the relevant route:
 | Configure or extend native file studies | [Native v2 guide](docs/configurable-native.md) and [implemented runner](ARCHITECTURE.md#implemented-configurable-native-runner) |
 | Native catalog enforcement and failed captures | [Context control and evidence](docs/native-context.md) and [implemented boundary](ARCHITECTURE.md#implemented-native-context-control) |
 | Guided preparation and answer rounds | [Preparation guide](docs/guided-preparation.md) and [implemented preparation](ARCHITECTURE.md#implemented-guided-preparation) |
+| Direct native/API execution and external grading | [Execution roles](docs/execution-roles.md), [direct runner](src/yassa/direct_runner.py), and [grading](src/yassa/grading.py) |
 | General task/rubric preparation through native studies | [General preparation](docs/general-preparation.md), [public records](src/yassa/general_contracts.py), and [implemented boundary](ARCHITECTURE.md#implemented-general-preparation) |
 | Reconciliation pilot and consumer baseline | [Pilot design and evidence](docs/reconciliation-pilot.md) and [baseline contract](docs/configurable-native.md#consumer-baseline) |
 | Reconciliation work after the pilot ceiling | [Sensitivity preparation](docs/reconciliation-sensitivity.md), [event checker](src/yassa/reconciliation.py), and [constructed cases](src/yassa/reconciliation_templates.py) |

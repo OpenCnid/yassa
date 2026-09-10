@@ -8,7 +8,14 @@ version = "0.1.0"
 description = "Traceable skill experiments through Inspect AI"
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
-dependencies = ["inspect-ai==0.3.263", "pydantic==2.13.5", "PyYAML==6.0.3"]
+dependencies = [
+    "anthropic==1.4.0",
+    "google-genai==2.22.0",
+    "inspect-ai==0.3.263",
+    "openai==3.11.0",
+    "pydantic==2.13.5",
+    "PyYAML==6.0.3",
+]
 
 [project.scripts]
 yassa = "yassa.app:main"

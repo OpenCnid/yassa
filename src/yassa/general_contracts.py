@@ -26,6 +26,17 @@ class PreparationSettings(Record):
     timeout_seconds: Annotated[StrictInt, Field(ge=1, le=300)]
 
 
+class NativePreparationSettings(Record):
+    runtime: Literal["native-codex-cli"]
+    image: Annotated[str, Field(pattern=r"^sha256:[0-9a-f]{64}$")]
+    model: Annotated[str, Field(pattern=r"^[a-zA-Z0-9_.-]+$")]
+    reviewer_model: Annotated[str, Field(pattern=r"^[a-zA-Z0-9_.-]+$")]
+    reasoning_effort: Literal["low", "medium", "high", "xhigh"]
+    max_calls: Annotated[StrictInt, Field(ge=1, le=12)]
+    max_output_bytes: Annotated[StrictInt, Field(ge=100, le=1_000_000)]
+    timeout_seconds: Annotated[StrictInt, Field(ge=30, le=300)]
+
+
 class ExecutionSettings(Record):
     model: Annotated[str, Field(pattern=r"^[a-zA-Z0-9_.-]+$")]
     reasoning_effort: Literal["low", "medium", "high", "xhigh"]
@@ -92,7 +103,7 @@ class GeneralRequest(Record):
     seed: StrictInt = 0
     development_cases: Annotated[StrictInt, Field(ge=1, le=10)] = 2
     evaluation_cases: Annotated[StrictInt, Field(ge=1, le=10)] = 3
-    preparation: PreparationSettings | None = None
+    preparation: PreparationSettings | NativePreparationSettings | None = None
     execution: ExecutionSettings | None = None
     expert_proposal: FileBinding | None = None
     expert_review: FileBinding | None = None

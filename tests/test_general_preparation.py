@@ -8,6 +8,8 @@ import copy
 import json
 import shutil
 import sys
+import zipfile
+from types import SimpleNamespace
 
 import pytest
 from inspect_ai.model import GenerateConfig, ModelAPI, ModelOutput, modelapi
@@ -354,6 +356,92 @@ def supplied(tmp_path, value):
     return originals
 
 
+@pytest.mark.parametrize(
+    "status,oversized", [("completed", False), ("budget_exhausted", False), ("completed", True)]
+)
+def test_native_preparation_adapter_boundaries_and_evidence(
+    tmp_path, monkeypatch, status, oversized
+):
+    value = request("assignment")
+    originals = supplied(tmp_path, value)
+    value["preparation"] = {
+        "runtime": "native-codex-cli",
+        "image": IMAGE,
+        "model": "test-preparer",
+        "reviewer_model": "test-reviewer",
+        "reasoning_effort": "low",
+        "max_calls": 6,
+        "max_output_bytes": 100 if oversized else 100000,
+        "timeout_seconds": 30,
+    }
+    seen = []
+
+    def native(root, attempt_id, prompt, files, **kwargs):
+        assert set(files) == {"input/instructions.txt", "input/request.json"}
+        assert kwargs["auth_path"] == tmp_path / "credential.json"
+        assert kwargs["timeout"] == 30 and kwargs["image"] == IMAGE
+        payload = parse_json(files["input/request.json"])
+        seen.append(payload)
+        if "specification_sources" in payload:
+            response = task_proposal("assignment")
+        elif "split" in payload:
+            response = case_batch(payload)
+        else:
+            assert b"test-reviewer" in kwargs["config"]
+            response = {"issues": [], "assessment": "Simulated native transport review."}
+        store = EvidenceStore(root)
+        output = store.put({"output/response.json": canonical(response)})
+        write_new(root / "attempts/prepare/result.json", canonical({"status": status}))
+        return {"status": status, "output_id": output}
+
+    monkeypatch.setattr("yassa.preparation_native.execute_native", native)
+    path = tmp_path / "request.json"
+    path.write_bytes(canonical(value))
+    root = prepare_draft(
+        path, tmp_path / "native-draft", auth_path=tmp_path / "credential.json"
+    ).parent
+    state = parse_json((root / "draft.json").read_bytes())
+    assert state["status"] == (
+        "ready_for_freeze" if status == "completed" and not oversized else "needs_input"
+    )
+    assert len(seen) == (6 if state["status"] == "ready_for_freeze" else 1)
+    for file in root.glob("history/*-native-*.zip"):
+        manifest = parse_json(file.with_name(file.name + ".json").read_bytes())
+        with zipfile.ZipFile(file) as archive:
+            assert set(archive.namelist()) == {f["path"] for f in manifest["files"]}
+            for entry in manifest["files"]:
+                assert digest(archive.read(entry["path"])) == entry["sha256"]
+    if state["status"] == "ready_for_freeze":
+        study = NativeStudyV2.model_validate_json((root / "study.json").read_bytes())
+        preserved = load_preparation(study, root)
+        assert all(body in preserved.values() for body in originals.values())
+        assert any(name.endswith(".zip") for name in preserved)
+        assert b"credential.json" not in b"".join(preserved.values())
+    else:
+        assert not (root / "study.json").exists()
+        assert (root / "calls/000/01/failure.json").exists()
+
+
+def test_native_preparation_requires_explicit_auth_and_honest_caps(tmp_path):
+    value = request()
+    value["preparation"] = {
+        "runtime": "native-codex-cli",
+        "image": IMAGE,
+        "model": "test",
+        "reviewer_model": "test",
+        "reasoning_effort": "low",
+        "max_calls": 4,
+        "max_output_bytes": 10000,
+        "timeout_seconds": 30,
+    }
+    root, state = draft(tmp_path, value)
+    assert state["status"] == "needs_input"
+    assert "--auth-file" in (root / "validation.json").read_text()
+    value["preparation"]["max_output_tokens"] = 1000
+    with pytest.raises(ValueError):
+        GeneralRequest.model_validate(value)
+
+
 @pytest.mark.parametrize("kind", ["selection", "assignment"])
 def test_guided_general_complete_request_compiles_and_expert_matches(tmp_path, kind):
     value = request(kind)
@@ -473,7 +561,7 @@ def test_general_cli_preparation_to_report_both_routes(tmp_path, monkeypatch, ca
     root = tmp_path / "reviewed"
     cli("study-draft", source, "--draft-dir", root)
     assert (root / "study.json").is_file(), (root / "validation.json").read_text()
-    monkeypatch.setattr("yassa.native_runner.subprocess.run", lambda *a, **k: None)
+    monkeypatch.setattr("yassa.native_runner.subprocess", SimpleNamespace(run=lambda *a, **k: None))
     run = tmp_path / "run"
     cli("native-prepare", root / "study.json", "--run-dir", run, "--image", IMAGE)
     study = NativeStudyV2.model_validate(parse_json((root / "study.json").read_bytes()))

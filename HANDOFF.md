@@ -7,21 +7,24 @@ evidence, but do not substitute for the missing product capabilities.
 
 ## Current development priority
 
-Continue with broader execution and grading roles in
-[SPEC step 2](SPEC.md#152-development-sequence), advancing Y03, Y04, Y05 and Y07.
-The preceding [general preparation implementation](docs/general-preparation.md)
-now advances Y01, Y02, Y03 and Y10 for declarative JSON work. It accepts ordinary
-task descriptions, prepares/reviews tasks and cases, preserves both material
-routes, and compiles to the existing native freeze/execution/report workflow.
-Expert imports share the same validation and compilation.
+The [execution roles implementation](docs/execution-roles.md) advances
+[SPEC step 2](SPEC.md#152-development-sequence), Y03, Y04, Y05 and Y07: direct
+native/API comparisons reuse a pinned task and both material routes, and external
+grading enforces a different vendor/family with calibration, blinded call inputs,
+missingness and replayable judgments. Native v1/v2 builder/consumer routes remain.
+The user authorized one bounded live general-preparation acceptance and continued
+execution/grading development. The room-booking task uses live native preparation,
+one preserved failed review, one explicit correction review and the same generated
+proposal. Evidence is under `C:/Users/Darian/yassa-runs/gp-live-20260909`.
 
-This is bounded implementation coverage, not full-product completion. The new
-acceptance uses a simulated Inspect preparation provider and native test adapter;
-live preparation synthesis quality and provider behavior remain unverified.
-Native direct comparison, additional vendor/runtime roles, measured activation
-and clarification, final model grading, semantic tasks outside JSON predicates,
-source research, inferential planning, resource/recovery operations and the
-substantive first study remain gaps. See the updated
+This is bounded implementation coverage, not full-product completion. New direct
+native/API roles and external grading have software acceptance, not live
+cross-vendor quality evidence. Additional native hosts and API builders, measured
+activation and clarification, semantic tasks outside JSON predicates, source
+research, inferential planning and the substantive first study remain open.
+Continue necessary integrated resource and durable cancellation/recovery work
+(Y08/Y09/Y10, SPEC step 3) alongside the remaining role support. Live validation
+must serve a named capability; do not default to another benchmark. See the updated
 [capability map](SPEC.md#151-capability-coverage) and
 [implemented boundary](ARCHITECTURE.md#implemented-general-preparation).
 
@@ -31,6 +34,30 @@ in `C:/Users/Darian/.codex/worktrees/cdb4/yassa`, on branch
 90-attempt reuse study remains consumed; new live validation needs a named
 capability claim, concrete resource allocation and applicable authorization.
 Do not merge the new milestone PR without authorization.
+
+## Latest live product acceptance
+
+The room-booking acceptance completed under its separate user authorization.
+Seven preparation attempts (six initial calls and one explicit review correction),
+two builders and four fresh consumers used 1,262.516 native command seconds of
+the 2,640-second reservation. Both packages were accepted; 4/4 held-out outputs
+passed, with no missing scores or deadline failures. The raw source originals
+and model-generated proposal are unchanged across the correction. The initial
+failed review remains preserved. The native context audit passed and repeat
+scoring is byte-identical. [Acceptance evidence](C:/Users/Darian/yassa-runs/gp-live-20260909/acceptance.json).
+
+The final software suite passed 248 tests with one existing Windows symlink skip.
+Ruff, formatting, whitespace and distribution checks passed; the wheel matched 41
+source/runtime files. New direct/API and grading tests use simulated providers and
+a native test adapter. SDK construction checks exercise the real Inspect provider
+classes, with zero API inference. Native direct execution and live cross-vendor
+grading quality still require their own bounded verification. Core legacy native
+runner/checker files and study fixtures are byte-unchanged from PR #8's prior head;
+the previous 250-row historical replay remains earlier evidence, not a new replay.
+
+The unused preparation reservation does not authorize another study. Continue
+product implementation using the current priority above. Keep PR #8 unmerged
+unless the user explicitly authorizes merging.
 
 ## Latest completed experiment
 
@@ -256,8 +283,9 @@ recovered at the four/eight uses actually assigned per package. The post hoc
 
 The previous small comparison is complete; its case counts and deadlines, and
 the v2 example allocations, are not pilot defaults. Binary inputs, broader
-checker semantics, hard token/spend controls, recovery, additional vendor
-runtimes, inferential analysis, and different-family grading remain outstanding.
+checker semantics, hard token/spend controls, recovery, additional native vendor
+runtimes and inferential analysis remain outstanding. The subsequent external
+grading implementation has software acceptance, with live quality still unverified.
 Some details are proposals, not settled product requirements.
 
 ## Code entry points

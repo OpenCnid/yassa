@@ -12,8 +12,9 @@ small descriptive trials and studies requiring stronger evidence.
 **Product status: the full specification is not implemented.** The current
 foundation is a CLI execution and evidence backend for simulated fixtures and
 native Codex file studies, with recipe preparation and model-assisted preparation
-of user-described JSON work. Broader semantic preparation, additional
-vendor roles, model grading, inferential planning/analysis, and complete resource
+of user-described JSON work. It also supports direct native/API studies and
+calibrated external model grading. Broader semantic preparation, additional native
+vendor/builder roles, inferential planning/analysis, and complete resource
 and recovery controls remain partial or missing. Some recent study preparation,
 launch coordination and assessment were performed by the development agent and
 external scripts, rather than supplied as Yassa product operations.
@@ -24,10 +25,13 @@ The delivery target remains the full spec. See the
 [current implementation priority](HANDOFF.md#current-development-priority).
 The [general preparation milestone](docs/general-preparation.md) connects
 user-described work, rubrics and cases to native execution and reporting through
-product commands. Its new acceptance evidence uses simulated preparation responses
-and a native test adapter; live preparation quality remains unverified. The next
-implementation priority is broader execution and grading roles. The milestones
-below establish only their recorded scope.
+product commands. A subsequent bounded live room-booking acceptance exercises
+native preparation and the connected builder/consumer workflow; its exact outcome
+and corrections are recorded in the guide. [Execution and grading roles](docs/execution-roles.md)
+add existing-skill comparisons and a different-family grading gate. New API/native
+direct roles and external grading have software acceptance evidence; live
+cross-vendor quality remains unverified. The milestones below establish only
+their recorded scope.
 
 ## Implemented foundation and study history
 
@@ -211,8 +215,10 @@ independent builds/repeats. Guided preparation now produces that same definition
 for account totals, simple reconciliation and event reconciliation. Legacy runs
 remain verifiable and rescorable.
 The general preparer adds model-assisted tasks within a bounded JSON predicate
-contract. Broader semantic checkers, additional native CLIs, final model grading,
-and inferential comparisons remain future work.
+contract. [Direct execution and external grading](docs/execution-roles.md) add
+separately frozen native/API role studies. Broader semantic checkers, additional
+native CLIs, live cross-vendor grading validation and inferential comparisons
+remain future work.
 
 ## Design navigation
 

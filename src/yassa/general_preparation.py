@@ -179,6 +179,9 @@ def prepare_task(request, documents, calls):
             "answers": request.answers,
             "scope": request.scope,
             "specification_sources": [d for d in documents if d["split"] == "specification"],
+            "context_scope": "This task operation sees only specification sources. "
+            "Development/evaluation sources may exist outside this view; their absence "
+            "here does not establish absence from the study.",
         },
         TaskProposal,
     )
@@ -312,6 +315,36 @@ def review_proposal(request, proposal, documents, calls):
             "answers": request.answers,
             "scope": request.scope,
             "documents": documents,
+            "construction_contexts": {
+                "basis": "Declared Yassa guided preparation source policy. Expert imports "
+                "do not attest their generation context through this summary; their "
+                "source history and provenance determine whether this policy applied.",
+                "task": {
+                    "source_ids": [d["id"] for d in documents if d["split"] == "specification"]
+                },
+                "cases": [
+                    {
+                        "route": route,
+                        "split": split,
+                        "count": getattr(request, split + "_cases"),
+                        "source_ids": [
+                            d["id"]
+                            for d in documents
+                            if d["split"] == "specification"
+                            or (route == "user-supplied" and d["split"] == split)
+                        ],
+                    }
+                    for route in request.routes
+                    for split in ("development", "evaluation")
+                ],
+                "scope": "Each task case_plan and batch selection was written from that "
+                "operation's visible sources only. A sources=[] reference means that "
+                "operation's sources, not this review's full documents inventory. "
+                "Case operations received the complete TaskProposal including "
+                "task.assumptions; in this review those same assumptions are exposed "
+                "as proposed_assumptions. Assess global and local claims in their "
+                "declared context; omissions or contradictions can still be material.",
+            },
             "task": task,
             "proposed_assumptions": proposal.task.assumptions,
             "conditions": [c.model_dump(mode="json") for c in proposal.conditions],
@@ -431,10 +464,15 @@ def _review(request, proposal, questions, status, validation, files):
         ]
     if request.preparation:
         s = request.preparation
+        output_limit = (
+            f"{s.max_output_bytes} accepted response bytes (no hard token cap)"
+            if getattr(s, "runtime", None) == "native-codex-cli"
+            else f"{s.max_output_tokens} output tokens"
+        )
         lines += [
             "",
             f"Preparation cap per round: {s.max_calls} calls, "
-            f"{s.max_output_tokens} output tokens and {s.timeout_seconds} seconds per call. "
+            f"{output_limit} and {s.timeout_seconds} seconds per call. "
             "Input tokens, provider billing and setup overhead are not capped. "
             f"Preparer: {s.model}; reviewer: {s.reviewer_model}.",
         ]
@@ -456,7 +494,13 @@ def _review(request, proposal, questions, status, validation, files):
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 
-def prepare_general(input_path: Path, destination: Path, previous: Path | None = None) -> Path:
+def prepare_general(
+    input_path: Path,
+    destination: Path,
+    previous: Path | None = None,
+    *,
+    auth_path: Path | None = None,
+) -> Path:
     destination = external_root(destination)
     if destination.exists():
         raise ValueError("draft destination must be new")
@@ -510,6 +554,7 @@ def prepare_general(input_path: Path, destination: Path, previous: Path | None =
             expert[key] = body
     if len(files) > 450 or sum(map(len, files.values())) > 10_000_000:
         raise ValueError("input/history evidence exceeds 450 files or 10 MB before preparation")
+    code = procedure_files()
     # Snapshot inputs before any effectful call, including failed attempts.
     destination.mkdir(parents=True, exist_ok=False)
     for name, body in files.items():
@@ -517,7 +562,9 @@ def prepare_general(input_path: Path, destination: Path, previous: Path | None =
     questions = readiness(request)
     proposal, study, validation = None, None, {}
     if not questions:
-        calls = PreparationCalls(request.preparation, destination / f"calls/{number:03d}")
+        calls = PreparationCalls(
+            request.preparation, destination / f"calls/{number:03d}", auth_path=auth_path
+        )
         try:
             if request.expert_proposal:
                 proposal = StudyProposal.model_validate(parse_json(expert["expert_proposal"]))
@@ -578,7 +625,6 @@ def prepare_general(input_path: Path, destination: Path, previous: Path | None =
     )
     files[f"history/{number:03d}-state.json"] = files["draft.json"]
     validation["runtime"] = runtime_versions()
-    code = procedure_files()
     validation["preparer"] = {name: digest(body) for name, body in code.items()}
     files["validation.json"] = canonical(validation)
     files.update({"preparer/" + name: body for name, body in code.items()})
@@ -586,9 +632,14 @@ def prepare_general(input_path: Path, destination: Path, previous: Path | None =
         {name: body.decode("utf-8") for name, body in code.items()}
     )
     # Record all newly written model logs and previous histories in the review manifest.
+    from .preparation_native import archive_native_calls
+
+    native_prefixes = archive_native_calls(destination, number, files)
     aliases = []
     for index, item in enumerate(inventory(destination)):
         name = item["path"]
+        if name.startswith(native_prefixes):
+            continue
         if name.startswith("calls/"):
             # Original logs stay in the draft; portable aliases retain their exact bytes.
             name = f"history/{number:03d}-calls/{index:03d}.json"

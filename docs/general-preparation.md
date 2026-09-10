@@ -20,8 +20,9 @@ Use the [locked environment](../README.md#run-the-fixture). The
 work description and configuration, with explicit placeholder model names.
 Choose available Inspect preparation/review models and a supported native subject
 model before using it. Inspect provider credentials are configured through the
-provider's normal environment. A saved native Codex login is used separately at
-subject execution; this preparation adapter does not consume that login.
+provider's normal environment. Alternatively use the native preparation role
+[described below](#live-native-preparation) with a saved Codex login. Credentials
+are passed separately from the frozen request and never included in its history.
 
 ```powershell
 $draftRoot = Join-Path $env:USERPROFILE 'yassa-runs/general-preparation-example'
@@ -215,19 +216,77 @@ questions, revisions, originals, source splits, unsupported conditions, admissio
 model errors, independent review findings, invalid witnesses, checker failures and
 expert import equivalence.
 
-These are software acceptance results, not experimental findings. **No live
-preparation API calls or new native subject trials were made for this milestone.**
-The new prompts' synthesis quality and live provider behavior lack integration
-evidence. The existing native adapter's earlier live evidence remains in the
-[v2 guide](configurable-native.md#verification-evidence); it does not establish
-the new preparer's quality. The prior 90-attempt allocation remains consumed.
+These initial results are software acceptance, not experimental findings. Initial
+implementation made no live preparation API calls or native subject trials.
+The subsequent separately authorized [live acceptance](#live-native-preparation)
+adds evidence for one task; it does not establish general synthesis reliability.
+The prior native adapter evidence remains in the
+[v2 guide](configurable-native.md#verification-evidence). The prior 90-attempt
+allocation remains consumed.
 
 Y01/Y02 remain partial for general semantic tasks, source research and verified
-real-world coverage. Y03 remains partial for native direct studies, additional
-vendor/runtime roles, activation and measured clarification. Y10 remains partial
+real-world coverage. The subsequent [execution roles](execution-roles.md) add
+direct native/API studies and external grading; additional native vendor/builder
+roles, activation and measured clarification remain incomplete. Y10 remains partial
 for full role coverage, public/redacted derivatives and recovery coordination.
-Different-family final model grading, inference/planning, hard native token/spend
+Broader model-grading evidence and live calibration, inference/planning, hard native token/spend
 controls, crash recovery and the substantive first Dovetail study remain on the
 [full-spec roadmap](../SPEC.md#151-capability-coverage). The next implementation
 priority is [development step 2](../SPEC.md#152-development-sequence), with live
 validation scoped separately to a named capability and concrete resources.
+
+## Live native preparation
+
+The user separately authorized a small live acceptance on 2026-09-09, followed by
+execution/grading implementation. It uses a synthetic room-booking conflict task
+that has no task-specific generator or checker in product code. The development
+agent supplied only ordinary requirements and raw development/evaluation inputs;
+live models produced the task, JSON predicates, witnesses, cases and calibration.
+Yassa commands perform the preparation, review, freeze, execution and reporting.
+
+Native preparation settings use `runtime: "native-codex-cli"`, a pinned Docker
+`image`, explicit `model`, `reviewer_model`, `reasoning_effort`, `max_calls`,
+`max_output_bytes` and `timeout_seconds`. Append `--auth-file AUTH.json` to
+`study-draft` or `study-revise`. Each call is a fresh Inspect Docker/Codex attempt
+using the same permission and catalog acceptance boundary as subjects. Preparation
+can use local tools to check its JSON. Its byte cap applies to accepted response
+files; it is not a hard generation-token cap. Deadlines cover the native command,
+excluding setup/export; input tokens and spend remain uncapped. Native internal
+model requests and tool work are retained and can exceed one per preparation call.
+
+The [allocation](C:/Users/Darian/yassa-runs/gp-live-20260909/allocation.json) reserves
+at most two rounds of six preparation attempts at 180 seconds each, two builds at
+120 seconds and four uses at 60 seconds: 2,640 maximum native command seconds.
+No old benchmark allocation is reused and no automatic retry is permitted.
+The initial round made six calls. The live reviewer found a source-narrative
+ambiguity: task/case models referred to their own restricted source views while
+the reviewer was given the global inventory without those views. It found no
+booking-rule, source-adaptation, witness or calibration error, but the material
+issue correctly withheld study export. That failed review remains unchanged.
+
+The correction makes source visibility explicit. `study-revise` imported the
+exact same model-produced proposal by hash and made one new review call, retaining
+the original request, raw source bytes, generated cases and prior review. The new
+review accepted the six witnesses and 100 probes, and the runnable study was
+frozen. No hand-written rubric, substituted answers or regenerated cases were
+used to obtain acceptance. The [ready review](C:/Users/Darian/yassa-runs/gp-live-20260909/r1/review.md)
+and [frozen native plan](C:/Users/Darian/yassa-runs/gp-live-20260909/run/plan.json)
+link the exact evidence.
+
+Both packages were accepted and **4/4 fresh held-out consumers passed**, with no
+missing scores or deadline failures. The [native report](C:/Users/Darian/yassa-runs/gp-live-20260909/run/interpretations/original/report.md)
+records the two material conditions separately. The [acceptance audit](C:/Users/Darian/yassa-runs/gp-live-20260909/acceptance.json)
+verifies the unchanged proposal and supplied originals, independently checks all
+six references and four consumer decisions, and records a passing native-context
+audit and byte-identical rescoring. All 13 root attempts used 1,262.516 native
+command seconds (21.04 minutes), with 69 recorded internal model responses.
+There were no automatic retries. Five reserved preparation attempts were unused;
+they are not standing authorization for another study.
+
+The final software check passed **248 tests, with one existing skip**. Ruff,
+formatting and patch whitespace passed, and the built wheel matched all 41
+source/runtime files. The SDK construction checks made no API inference calls.
+This live acceptance establishes the connected workflow on one specified
+synthetic task; broader preparation reliability, real booking reliability and
+skill rankings remain unmeasured. New direct/API and external grading roles have
+separate [software acceptance and limits](execution-roles.md).

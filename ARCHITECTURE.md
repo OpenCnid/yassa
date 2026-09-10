@@ -66,15 +66,41 @@ which unsuccessful attempts disappear.
 ## Current implementation priority
 
 The general preparation milestone implements the bounded JSON path for Y01,
-Y02, Y03 and Y10 described in [the guide](docs/general-preparation.md). The next
-implementation priority is broader execution and grading roles in
-[SPEC step 2](SPEC.md#152-development-sequence). Full capability coverage remains
-incomplete; live synthesis quality for the new preparer has not been validated.
+Y02, Y03 and Y10 described in [the guide](docs/general-preparation.md), with a
+subsequent separately scoped native live acceptance. [Execution roles](docs/execution-roles.md)
+advance SPEC step 2 through direct native/API comparisons and calibrated external
+grading. This remains partial capability coverage: additional native hosts and
+builder roles, activation/clarification measurement and live cross-vendor grading
+validation remain open. Necessary resource and recovery controls belong alongside
+each new effectful role; the full specification remains the delivery target.
 
-Keep extending the shared task/material/native runner boundaries. Direct native
-comparison, additional runtime/vendor roles, measured activation/clarification
-and different-family final grading remain to be implemented for the wider task
-contracts. Necessary resource controls belong alongside each new effectful role.
+## Implemented execution and grading roles
+
+`direct_contracts.py` defines a direct request over a pinned native v2 task source,
+explicit host/model, pinned source packs, arms, repeats and admission caps.
+`direct_runner.py` resolves the source task/material/preparation records and freezes
+a separate direct plan. It gives each fresh attempt complete task facts, current
+case files and its declared treatment, with no build or package parent. Native
+attempts reuse `native_execution.py`; closed API attempts use `role_api.py` with
+two explicit messages, no tools and first-party endpoint/model identities.
+Native v1/v2 definitions and planner/checker identities are unchanged.
+
+`grading.py` reads sealed native v2 or direct work, then freezes a separate rubric,
+calibration allocation, exact input/output evidence and source seal. The API role
+must belong to a different vendor/model family. It gates all work on calibration,
+withholds treatment labels and expected judgments, retains raw responses and
+missingness, and reports components and counts independently of deterministic
+scores. Offline grade reporting checks stored judgments without inference.
+Supplied calibration labels are not authenticated semantic truth. Full model
+grading across arbitrary evidence, mixed-family authorship and scorer corrections
+remains a broader interface requirement.
+
+`preparation_native.py` supplies the same native boundary to preparation calls.
+Credentials enter only at execution. Exact raw captures stay in the draft; bounded
+ZIP copies plus member hashes make preparation history portable without expanding
+Windows path depth. ZIP evidence is never extracted or executed by the product.
+Source visibility is explicit in the task and reviewer payloads so a route-local
+absence cannot silently become a global source claim.
 
 ## Repository map
 
@@ -424,10 +450,11 @@ review and distinguish predicate compliance from semantic or real-world coverage
 The [general guide](docs/general-preparation.md) specifies limits, resource caps,
 expert import semantics and acceptance evidence. Tests use actual Inspect with a
 simulated preparer and a native output adapter for record selection and feasible
-assignment; they establish software composition, not live synthesis quality.
-No new live calls or benchmark allocation were consumed. General semantic
-judgment, remote dataset research, direct native studies, vendor/grading roles,
-full recovery and public/redacted derivatives remain incomplete.
+assignment; they establish software composition. Initial implementation consumed
+no live allocation. The subsequent [native live acceptance](docs/general-preparation.md#live-native-preparation)
+adds evidence for one booking task. [Execution roles](docs/execution-roles.md) add
+direct studies and grading; their new role validation, broader semantic judgment,
+remote research, full recovery and public/redacted derivatives remain incomplete.
 
 ## Implemented event reconciliation preparation
 
