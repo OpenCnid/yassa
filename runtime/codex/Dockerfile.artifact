@@ -1,0 +1,10 @@
+# Build only after verifying yassa-codex:0.153.4 against the study's recorded base ID.
+FROM yassa-codex:0.153.4
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends python3-venv
+RUN python3 -m venv /opt/artifact \
+    && /opt/artifact/bin/pip install --no-cache-dir pip==25.2 \
+    && /opt/artifact/bin/pip install --no-cache-dir torch==2.14.0+cpu --index-url https://download.pytorch.org/whl/cpu \
+    && /opt/artifact/bin/pip install --no-cache-dir pytest==9.1.1 numpy==2.4.3 PyYAML==6.0.3
+ENV PATH=/opt/artifact/bin:$PATH
+USER node

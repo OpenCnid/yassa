@@ -391,6 +391,13 @@ def write_resource_interpretation(root: Path, source_label: str, destination: Pa
     if destination.is_relative_to(root.resolve()):
         raise ValueError("resource interpretation must be outside the preserved run")
     seal = verify_run(root)
+    if (root / "control/summary.json").exists():
+        control = parse_json(read_regular(root / "control/summary.json"))
+        if any(a["number"] > 1 or a["uncertain_execution"] for a in control["attempts"]):
+            raise ValueError(
+                "reuse curves do not define retry/uncertain cost allocation; "
+                "use run-report and resource-status for complete operational expenditure"
+            )
     frozen, plan, study, _ = load_native_v2(root)
     score_bytes = read_regular(root / "interpretations" / source_label / "scores.json")
     score_record = parse_json(score_bytes)

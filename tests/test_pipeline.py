@@ -150,7 +150,7 @@ def test_changed_scorer_requires_reason_and_preserves_original(completed_run, mo
 def test_report_links_resolve(completed_run):
     report = completed_run / "interpretations/original/report.md"
     for link in re.findall(r"\]\(([^)]+)\)", report.read_text(encoding="utf-8")):
-        assert (report.parent / link).is_file(), link
+        assert (report.parent / link).resolve().is_file(), link
 
 
 def test_sealed_tampering_detected(completed_run, tmp_path):

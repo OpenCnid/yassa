@@ -38,9 +38,15 @@ def summarize(scores: list[dict], results: dict, attempts: list[dict]) -> dict:
         "attempts": len(attempts),
         "attempt_statuses": dict(Counter(attempt["status"] for attempt in attempts)),
         "usage": {
-            "provider_calls": sum(a["usage"]["provider_calls"] for a in attempts),
-            "internal_calls": sum(a["usage"]["internal_calls"] for a in attempts),
-            "tool_calls": sum(a["usage"]["tool_calls"] for a in attempts),
+            "provider_calls": sum(a["usage"]["provider_calls"] for a in attempts)
+            if all(a["usage"]["provider_calls"] is not None for a in attempts)
+            else None,
+            "internal_calls": sum(a["usage"]["internal_calls"] for a in attempts)
+            if all(a["usage"]["internal_calls"] is not None for a in attempts)
+            else None,
+            "tool_calls": sum(a["usage"]["tool_calls"] for a in attempts)
+            if all(a["usage"]["tool_calls"] is not None for a in attempts)
+            else None,
             "duration_seconds": round(sum(d or 0 for d in durations), 6),
             "missing_durations": sum(d is None for d in durations),
             "model_tokens": None,
@@ -61,6 +67,9 @@ def render_report(
 ) -> str:
     def cell(value):
         return str(value).replace("|", "\\|").replace("\n", " ").replace("\r", " ")
+
+    def available(value):
+        return "unavailable" if value is None else str(value)
 
     lines = [
         "# Yassa synthetic fixture report",
@@ -93,9 +102,9 @@ def render_report(
         f"Actual attempts, including retries: {summary['attempts']}; "
         f"reserved maximum: {plan['reserved_attempts']}.",
         "",
-        f"Resource use: {summary['usage']['provider_calls']} simulated provider calls, "
-        f"{summary['usage']['tool_calls']} tool calls, "
-        f"{summary['usage']['internal_calls']} internal calls, "
+        f"Resource use: {available(summary['usage']['provider_calls'])} simulated provider calls, "
+        f"{available(summary['usage']['tool_calls'])} tool calls, "
+        f"{available(summary['usage']['internal_calls'])} internal calls, "
         f"{summary['usage']['duration_seconds']:.3f} recorded attempt seconds. "
         "Model token counts and monetary costs are unavailable/not applicable to this simulation. "
         "The configured output cap uses UTF-8 byte units in the fixture provider; "
@@ -134,8 +143,11 @@ def render_report(
         "| --- | --- | ---: | --- | --- | --- |",
     ]
     for score in score_record["scores"]:
+        uncertain = any(a["id"] == score["attempt_id"] and a.get("uncertain") for a in attempts)
         attempt = (
-            f"[record](../../attempts/{score['attempt_id']}/result.json)"
+            f"[record](../../control/attempts/{score['attempt_id']}/completion.json)"
+            if uncertain
+            else f"[record](../../attempts/{score['attempt_id']}/result.json)"
             if score["attempt_id"]
             else "none (dependency disposition)"
         )
@@ -175,6 +187,12 @@ def render_report(
         "| --- | --- | --- | --- |",
     ]
     for attempt in attempts:
+        if attempt.get("uncertain"):
+            lines.append(
+                f"| [uncertain launch](../../control/attempts/{attempt['id']}/completion.json) | "
+                "harness_failure | unavailable | retained partial evidence, if any |"
+            )
+            continue
         lines.append(
             f"| [record](../../attempts/{attempt['id']}/result.json) | {attempt['status']} | "
             f"[binding](../../artifacts/{attempt['binding_id']}/files/binding.json) | "

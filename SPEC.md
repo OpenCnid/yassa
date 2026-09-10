@@ -554,6 +554,32 @@ service, network, and state boundaries. Include no repository instructions,
 personal skills, development notes, held-out answers, or other arms' artifacts
 unless the study explicitly names them as inputs.
 
+### 9.1 Resource and recovery milestone
+
+**Implemented bounded policy, 2026-09-10.** The
+[resource/recovery interface](docs/resource-controls.md) supplies shared root-attempt
+and scheduled-deadline budgets. Admission reserves the full deadline before a
+launch, including retries and in-flight work; reservations are not refunded.
+Reported usage and allocation remain distinct. Each adapter retains its actual
+enforcement granularity, and unavailable token/spend controls stay explicit.
+
+Cancellation settles bounded active work and prevents further launches. Explicit
+resume reuses verified returns under unchanged bindings, code and dependencies.
+An uncertain launch requires a recorded missing disposition or an eligible,
+explicitly allowed infrastructure retry. Retries have new identities and retain
+the original evidence. Wrong work, refusal and deadline outcomes are not eligible
+for this retry policy. A result selection cannot be reopened for new attempts.
+Operational interruption does not establish a statistical stopping criterion.
+
+Acceptance includes exhaustion while another reservation is in flight, preserved
+partial work, real Inspect fixture CLI cancellation/process-death/restart without
+duplicating completed work, native package reuse and missing dependencies through
+adapter doubles, grading calibration/retry gating, shared preparation/execution/
+grading accounting, and portable offline replay. Authenticated native restart,
+same-directory preparation resume, legacy interrupted-run migration and hard native
+token/spend caps remain unverified or unimplemented. This milestone advances
+Y08/Y09/Y10 without completing those capability rows or the full product.
+
 ## 10. Evidence and reporting
 
 **Proposal.** A run's evidence connects the study revision to source revisions,
@@ -942,11 +968,11 @@ sections, not new semantics or a count-based completion percentage.
 | Y05 — Multiple vendor families ([sections 2](#2-scope-and-commitments), [13](#13-first-dovetail-study-decisions-still-open)) | **Partial, live evidence added.** Claude Code OAuth grading of GPT direct work passed six calibration cases and eight grades. First-party OpenAI/GPT, Anthropic/Claude and Google/Gemini Inspect API roles have pinned SDKs and software checks, without live API inference acceptance. Additional native subject/builder roles and API builders remain open. | Implement and separately verify the additional provider/runtime roles needed for a study program involving different vendors. Record the role and capabilities of each family and host; do not attribute host differences solely to the skill builder. Exact vendor/model selections remain study decisions. |
 | Y06 — Scope, resolution and resource planning ([section 7](#7-experimental-sensitivity-and-selectable-inference-budgets)) | **Partial.** Explicit allocations, admission arithmetic, seeded scheduling and reuse scenarios exist. Broader sensitivity requests stay unresolved. | Implement budget-first, resolution-first and expert planning for selected supported designs, with assumptions and unknowns visible. Preserve independent briefs/builds/tasks/repeats and pairing. Simple descriptive studies must continue without a mandatory power target or pilot. Select and validate methods before claiming sensitivity. |
 | Y07 — Scoring recorded work ([section 8](#8-scoring-recorded-work)) | **Partial, expanded.** Deterministic checkers and versioned rescoring remain. [External grading](src/yassa/grading.py) freezes recorded work, enforces a different vendor/family, gates work on calibration, preserves raw judgments and missing grades, and reports separately from deterministic scores. Bounded Claude live acceptance passed with independent label/output checks and offline replay; failed calibrations remain preserved. Broader grading quality/evidence and mixed-family authorship remain unverified/unsupported. | Add task-appropriate checker/evidence interfaces and a calibrated model-grading route that enforces the different-family rule when grading is selected. Preserve raw judgments, component semantics, missing grades and scorer revisions; validate legitimate alternatives and plausible wrong work. |
-| Y08 — Resource controls and accounting ([section 9](#9-execution-resource-accounting-and-failure-handling)) | **Partial, expanded.** Preparation, direct and grading roles have explicit allocations/deadlines, available usage and API output-token caps. Native preparation has an accepted-response byte cap, without a hard token cap. Native hard token/spend controls and integrated cross-role accounting remain absent. | Account for preparation, builds, uses, internal agents and external grading; admit and enforce selected limits at the granularity each adapter actually supports. Verify exhaustion with in-flight work and retain partial evidence. Unsupported hard caps must remain explicit until implemented, not be treated as zero cost or precise enforcement. |
-| Y09 — Cancellation, recovery and retry ([sections 9](#9-execution-resource-accounting-and-failure-handling), [11](#11-inspect-integration-requirements)) | **Missing for native crash recovery/resume.** Interrupted evidence is retained and a started run cannot simply be relaunched. | Reconcile durable attempts and Inspect evidence after interruption; preserve uncertain launches, original failures and linked retries. Exercise cancellation and restart without duplicating completed trials or granting failed answers unrecorded extra chances. No exactly-once provider-execution claim is required. |
-| Y10 — Evidence operations and reporting ([sections 10](#10-evidence-and-reporting), [12](#12-acceptance-evidence-for-an-implementation)) | **Partial, with a substantial implemented core.** [General preparation](docs/general-preparation.md) connects product draft/revision/schema operations to native freeze, execute, verify, rescore and reports; histories and source/code/model evidence are portable. Full role coverage, public/redacted derivatives and recovery coordination remain gaps. | Make required preparation-to-report operations callable and reproducible through supported product interfaces. Cover all implemented study roles and artifact types, and identify supported replay and public/redacted derivatives. An end-to-end acceptance example must not depend on an untracked developer-written orchestration script. |
+| Y08 — Resource controls and accounting ([section 9](#9-execution-resource-accounting-and-failure-handling)) | **Partial, expanded.** [Shared ledgers](docs/resource-controls.md) reserve root attempts and full deadlines across preparation, builds, uses, direct work, calibration and grading, including in-flight/uncertain attempts and explicit retries. Reports retain stage attribution, recorded native child usage and unknown values. API output caps and native deadlines remain adapter-specific; native hard token/spend caps are absent. | Account for preparation, builds, uses, internal agents and external grading; admit and enforce selected limits at the granularity each adapter actually supports. Verify exhaustion with in-flight work and retain partial evidence. Unsupported hard caps must remain explicit until implemented, not be treated as zero cost or precise enforcement. |
+| Y09 — Cancellation, recovery and retry ([sections 9](#9-execution-resource-accounting-and-failure-handling), [11](#11-inspect-integration-requirements)) | **Partial, implemented for managed execution.** [Durable controller records](src/yassa/control.py) support cooperative cancellation, local resume, verified return reuse, uncertain dispositions and bounded explicit linked retries for native/direct/grading execution; fixtures retain their declared retry policy. Real Inspect fixture cancellation/process-kill/restart and native adapter-double checks pass. Preparation resume, legacy interrupted-run adoption and authenticated native restart validation remain open. | Reconcile durable attempts and Inspect evidence after interruption; preserve uncertain launches, original failures and linked retries. Exercise cancellation and restart without duplicating completed trials or granting failed answers unrecorded extra chances. No exactly-once provider-execution claim is required. |
+| Y10 — Evidence operations and reporting ([sections 10](#10-evidence-and-reporting), [12](#12-acceptance-evidence-for-an-implementation)) | **Partial, expanded.** Product commands now expose shared budgets, operational status/reports, cancellation and resume alongside preparation, freeze, execute, verify and rescore. Partial reports preserve all planned trials and physical attempt lineage; final reports link sealed recovery/resource records. Full role coverage, public/redacted derivatives and preparation recovery remain gaps. | Make required preparation-to-report operations callable and reproducible through supported product interfaces. Cover all implemented study roles and artifact types, and identify supported replay and public/redacted derivatives. An end-to-end acceptance example must not depend on an untracked developer-written orchestration script. |
 | Y11 — Analysis and claim scope ([sections 7.4](#74-analysis-and-stopping), [10](#10-evidence-and-reporting)) | **Partial.** Descriptive scores, denominators, per-build curves and paired case times exist; inferential methods are not implemented. | Implement selected fixed-plan methods and compatible planning with declared grouping, weights, uncertainty assumptions and practical thresholds. Validate the dependency structures each method supports. Keep descriptive results available and identify unsupported inference; sequential methods remain a separately justified extension. |
-| Y12 — First substantive Dovetail study ([section 13](#13-first-dovetail-study-decisions-still-open)) | **Partial.** Completed synthetic fixtures validate portions of the machinery and describe those cases. The accepted multi-domain, two-vendor program and verified first-party builder comparison are unfinished. | Resolve representative work, controls/provenance, model roles, input conditions and the intended claim; exercise the resulting supported product path on held-out work. Preserve both supplied and Yassa-prepared conditions. A further saturated reconciliation run does not close this row. |
+| Y12 — First substantive Dovetail study ([section 13](#13-first-dovetail-study-decisions-still-open)) | **Partial.** Synthetic fixtures and the completed [U-Neuron reconstruction pair](docs/u-neuron-reconstruction.md) exercise supported study paths. The U-Neuron test oracle limits correctness conclusions. The accepted multi-domain, two-vendor program and verified first-party builder comparison are unfinished. | Resolve the U-Neuron oracle before another reconstruction comparison. For the broader program, freeze representative work, controls/provenance, model roles, input conditions and the intended claim; exercise the supported product path on held-out work. Preserve both supplied and Yassa-prepared conditions. One artifact pair does not close this row. |
 
 Completion of a row requires code reachable through a supported interface,
 appropriate behavioral checks and recorded integration evidence for its claimed
@@ -954,6 +980,23 @@ scope. Full-product completion also requires the rows to compose through the
 user's preparation-to-report workflow. Existing unit tests, scorer probes and
 audits support particular implementation claims; their counts are not additional
 experimental observations or proof that task selection is informative.
+
+The user-selected U-Neuron reconstruction adds a bounded
+[artifact study route](docs/artifact-studies.md) to partial Y03/Y04/Y07/Y10:
+supplied specifications, explicit treatment packs, separate protected source and
+pytest bundles, native reconstruction and later isolated testing of saved work.
+The initial allocation is one attempt per arm on one artifact. It does not close
+Y12's broader program, validate all mathematical claims, or implement inferential
+analysis. Material selection is manual; freeze/build/test/report are product
+commands. The full capability targets above remain unchanged.
+
+The bounded U-Neuron pair completed through the artifact commands: 66/87 shipped
+tests with Dovetail, 64/87 without, and 85/87 on the untouched reference. The
+two-test difference concerns error-message wording; the shipped oracle also
+assumes private implementation details absent from the supplied specifications.
+This is descriptive evidence of execution and a study-design limitation, not a
+mathematical correctness ranking. See
+[recorded results and failure analysis](docs/u-neuron-reconstruction.md#recorded-results).
 
 Outstanding choices include the supported initial non-fixture task contracts,
 rubric/checker extension interfaces, additional model/runtime roles, statistical

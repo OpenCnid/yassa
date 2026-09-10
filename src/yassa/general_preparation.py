@@ -500,6 +500,7 @@ def prepare_general(
     previous: Path | None = None,
     *,
     auth_path: Path | None = None,
+    resources: Path | None = None,
 ) -> Path:
     destination = external_root(destination)
     if destination.exists():
@@ -563,7 +564,10 @@ def prepare_general(
     proposal, study, validation = None, None, {}
     if not questions:
         calls = PreparationCalls(
-            request.preparation, destination / f"calls/{number:03d}", auth_path=auth_path
+            request.preparation,
+            destination / f"calls/{number:03d}",
+            auth_path=auth_path,
+            resources=resources,
         )
         try:
             if request.expert_proposal:

@@ -10,6 +10,14 @@ from pydantic import ValidationError
 
 from . import __version__
 from .contexts import binding, common_input
+from .control import (
+    fixture_call,
+    managed,
+    same_or_new,
+    selected_result,
+    start_control,
+    verify_execution_freeze,
+)
 from .evidence import (
     EvidenceStore,
     freeze_package,
@@ -148,22 +156,17 @@ def load_frozen(root: Path) -> tuple[dict, dict, Study, dict[str, Materials]]:
     return frozen, plan, study, materials
 
 
+@managed("fixture")
 def execute(root: Path) -> Path:
     root = root.resolve()
-    freeze = parse_json(read_regular(root / "freeze-seal.json"))
-    body = {key: value for key, value in freeze.items() if key != "id"}
-    current = [entry for entry in inventory(root) if entry["path"] != "freeze-seal.json"]
-    if identity(body) != freeze["id"] or current != freeze["files"]:
-        raise ValueError(
-            "prepared evidence changed or execution already started; automatic resume "
-            "is unsupported. Preserve this run and use a new run directory."
-        )
+    verify_execution_freeze(root)
     frozen, plan, study, materials = load_frozen(root)
     store = EvidenceStore(root)
     if store.get(frozen["procedure_id"]) != procedure_files():
         raise ValueError("implementation changed after freeze; prepare a new revision")
     if any(frozen["runtime"][name] != value for name, value in runtime_versions().items()):
         raise ValueError("runtime dependencies changed after freeze; prepare a new revision")
+    start_control()
     arms = {arm.id: arm for arm in study.arms}
     common = {}  # One rendered common segment per matched condition/case/stage.
     for trial in plan["trials"]:
@@ -206,7 +209,9 @@ def execute(root: Path) -> Path:
         for attempt_number in range(1, study.limits.infrastructure_retries + 2):
             # Fault injection is a declared fixture setting. Consumers share an unmodified runtime.
             failures = 0 if parent else arms[trial["arm"]].infrastructure_failures
-            attempt = execute_attempt(root, trial, context, study.limits, attempt_number, failures)
+            attempt = fixture_call(
+                execute_attempt, root, trial, context, study.limits, attempt_number, failures
+            )
             attempts.append(attempt)
             if attempt["status"] != "infrastructure_failure":
                 break
@@ -225,7 +230,7 @@ def execute(root: Path) -> Path:
             except (ValueError, UnicodeError, RecursionError) as error:
                 result.update(status="build_failed", reason=str(error))
         results[trial["id"]] = result
-    write_new(
+    same_or_new(
         root / "results.json",
         canonical(
             {
@@ -301,7 +306,7 @@ def rescore(root: Path, label: str, reason: str | None = None) -> Path:
         "scores": scores,
     }
     attempt_records = [
-        parse_json(read_regular(root / "attempts" / attempt / "result.json"))
+        selected_result(root, attempt, root / "attempts" / attempt / "result.json")
         for attempt in selections["attempts"]
     ]
     summary = summarize(scores, results, attempt_records)
@@ -358,6 +363,21 @@ def main() -> int:
     command.add_argument("run_dir", type=Path)
     command.add_argument("--label", required=True)
     command.add_argument("--reason")
+    command = commands.add_parser(
+        "artifact-prepare", help="freeze a spec-only artifact comparison and test its reference"
+    )
+    command.add_argument("request", type=Path)
+    command.add_argument("--run-dir", required=True, type=Path)
+    command = commands.add_parser(
+        "artifact-execute", help="reconstruct artifacts in fresh native sandboxes"
+    )
+    command.add_argument("run_dir", type=Path)
+    command.add_argument("--auth-file", required=True, type=Path)
+    command = commands.add_parser(
+        "artifact-score", help="run held-out pytest against recorded artifacts"
+    )
+    command.add_argument("run_dir", type=Path)
+    command.add_argument("--label", required=True)
     command = commands.add_parser("study-revise", help="record answers in a new preparation round")
     command.add_argument("previous", type=Path)
     command.add_argument("answers", type=Path)
@@ -398,9 +418,91 @@ def main() -> int:
     command.add_argument("run_dir", type=Path)
     command.add_argument("--scores", required=True, help="existing score interpretation label")
     command.add_argument("--output-dir", required=True, type=Path)
+    command = commands.add_parser("resource-init", help="create a shared launch budget")
+    command.add_argument("resource_dir", type=Path)
+    command.add_argument("--max-attempts", required=True, type=int)
+    command.add_argument("--max-scheduled-seconds", required=True, type=int)
+    command = commands.add_parser("resource-status", help="read integrated cross-role resources")
+    command.add_argument("resource_dir", type=Path)
+    for name in ("run-status", "run-report", "cancel"):
+        command = commands.add_parser(name)
+        command.add_argument("run_dir", type=Path)
+        if name == "cancel":
+            command.add_argument("--reason", required=True)
+    execution_commands = {
+        "execute",
+        "run",
+        "native-execute",
+        "native-run",
+        "direct-execute",
+        "artifact-execute",
+        "grade-execute",
+    }
+    for name in execution_commands:
+        command = commands.choices[name]
+        command.add_argument("--resources", type=Path, help="shared immutable launch budget")
+        command.add_argument("--resume", action="store_true")
+        command.add_argument(
+            "--retry", action="append", default=[], help="logical attempt to retry"
+        )
+        command.add_argument(
+            "--mark-missing",
+            action="append",
+            default=[],
+            help="retain an uncertain launch as missing",
+        )
+        command.add_argument("--reason")
+        command.add_argument(
+            "--infrastructure-retries",
+            type=int,
+            default=0,
+            help="freeze a retry allowance at first execution; requires resources",
+        )
+    for name in ("study-draft", "study-revise"):
+        commands.choices[name].add_argument("--resources", type=Path)
     args = parser.parse_args()
     try:
-        if args.command == "study-schema":
+        execution_options = (
+            {
+                name: getattr(args, name)
+                for name in (
+                    "resources",
+                    "resume",
+                    "retry",
+                    "mark_missing",
+                    "reason",
+                    "infrastructure_retries",
+                )
+            }
+            if args.command in execution_commands
+            else {}
+        )
+        if args.command == "resource-init":
+            from .control import resource_init
+
+            output = resource_init(
+                args.resource_dir,
+                {
+                    "max_attempts": args.max_attempts,
+                    "max_scheduled_seconds": args.max_scheduled_seconds,
+                },
+            )
+        elif args.command == "resource-status":
+            from .control import resource_status
+
+            output = canonical(resource_status(args.resource_dir.resolve())).decode().strip()
+        elif args.command in {"run-status", "run-report", "cancel"}:
+            from .control import cancel, control_report, control_status
+
+            root = args.run_dir.resolve()
+            output = (
+                cancel(root, args.reason)
+                if args.command == "cancel"
+                else control_report(root)
+                if args.command == "run-report"
+                else canonical(control_status(root)).decode().strip()
+            )
+        elif args.command == "study-schema":
             from .general_contracts import (
                 CaseBatch,
                 ExpertReview,
@@ -423,10 +525,16 @@ def main() -> int:
             from .guided_preparation import prepare_draft
 
             output = (
-                prepare_draft(args.request, args.draft_dir, auth_path=args.auth_file)
+                prepare_draft(
+                    args.request, args.draft_dir, auth_path=args.auth_file, resources=args.resources
+                )
                 if args.command == "study-draft"
                 else prepare_draft(
-                    args.answers, args.draft_dir, args.previous, auth_path=args.auth_file
+                    args.answers,
+                    args.draft_dir,
+                    args.previous,
+                    auth_path=args.auth_file,
+                    resources=args.resources,
                 )
             )
         elif args.command == "role-schema":
@@ -441,16 +549,29 @@ def main() -> int:
             if args.command == "grade-prepare":
                 output = prepare_grades(args.run_dir.resolve(), args.request, args.grade_dir)
             elif args.command == "grade-execute":
-                output = execute_grades(args.grade_dir.resolve(), args.auth_file)
+                output = execute_grades(
+                    args.grade_dir.resolve(), args.auth_file, **execution_options
+                )
             else:
                 output = report_grades(args.grade_dir.resolve(), args.label)
+        elif args.command.startswith("artifact-"):
+            from .artifact_runner import execute_artifact, prepare_artifact, score_artifact
+
+            if args.command == "artifact-prepare":
+                output = prepare_artifact(args.request, args.run_dir)
+            elif args.command == "artifact-execute":
+                output = execute_artifact(
+                    args.run_dir.resolve(), args.auth_file, **execution_options
+                )
+            else:
+                output = score_artifact(args.run_dir.resolve(), args.label)
         elif args.command.startswith("direct-"):
             from .direct_runner import execute_direct, prepare_direct, rescore_direct
 
             if args.command == "direct-prepare":
                 output = prepare_direct(args.request, args.run_dir)
             elif args.command == "direct-execute":
-                output = execute_direct(args.run_dir.resolve(), args.auth_file)
+                output = execute_direct(args.run_dir.resolve(), args.auth_file, **execution_options)
             else:
                 output = rescore_direct(args.run_dir.resolve(), args.label, args.reason)
         elif args.command.startswith("native-"):
@@ -459,7 +580,7 @@ def main() -> int:
             if args.command in {"native-prepare", "native-run"}:
                 root = prepare_native(args.study, args.run_dir, args.dovetail_dir, args.image)
                 output = (
-                    execute_native_study(root, args.auth_file)
+                    execute_native_study(root, args.auth_file, **execution_options)
                     if args.command == "native-run"
                     else root / "plan.json"
                 )
@@ -470,14 +591,18 @@ def main() -> int:
                     args.run_dir.resolve(), args.scores, args.output_dir
                 )
             elif args.command == "native-execute":
-                output = execute_native_study(args.run_dir.resolve(), args.auth_file)
+                output = execute_native_study(
+                    args.run_dir.resolve(), args.auth_file, **execution_options
+                )
             else:
                 output = rescore_native(args.run_dir.resolve(), args.label, args.reason)
         elif args.command in {"prepare", "run"}:
             root = prepare(args.study, args.run_dir)
-            output = execute(root) if args.command == "run" else root / "plan.json"
+            output = (
+                execute(root, **execution_options) if args.command == "run" else root / "plan.json"
+            )
         elif args.command == "execute":
-            output = execute(args.run_dir)
+            output = execute(args.run_dir, **execution_options)
         elif args.command == "rescore":
             output = rescore(args.run_dir.resolve(), args.label, args.reason)
         elif args.command == "verify":
@@ -485,6 +610,12 @@ def main() -> int:
         else:
             output = canonical(intake(parse_json(read_regular(args.request)))).decode().strip()
         print(output)
+        if (
+            args.command in execution_commands
+            and isinstance(output, Path)
+            and output.parent.name.startswith("control-")
+        ):
+            return 3
         return 0
     except (ValueError, OSError, ValidationError) as error:
         print(f"yassa: {error}", file=sys.stderr)

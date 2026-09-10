@@ -11,6 +11,16 @@ import yaml
 from pydantic import Field, StrictInt, model_validator
 
 from .app import external_root, procedure_files, runtime_versions, scorer_identity
+from .control import (
+    control_link,
+    managed,
+    native_call,
+    result_path,
+    same_or_new,
+    selected_result,
+    start_control,
+    verify_execution_freeze,
+)
 from .evidence import (
     EvidenceStore,
     inventory,
@@ -276,6 +286,7 @@ def native_package(
     return store.put(files, executable=modes)
 
 
+@managed("native")
 def execute_native_study(root: Path, auth_path: Path) -> Path:
     version = parse_json(read_regular(root / "study.json")).get("schema_version")
     if version == 2:
@@ -284,11 +295,7 @@ def execute_native_study(root: Path, auth_path: Path) -> Path:
         return execute_native_v2(root, auth_path)
     if version != 1:
         raise ValueError("unsupported native evidence schema_version")
-    freeze = parse_json(read_regular(root / "freeze-seal.json"))
-    body = {key: value for key, value in freeze.items() if key != "id"}
-    current = [x for x in inventory(root) if x["path"] != "freeze-seal.json"]
-    if identity(body) != freeze["id"] or current != freeze["files"]:
-        raise ValueError("frozen evidence changed or execution already started; use a new run")
+    verify_execution_freeze(root)
     frozen = parse_json(read_regular(root / "study.json"))
     plan = parse_json(read_regular(root / "plan.json"))
     store = EvidenceStore(root)
@@ -302,6 +309,7 @@ def execute_native_study(root: Path, auth_path: Path) -> Path:
         c["id"]: Materials.model_validate(store.json(c["materials_id"], "materials.json"))
         for c in frozen["conditions"]
     }
+    start_control()
     results = {}
     for trial in plan["trials"]:
         print(f"Running {trial['id']}", flush=True)
@@ -347,11 +355,13 @@ def execute_native_study(root: Path, auth_path: Path) -> Path:
             )
             prompt = CONSUMER_PROMPT
             timeout = study.consumer_timeout_seconds
-        result = execute_native(
+        result = native_call(
+            execute_native,
             root,
             trial["id"],
             prompt,
             files,
+            role=trial["role"],
             image=frozen["runtime"]["image"],
             auth_path=auth_path,
             config=store.get(frozen["config_id"])["config.toml"],
@@ -377,7 +387,7 @@ def execute_native_study(root: Path, auth_path: Path) -> Path:
                 result.update(status="build_failed", reason=str(error))
         results[trial["id"]] = result
         print(f"Finished {trial['id']}: {result['status']}", flush=True)
-    write_new(root / "results.json", canonical({"trials": results}))
+    same_or_new(root / "results.json", canonical({"trials": results}))
     seal_run(root)
     return rescore_native(root, "original")
 
@@ -516,15 +526,19 @@ def rescore_native(root: Path, label: str, reason: str | None = None) -> Path:
         result = results[trial["id"]]
         u = usage.get(trial["id"], {})
         total = u.get("totals", {})
-        attempt_path = root / "attempts" / trial["id"] / "result.json"
+        attempt_path = result_path(
+            root, trial["id"], root / "attempts" / trial["id"] / "result.json"
+        )
         native_status = (
-            parse_json(read_regular(attempt_path))["status"]
+            selected_result(root, trial["id"], attempt_path)["status"]
             if attempt_path.is_file()
             else "not launched"
         )
+        seconds = result.get("duration_seconds")
+        duration = f"{seconds:.1f}" if seconds is not None else "unavailable"
         lines.append(
             f"| {trial['id']} | {result['status']} | {native_status} | "
-            f"{result.get('duration_seconds', 0):.1f} | "
+            f"{duration} | "
             f"{total.get('input_tokens', 'unavailable')} | "
             f"{total.get('output_tokens', 'unavailable')} | {len(u.get('sessions', []))} |"
         )
@@ -566,5 +580,6 @@ def rescore_native(root: Path, label: str, reason: str | None = None) -> Path:
                 f"- [{trial['id']} package](../../artifacts/{result['package_id']}/files/SKILL.md)"
             )
     report = destination / "report.md"
+    lines.append(control_link(root))
     write_new(report, ("\n".join(lines) + "\n").encode())
     return report

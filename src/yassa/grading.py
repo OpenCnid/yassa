@@ -7,6 +7,17 @@ from inspect_ai.model import ChatMessageSystem, ChatMessageUser
 from pydantic import Field, StrictBool, StrictInt, model_validator
 
 from .app import external_root, procedure_files, runtime_versions
+from .control import (
+    control_link,
+    control_status,
+    managed,
+    result_path,
+    role_call,
+    same_or_new,
+    selected_result,
+    start_control,
+    verify_execution_freeze,
+)
 from .direct_runner import load_direct
 from .evidence import (
     EvidenceStore,
@@ -266,24 +277,32 @@ def _call(root, number, request, requirements, evidence, auth_path=None):
             "required": [criterion.id for criterion in request.criteria],
             "additionalProperties": False,
         }
-        return call_claude(
+        return role_call(
+            call_claude,
             root / "calls" / f"{number:04}",
             request.role,
             messages,
             f"work-{number:04}",
             auth_path,
             schema,
+            role="calibration" if number <= len(request.calibration) else "grading",
         )
-    return call_api(root / "calls" / f"{number:04}", request.role, messages, f"work-{number:04}")
+    return role_call(
+        call_api,
+        root / "calls" / f"{number:04}",
+        request.role,
+        messages,
+        f"work-{number:04}",
+        role="calibration" if number <= len(request.calibration) else "grading",
+    )
 
 
+@managed("grading")
 def execute_grades(root, auth_path=None):
     frozen = parse_json(read_regular(root / "grading.json"))
     if identity({k: v for k, v in frozen.items() if k != "id"}) != frozen.get("id"):
         raise ValueError("invalid grading identity")
-    freeze = parse_json(read_regular(root / "freeze-seal.json"))
-    if [x for x in inventory(root) if x["path"] != "freeze-seal.json"] != freeze["files"]:
-        raise ValueError("grading freeze changed or execution already started")
+    verify_execution_freeze(root)
     if (
         frozen["procedure"] != {n: digest(b) for n, b in procedure_files().items()}
         or frozen["runtime"] != runtime_versions()
@@ -295,6 +314,7 @@ def execute_grades(root, auth_path=None):
             raise ValueError("Claude Code grading requires --auth-file")
         if frozen.get("native_runtime") != {n: digest(b) for n, b in runtime_files().items()}:
             raise ValueError("Claude runtime changed after grading freeze")
+    start_control()
     evidence = frozen["evidence"]
     calibration, grades, count = [], [], 0
     for case in request.calibration:
@@ -347,7 +367,7 @@ def execute_grades(root, auth_path=None):
             except ValueError as error:
                 row.update(status="grade_missing", error=str(error))
         grades.append(row)
-    write_new(
+    same_or_new(
         root / "results.json",
         canonical(
             {
@@ -379,7 +399,9 @@ def report_grades(root, label):
     if len(results["calibration"]) != len(request.calibration):
         raise ValueError("incomplete grading calibration records")
     for row, case in zip(results["calibration"], request.calibration, strict=True):
-        record = parse_json(read_regular(root / "calls" / f"{row['call']:04}" / "result.json"))
+        record = selected_result(
+            root, f"work-{row['call']:04}", root / "calls" / f"{row['call']:04}" / "result.json"
+        )
         try:
             passed = _judgment(record, request.criteria)["components"] == case.expected
         except ValueError:
@@ -392,7 +414,9 @@ def report_grades(root, label):
         raise ValueError("subject grades released after a failed calibration")
     for row in results["grades"]:
         if row["status"] == "graded":
-            record = parse_json(read_regular(root / "calls" / f"{row['call']:04}" / "result.json"))
+            record = selected_result(
+                root, f"work-{row['call']:04}", root / "calls" / f"{row['call']:04}" / "result.json"
+            )
             parsed = _judgment(record, request.criteria)
             if (
                 parsed["components"] != row["components"]
@@ -432,7 +456,12 @@ def report_grades(root, label):
         )
     calls = []
     for number in range(1, results["calls_made"] + 1):
-        record = parse_json(read_regular(root / "calls" / f"{number:04}" / "result.json"))
+        record = selected_result(
+            root, f"work-{number:04}", root / "calls" / f"{number:04}" / "result.json"
+        )
+        selected_path = result_path(
+            root, f"work-{number:04}", root / "calls" / f"{number:04}" / "result.json"
+        )
         calls.append(
             {
                 "call": number,
@@ -444,8 +473,11 @@ def report_grades(root, label):
                 "output_repairs": record.get("output_repairs"),
                 "duration_seconds": record.get("duration_seconds"),
                 "native_command_seconds": record.get("native_command_seconds"),
-                "request_path": f"../../calls/{number:04}/request.json",
-                "response_path": f"../../calls/{number:04}/result.json",
+                "request_path": "../../"
+                + (selected_path.parent / "request.json").relative_to(root).as_posix()
+                if (selected_path.parent / "request.json").exists()
+                else None,
+                "response_path": "../../" + selected_path.relative_to(root).as_posix(),
             }
         )
     destination = root / "interpretations" / label
@@ -471,6 +503,11 @@ def report_grades(root, label):
         ),
     )
     write_new(destination / "interpreter.py", read_regular(Path(__file__)))
+    attempt_count = (
+        control_status(root)["attempts_reserved"]
+        if (root / "control/run.json").exists()
+        else results["calls_made"]
+    )
     write_new(
         destination / "report.md",
         (
@@ -478,7 +515,9 @@ def report_grades(root, label):
             f"Calibration passed: {results['calibrated']}. "
             f"{summary['passed']}/{summary['scored']} scored work passed; "
             f"{summary['planned']} planned, {summary['missing']} missing. "
-            f"{results['calls_made']} calls made.\n\nAll criteria are required; "
+            f"{results['calls_made']} logical calls; "
+            f"{attempt_count} "
+            "attempts including retries.\n\nAll criteria are required; "
             "these are model judgments separate from deterministic scores. "
             "Calibration labels and rubric quality limit interpretation. "
             "Different graders and hosts do not imply comparable scales. "
@@ -488,6 +527,7 @@ def report_grades(root, label):
             "- [Per-attempt grades and missingness](scores.json)\n"
             "- [Counts by condition, arm and build](analysis.json)\n"
             "- [Calibration and grading resources and raw call links](resources.json)\n"
+            + control_link(root)
         ).encode(),
     )
     return destination / "report.md"

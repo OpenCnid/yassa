@@ -5,6 +5,16 @@ import subprocess
 from pathlib import Path
 
 from .app import external_root, procedure_files, runtime_versions
+from .control import (
+    control_link,
+    managed,
+    native_call,
+    result_path,
+    same_or_new,
+    selected_result,
+    start_control,
+    verify_execution_freeze,
+)
 from .evidence import (
     EvidenceStore,
     inventory,
@@ -223,13 +233,9 @@ def executable_paths(store: EvidenceStore, artifact_id: str) -> tuple[str, ...]:
     return tuple(x["path"] for x in manifest["files"] if x["executable"])
 
 
+@managed("native")
 def execute_native_v2(root: Path, auth_path: Path) -> Path:
-    freeze = parse_json(read_regular(root / "freeze-seal.json"))
-    if (
-        identity({k: v for k, v in freeze.items() if k != "id"}) != freeze["id"]
-        or [x for x in inventory(root) if x["path"] != "freeze-seal.json"] != freeze["files"]
-    ):
-        raise ValueError("frozen evidence changed or execution already started; use a new run")
+    verify_execution_freeze(root)
     frozen, plan, study, materials = load_native_v2(root)
     store = EvidenceStore(root)
     if store.get(frozen["procedure_id"]) != procedure_files():
@@ -239,6 +245,7 @@ def execute_native_v2(root: Path, auth_path: Path) -> Path:
     runtime_files = {p.name: read_regular(p) for p in sorted(RUNTIME.iterdir()) if p.is_file()}
     if store.get(frozen["runtime_files_id"]) != runtime_files:
         raise ValueError("runtime files changed after freeze")
+    start_control()
     arms = {a.id: a for a in study.arms}
     results = {}
     common = {}
@@ -304,13 +311,15 @@ def execute_native_v2(root: Path, auth_path: Path) -> Path:
             "executable": sorted(modes),
         }
         # Store bindings outside attempt directories; the adapter owns their creation.
-        write_new(root / "bindings" / f"{trial['id']}.json", canonical(binding))
+        same_or_new(root / "bindings" / f"{trial['id']}.json", canonical(binding))
         print(f"Running {trial['id']}", flush=True)
-        result = execute_native(
+        result = native_call(
+            execute_native,
             root,
             trial["id"],
             prompt,
             files,
+            role=trial["role"],
             image=frozen["runtime"]["image"],
             auth_path=auth_path,
             config=store.get(frozen["config_id"])["config.toml"],
@@ -340,7 +349,7 @@ def execute_native_v2(root: Path, auth_path: Path) -> Path:
             result.update(status="build_failed", reason="no recorded package output")
         results[trial["id"]] = result
         print(f"Finished {trial['id']}: {result['status']}", flush=True)
-    write_new(
+    same_or_new(
         root / "results.json",
         canonical(
             {
@@ -578,13 +587,15 @@ def rescore_native_v2(root: Path, label: str, reason: str | None = None) -> Path
     ]
     for trial in plan["trials"]:
         result = results[trial["id"]]
-        attempt = root / "attempts" / trial["id"] / "result.json"
-        native = parse_json(read_regular(attempt)) if attempt.is_file() else {}
+        attempt = result_path(root, trial["id"], root / "attempts" / trial["id"] / "result.json")
+        native = selected_result(root, trial["id"], attempt) if attempt.is_file() else {}
         native_status = native.get("native_status", native.get("status", "not launched"))
         totals = usage.get(trial["id"], {}).get("totals", {})
+        seconds = result.get("duration_seconds")
+        duration = f"{seconds:.1f}" if seconds is not None else "unavailable"
         lines.append(
             f"| {trial['id']} | {result['status']} | {native_status} | "
-            f"{result.get('duration_seconds', 0):.1f} | "
+            f"{duration} | "
             f"{totals.get('input_tokens', 'unavailable')} | "
             f"{totals.get('output_tokens', 'unavailable')} |"
         )
@@ -649,5 +660,6 @@ def rescore_native_v2(root: Path, label: str, reason: str | None = None) -> Path
                 f"(../../artifacts/{capture['archive_id']}/files/archive.json)"
             )
     report = destination / "report.md"
+    lines.append(control_link(root))
     write_new(report, ("\n".join(lines) + "\n").encode("utf-8"))
     return report

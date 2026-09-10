@@ -1,10 +1,11 @@
 # Architecture
 
-Status: simulated fixtures, configurable native Codex file studies, and bounded
-guided preparation implemented, including declarative JSON task preparation, 2026-09-09. The
-implemented slice is identified below; the broader component design and explicitly
-proposed paths describe remaining work. Conceptual record
-names are not all public APIs.
+Status, 2026-09-10: simulated fixtures, configurable native Codex file studies,
+bounded JSON preparation, direct execution, external grading, integrated resource
+controls and Python artifact reconstruction are implemented within the boundaries
+below. The U-Neuron reconstruction pair completed through the artifact route.
+The broader component design and explicitly proposed paths describe remaining
+work. Conceptual record names are not all public APIs.
 
 The full specification remains the delivery target. The
 [capability coverage map](SPEC.md#151-capability-coverage) records unfinished
@@ -65,15 +66,19 @@ which unsuccessful attempts disappear.
 
 ## Current implementation priority
 
-The general preparation milestone implements the bounded JSON path for Y01,
-Y02, Y03 and Y10 described in [the guide](docs/general-preparation.md), with a
-subsequent separately scoped native live acceptance. [Execution roles](docs/execution-roles.md)
-advance SPEC step 2 through direct native/API comparisons and calibrated external
-grading, including live native-direct and Claude Code OAuth grading acceptance on
-one bounded task. This remains partial capability coverage: API live inference,
-additional native subject/builder roles, activation/clarification measurement and
-broader grading validation remain open. Necessary resource and recovery controls belong alongside
-each new effectful role; the full specification remains the delivery target.
+Use the working framework on the user-selected representative task. The completed
+[U-Neuron comparison](docs/u-neuron-reconstruction.md) added a concrete artifact
+route and exposed a correctness-oracle limitation: shipped tests assume private
+implementation details and incidental error wording absent from the supplied
+specifications. The next study work is to freeze the required public API and
+validate observable-behavior tests before another allocation. Preserve the
+original pair and its scores; general hardening is not the default next step.
+
+General preparation, execution/grading roles and integrated controls remain
+partial capability coverage. API live inference, additional hosts, measured
+activation/clarification, broader grading validation and preparation recovery
+remain open. The full specification remains the delivery target; see
+[the handoff](HANDOFF.md#current-development-priority) for current decisions.
 
 ## Implemented execution and grading roles
 
@@ -195,6 +200,7 @@ contract; real-study settings remain open in
 | [records.py](src/yassa/records.py) | Canonical UTF-8 JSON, duplicate-key rejection, and content identities |
 | [scoring.py](src/yassa/scoring.py) | Independent reference oracle and deterministic checking of preserved JSON work |
 | [reporting.py](src/yassa/reporting.py) | Planned-denominator counts by route/stage/arm, missingness, resources, and evidence-linked Markdown |
+| [control.py](src/yassa/control.py) | Shared launch budgets, durable execution policy and attempts, cancellation, explicit recovery/retries, and operational reports |
 | [app.py](src/yassa/app.py) | CLI composition, freezing, bounded dependency execution/retries, and append-only scoring interpretations |
 
 `prepare` validates inputs, references, supported conditions, and maximum attempt
@@ -241,9 +247,10 @@ zero under the selected end-to-end rule.
 Launch records precede execution. Native logs, bindings, responses, packages,
 and final selections are preserved before a whole-run seal is written. Existing
 run roots and existing records cannot be overwritten. An interrupted/unsealed
-run remains incomplete; automatic crash recovery and resume are deferred.
-`execute` only admits an unchanged, never-started prepared run under the same
-code and dependency versions. File hashes detect later changes; they do not
+run remains incomplete until explicit reconciliation. The subsequent
+[resource/recovery controller](#integrated-resource-controls-and-recovery)
+adds managed `--resume`; legacy interrupted runs cannot be adopted automatically.
+`execute` requires unchanged preparation, code and dependency versions. File hashes detect later changes; they do not
 enforce OS immutability or protect against a privileged actor replacing seals.
 
 Scoring runs after the subject's work is sealed, using controller code and
@@ -258,9 +265,9 @@ aggregate reducers, and `score()` workflow are not claimed as integrated.
 
 The simulated fixture route covers both accepted preparation conditions. See
 [milestone evidence](docs/milestone-1.md) for its original checks. The subsequent
-native route is described below. Arbitrary guided study synthesis, dataset
-discovery, model grading, inferential methods, and cancellation recovery remain
-deferred.
+native route is described below. Later general-preparation, grading and recovery
+milestones extend this fixture. Dataset discovery, broader semantic synthesis and
+inferential methods remain incomplete.
 
 ## Implemented native Codex fixture
 
@@ -476,6 +483,65 @@ adds evidence for one booking task. [Execution roles](docs/execution-roles.md) a
 direct studies and grading with a subsequent bounded native live acceptance.
 API live inference, broader semantic judgment, remote research, full recovery and
 public/redacted derivatives remain incomplete.
+
+## Integrated resource controls and recovery
+
+The [resource/recovery milestone](docs/resource-controls.md) adds a controller
+around the existing execution loops. [control.py](src/yassa/control.py) owns
+local OS locks, durable root-attempt admission, recovery decisions and operational
+reporting. The native, direct, grading and fixture adapters continue to own their
+Inspect calls and raw captures. Model preparation can charge the same external
+ledger; its immutable draft lifecycle remains separate from execution resume.
+
+`control/run.json` binds an execution policy, optional shared ledger identity and
+explicit retry allowance to the existing preparation freeze before the first call.
+`control/attempts/ID/launch.json` records the logical trial, physical attempt,
+binding hash, deadline and retry parent. A separate `completion.json` commits the
+returned record, artifact IDs and exact attempt-file inventory. Session records
+retain resume/retry/missing decisions. The root lock prevents competing local
+controllers; shared ledger reservations have their own lock, and ledger-backed
+runs also lock their run identity. Locks release when the OS process dies.
+
+The shared ledger reserves one root and its full configured deadline before
+invoking an adapter. Reservations include in-flight, failed and uncertain work
+and are never refunded. This is a conservative scheduling ceiling, not a claim
+that native command time includes sandbox setup/export or that actual usage equals
+the reservation. Outcomes retain available native child usage once within their
+root and keep duration scopes explicit. Referenced preparation histories do not
+create additional charges. Unsupported spend/native token caps remain null.
+
+Cancellation requests are an operational channel. The controller checks it before
+launch and before sealing; active bounded work settles through the existing adapter.
+Handled requests and requests acknowledged by explicit resume are copied into
+sealed cancellation evidence. The mutable request channel and `control.lock` are
+excluded from run inventory. Final summaries, policies, sessions, launches and
+completions are included. Final reports link the controller summary, including
+original failures and superseded attempts. Pauses write new operational
+interpretations with every planned trial; they do not seal partial work as complete.
+
+Resume reconstructs the same inputs and validates committed file/artifact hashes.
+Inspect's fresh local message IDs are excluded from content binding identity. If
+the adapter committed its result before the controller died, the controller can
+reconcile its Inspect log and artifacts and commit the return without another call.
+Partial logs alone remain uncertain. Missing dispositions retain uncertainty;
+explicit infrastructure retries use new directories and `retry_of`. Existing task,
+build-dependency and grading-calibration semantics decide final denominators.
+
+[evidence.py](src/yassa/evidence.py) publishes complete new records atomically
+without overwriting existing names, and stages complete artifact bundles before
+renaming them into their content-addressed location. Windows temporary-file IO uses
+extended paths. A crash can leave pending bytes, which are retained. These local
+process-failure checks do not establish power-loss or network-filesystem durability.
+Original sealed studies retain their existing offline readers. Legacy interrupted
+runs without controller records cannot be automatically adopted.
+
+Native hard token/spend enforcement, preparation resume and authenticated native
+cancellation/restart remain gaps. The existing reuse-efficiency interpreter rejects
+retry/uncertain histories because its cost-allocation semantics are not defined for
+them; operational accounting still retains every root. Software acceptance uses
+actual Inspect simulated providers and native adapter doubles. No live allocation
+was used for this implementation, and no exactly-once provider-execution guarantee
+is claimed.
 
 ## Implemented event reconciliation preparation
 
@@ -1078,6 +1144,26 @@ Verified fixture commands and observed coverage are maintained in
 
 ## Inspect integration checkpoints
 
+### Artifact reconstruction boundary
+
+[Artifact studies](docs/artifact-studies.md) add a supplied-specification route
+through `artifact-prepare`, `artifact-execute` and `artifact-score`. The frozen
+public bundle is the only task-specific material admitted to the existing native
+adapter. Original implementation and pytest files are separate evaluator bundles.
+Preparation runs the reference suite before freezing; scoring runs recorded
+projects in new offline Inspect Docker sandboxes as an unprivileged user, with
+read-only source/tests and no credentials or candidate installation hooks.
+
+The build phase uses the integrated controller and its root-inclusive resource
+records. Scoring preserves the reference-collected test denominator, including
+reference failures, and keeps infrastructure failures missing. This advances
+partial Y03/Y04/Y07/Y10 coverage. It supports preinstalled Python/pytest projects,
+not arbitrary build systems or mathematical proof. Reference preparation and
+offline testing do not yet have durable recovery; adversarial in-process pytest
+tampering is not an established boundary.
+
+### Framework checks
+
 Inspect 0.3.263 is installed and pinned for the first fixture route. Its installed
 signatures and runtime behavior were checked against official
 [Model APIs](https://inspect.aisi.org.uk/extensions-model-api.html),
@@ -1110,19 +1196,20 @@ Use the [capability coverage map](SPEC.md#151-capability-coverage) for the full
 product backlog and completion criteria. The list below summarizes technical
 choices and gaps; it is not a separate delivery scope.
 
-The implemented paths resolve packaging, JSON serialization, local evidence,
-the account-totals checker, a pinned native Codex runtime, Docker isolation, and
-executable package transfer. These are bounded fixture capabilities; the wider
-product still needs:
+The implemented paths cover simulated fixtures, bounded JSON preparation and
+grading, native package/direct studies, integrated controls and supplied
+Python/pytest artifact comparisons. These remain partial product capabilities;
+the wider product still needs:
 
-1. Preparation beyond the implemented totals and simple/event reconciliation
-   recipes, including general task synthesis and dataset research when required
-   by a study.
+1. Preparation beyond the implemented JSON predicate contract, including
+   artifact-task preparation and dataset research when required by a study.
 2. Broader task semantics, binary attachments, and validated checker extensions.
 3. Additional vendor runtimes and separately verified adapter capabilities.
-4. Resource admission beyond deadlines, cancellation recovery, and local resume.
+4. Hard token/spend controls where supported, preparation resume, and authenticated
+   native cancellation/restart validation beyond the implemented local controller.
 5. A selected paired analysis method appropriate to a broader study's design.
-6. A verified different-family grading route when deterministic checks are insufficient.
+6. Broader validation of the implemented different-family grading route when
+   deterministic checks are insufficient.
 
 The configurable native and bounded preparation milestones share the contracts
 above. The completed event-reconciliation allocation and its results are recorded in
@@ -1140,4 +1227,6 @@ another correctness ceiling. Both offline audits and byte-identical repeat scori
 passed, with 75 recorded root/child sessions and no missing outputs or audit gaps.
 Per-request context interception
 and broader upstream-context attestation remain outside the implemented gate.
-Broader preparation and representative-work studies remain future work.
+The subsequent [U-Neuron study](docs/u-neuron-reconstruction.md) completed a
+bounded representative-work comparison. Broader preparation, a validated
+specification-based artifact oracle and the wider study program remain open.
