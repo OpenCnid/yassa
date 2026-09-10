@@ -28,6 +28,7 @@ testpaths = ["tests"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "runtime/codex" = "yassa/_native_runtime"
+"runtime/claude" = "yassa/_claude_runtime"
 
 [tool.ruff]
 target-version = "py311"

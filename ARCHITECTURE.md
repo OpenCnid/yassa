@@ -69,9 +69,10 @@ The general preparation milestone implements the bounded JSON path for Y01,
 Y02, Y03 and Y10 described in [the guide](docs/general-preparation.md), with a
 subsequent separately scoped native live acceptance. [Execution roles](docs/execution-roles.md)
 advance SPEC step 2 through direct native/API comparisons and calibrated external
-grading. This remains partial capability coverage: additional native hosts and
-builder roles, activation/clarification measurement and live cross-vendor grading
-validation remain open. Necessary resource and recovery controls belong alongside
+grading, including live native-direct and Claude Code OAuth grading acceptance on
+one bounded task. This remains partial capability coverage: API live inference,
+additional native subject/builder roles, activation/clarification measurement and
+broader grading validation remain open. Necessary resource and recovery controls belong alongside
 each new effectful role; the full specification remains the delivery target.
 
 ## Implemented execution and grading roles
@@ -80,13 +81,15 @@ each new effectful role; the full specification remains the delivery target.
 explicit host/model, pinned source packs, arms, repeats and admission caps.
 `direct_runner.py` resolves the source task/material/preparation records and freezes
 a separate direct plan. It gives each fresh attempt complete task facts, current
-case files and its declared treatment, with no build or package parent. Native
+case files and its declared treatment, with no build or package parent. An explicit
+execution instruction distinguishes the current case deliverable from the preserved
+source study's skill-building language; this fixed a live direct-role failure. Native
 attempts reuse `native_execution.py`; closed API attempts use `role_api.py` with
 two explicit messages, no tools and first-party endpoint/model identities.
 Native v1/v2 definitions and planner/checker identities are unchanged.
 
 `grading.py` reads sealed native v2 or direct work, then freezes a separate rubric,
-calibration allocation, exact input/output evidence and source seal. The API role
+calibration allocation, exact input/output evidence and source seal. The grading role
 must belong to a different vendor/model family. It gates all work on calibration,
 withholds treatment labels and expected judgments, retains raw responses and
 missingness, and reports components and counts independently of deterministic
@@ -94,6 +97,23 @@ scores. Offline grade reporting checks stored judgments without inference.
 Supplied calibration labels are not authenticated semantic truth. Full model
 grading across arbitrary evidence, mixed-family authorship and scorer corrections
 remains a broader interface requirement.
+
+`role_claude.py` adds a closed native Claude Code grading host using saved CLI
+OAuth. A pinned container receives only the declared messages and private login;
+CLI safe/restricted settings remove operational tools and customizations. Its
+sole tool submits a schema-constrained response. Native init/response records
+gate acceptance on that sole tool, empty other catalogs, exact selected model
+usage and declared turn/repair caps. One explicitly requested schema-format repair
+may follow a recorded native validation error; the default permits none. API and
+attempt retries remain disabled. The terminal structured result must match the
+final response-tool input. Background title generation is disabled. Raw captures, rejected
+work and available usage remain evidence. The CLI may refresh its private login;
+credential bytes never belong to the grading freeze or report. This host supports
+grading only, not native Claude direct subjects/builders or arbitrary agent tools.
+The [live roles acceptance](docs/execution-roles.md#live-native-direct-and-claude-grading)
+records 8/8 corrected direct outputs, 6/6 independent Claude calibration judgments
+and 8/8 grades, with matching offline replay and passed raw-evidence audits. Earlier
+failed integrations and calibrations remain sealed; this is bounded validation.
 
 `preparation_native.py` supplies the same native boundary to preparation calls.
 Credentials enter only at execution. Exact raw captures stay in the draft; bounded
@@ -453,8 +473,9 @@ simulated preparer and a native output adapter for record selection and feasible
 assignment; they establish software composition. Initial implementation consumed
 no live allocation. The subsequent [native live acceptance](docs/general-preparation.md#live-native-preparation)
 adds evidence for one booking task. [Execution roles](docs/execution-roles.md) add
-direct studies and grading; their new role validation, broader semantic judgment,
-remote research, full recovery and public/redacted derivatives remain incomplete.
+direct studies and grading with a subsequent bounded native live acceptance.
+API live inference, broader semantic judgment, remote research, full recovery and
+public/redacted derivatives remain incomplete.
 
 ## Implemented event reconciliation preparation
 

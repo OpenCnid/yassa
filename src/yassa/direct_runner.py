@@ -34,6 +34,32 @@ from .records import canonical, digest, identity, parse_json
 from .role_api import api_identity, call_api
 
 
+def direct_prompt(task, native):
+    """Resolve the direct role while preserving the source's complete public task facts."""
+    definition = (
+        common_prompt(task, "consume", complete_facts=True) if native else task.requirements
+    )
+    delivery = (
+        f"Write the required JSON to /work/{task.result_path}."
+        if native
+        else (
+            "Return only the required JSON. Input files and text skill resources are in the "
+            "user message. No tools are available."
+        )
+    )
+    return (
+        "<direct_execution>\nSolve the current input case now. Your sole deliverable is the "
+        "case result. Use an existing skill if the assigned treatment supplies one. "
+        "Any skill-building language in the source task definition describes the originating "
+        "study; this attempt has no package-building stage. Apply its task rules to the "
+        "current case.\n</direct_execution>\n<source_task_definition>\n"
+        + definition
+        + "\n</source_task_definition>\n<delivery>\n"
+        + delivery
+        + " Complete the case without asking questions.\n</delivery>"
+    )
+
+
 def prepare_direct(path, root):
     request_raw = read_regular(path)
     request = DirectRequest.model_validate(parse_json(request_raw))
@@ -207,15 +233,7 @@ def execute_direct(root, auth_path=None):
         arm = arms[trial["arm"]]
         case = next(c for c in materials[trial["condition"]].evaluation if c.id == trial["case"])
         files = {n: t.encode() for n, t in case.files.items()}
-        common = (
-            common_prompt(task, "consume", complete_facts=True)
-            if native
-            else (
-                task.requirements
-                + "\nReturn only the required JSON output. Declared input files and text skill "
-                "resources are provided as data in the user message. No tools are available."
-            )
-        )
+        common = direct_prompt(task, native)
         common_id = store.put({"prompt.txt": common.encode(), **files})
         prompt = arm.invocation + "\n\n" + common if arm.invocation else common
         treatment_ids, modes = [], []

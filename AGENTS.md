@@ -28,6 +28,7 @@ yassa/
 |-- src/yassa/         Preparation, plans, Inspect execution, evidence, scores, reports
 |-- studies/           Synthetic study definitions and supplied-input fixtures
 |-- runtime/codex/     Pinned container recipe, controlled config, boundary probe
+|-- runtime/claude/    Pinned closed Claude Code grading container
 |-- tests/             Contract and Inspect integration checks
 `-- docs/              Milestone evidence and implementation limitations
 ```

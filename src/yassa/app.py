@@ -373,6 +373,7 @@ def main() -> int:
     command.add_argument("--grade-dir", required=True, type=Path)
     command = commands.add_parser("grade-execute", help="calibrate and grade frozen recorded work")
     command.add_argument("grade_dir", type=Path)
+    command.add_argument("--auth-file", type=Path, help="Claude Code OAuth only; never frozen")
     command = commands.add_parser("grade-report", help="replay recorded judgments without calls")
     command.add_argument("grade_dir", type=Path)
     command.add_argument("--label", required=True)
@@ -440,7 +441,7 @@ def main() -> int:
             if args.command == "grade-prepare":
                 output = prepare_grades(args.run_dir.resolve(), args.request, args.grade_dir)
             elif args.command == "grade-execute":
-                output = execute_grades(args.grade_dir.resolve())
+                output = execute_grades(args.grade_dir.resolve(), args.auth_file)
             else:
                 output = report_grades(args.grade_dir.resolve(), args.label)
         elif args.command.startswith("direct-"):

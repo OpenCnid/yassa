@@ -17,9 +17,10 @@ execution/grading development. The room-booking task uses live native preparatio
 one preserved failed review, one explicit correction review and the same generated
 proposal. Evidence is under `C:/Users/Darian/yassa-runs/gp-live-20260909`.
 
-This is bounded implementation coverage, not full-product completion. New direct
-native/API roles and external grading have software acceptance, not live
-cross-vendor quality evidence. Additional native hosts and API builders, measured
+The user then explicitly requested native-direct and live grading validation and
+authorized saved Claude Code authentication. Both passed the bounded acceptance
+below. This is partial implementation coverage, not full-product completion.
+API live inference, additional native subject/builder roles and API builders, measured
 activation and clarification, semantic tasks outside JSON predicates, source
 research, inferential planning and the substantive first study remain open.
 Continue necessary integrated resource and durable cancellation/recovery work
@@ -37,6 +38,41 @@ Do not merge the new milestone PR without authorization.
 
 ## Latest live product acceptance
 
+The [native-direct and Claude grading acceptance](docs/execution-roles.md#live-native-direct-and-claude-grading)
+completed using supported product commands. Corrected direct execution passed
+8/8 cases, and Claude Opus 5 through saved Claude Code OAuth passed 6/6 calibration
+cases and 8/8 recorded grades. No final outputs or grades are missing; the final
+grader used zero of its explicitly permitted format repairs. Raw-context and
+independent scoring audits passed, and offline replay is byte-identical.
+[Complete evidence](C:/Users/Darian/yassa-runs/direct-live-20260909/acceptance.json).
+
+The first direct run passed 5/8: source study skill-building language misdirected
+three unassisted subjects into timeouts. The direct instruction now makes the
+case-result role explicit while preserving complete public task facts. Five failed
+grading calibrations and three diagnostics remain sealed. They exposed background
+title-model traffic, raw JSON delivery failures, a wrong component judgment and
+schema wrapper errors. The final native host disables title generation and uses
+the CLI's validated response tool, with an explicit bounded schema-only repair
+option. Every failed calibration withheld source work; labels and rubric were
+unchanged. The superseded `bounded-repair-grades` freeze launched zero calls.
+
+Current continuation totals: 16 direct attempts and 47 grader/diagnostic attempts,
+769.144 native command seconds, including failed attempts and excluding setup/export.
+Allocations were separately recorded; there are no native hard token/spend caps.
+The earlier prepared study and selected package bytes remain unchanged. This uses
+previous acceptance cases with fresh subjects, and establishes no broad ranking.
+
+Final software verification: **270 passed, one existing Windows symlink skip**.
+Ruff, formatting and patch whitespace passed. Wheel/sdist builds passed and all
+43 packaged source/runtime files matched this checkout. Current saved credential
+values were absent from 35,787 scanned uncompressed external evidence files;
+the native adapter separately screens original/refreshed values before export.
+Nine legacy native runner/checker/core files and study fixtures are unchanged
+from `6881fd55a179cea2d1fbbb42d6a19072359932d5`. No new historical study replay ran.
+The full specification remains open; continue the current priority above.
+
+## Prior general preparation acceptance
+
 The room-booking acceptance completed under its separate user authorization.
 Seven preparation attempts (six initial calls and one explicit review correction),
 two builders and four fresh consumers used 1,262.516 native command seconds of
@@ -46,12 +82,12 @@ and model-generated proposal are unchanged across the correction. The initial
 failed review remains preserved. The native context audit passed and repeat
 scoring is byte-identical. [Acceptance evidence](C:/Users/Darian/yassa-runs/gp-live-20260909/acceptance.json).
 
-The final software suite passed 248 tests with one existing Windows symlink skip.
+The prior software suite passed 248 tests with one existing Windows symlink skip.
 Ruff, formatting, whitespace and distribution checks passed; the wheel matched 41
 source/runtime files. New direct/API and grading tests use simulated providers and
 a native test adapter. SDK construction checks exercise the real Inspect provider
-classes, with zero API inference. Native direct execution and live cross-vendor
-grading quality still require their own bounded verification. Core legacy native
+classes, with zero API inference. The subsequent acceptance above adds live native
+direct and Claude grading evidence. Core legacy native
 runner/checker files and study fixtures are byte-unchanged from PR #8's prior head;
 the previous 250-row historical replay remains earlier evidence, not a new replay.
 
@@ -285,7 +321,8 @@ The previous small comparison is complete; its case counts and deadlines, and
 the v2 example allocations, are not pilot defaults. Binary inputs, broader
 checker semantics, hard token/spend controls, recovery, additional native vendor
 runtimes and inferential analysis remain outstanding. The subsequent external
-grading implementation has software acceptance, with live quality still unverified.
+grading implementation now has bounded Claude Code live acceptance; broader
+grading reliability remains unverified.
 Some details are proposals, not settled product requirements.
 
 ## Code entry points
@@ -295,6 +332,7 @@ Some details are proposals, not settled product requirements.
 | CLI and simulated composition | [app.py](src/yassa/app.py) |
 | Schemas, preparation, planning | [study.py](src/yassa/study.py), [prepare.py](src/yassa/prepare.py), [planning.py](src/yassa/planning.py) |
 | General model preparation and expert review | [general_preparation.py](src/yassa/general_preparation.py), [general_contracts.py](src/yassa/general_contracts.py), [preparation_model.py](src/yassa/preparation_model.py), [json_rubric.py](src/yassa/json_rubric.py) |
+| Direct roles and independent Claude grading | [direct_runner.py](src/yassa/direct_runner.py), [grading.py](src/yassa/grading.py), [role_claude.py](src/yassa/role_claude.py), [execution guide](docs/execution-roles.md) |
 | Guided draft schema, readiness and revision | [guided_preparation.py](src/yassa/guided_preparation.py) |
 | Constructed feature cases and checker probes | [preparation_templates.py](src/yassa/preparation_templates.py) |
 | Event reconciliation semantics and faulty-solver probes | [reconciliation.py](src/yassa/reconciliation.py), [reconciliation_templates.py](src/yassa/reconciliation_templates.py) |

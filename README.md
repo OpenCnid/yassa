@@ -28,10 +28,11 @@ user-described work, rubrics and cases to native execution and reporting through
 product commands. A subsequent bounded live room-booking acceptance exercises
 native preparation and the connected builder/consumer workflow; its exact outcome
 and corrections are recorded in the guide. [Execution and grading roles](docs/execution-roles.md)
-add existing-skill comparisons and a different-family grading gate. New API/native
-direct roles and external grading have software acceptance evidence; live
-cross-vendor quality remains unverified. The milestones below establish only
-their recorded scope.
+add existing-skill comparisons and a different-family grading gate. A separate
+[live roles acceptance](docs/execution-roles.md#live-native-direct-and-claude-grading)
+passed 8/8 native-direct cases, 6/6 Claude calibration cases and 8/8 recorded grades
+using saved Claude Code authentication. API inference and broader cross-vendor
+quality remain unverified. The milestones below establish only their recorded scope.
 
 ## Implemented foundation and study history
 
@@ -205,8 +206,8 @@ this does **not** exercise native skill discovery, scripts, or activation.
 The fixture output cap uses UTF-8 byte units, and Inspect applies per-sample time
 limits. Token prices and real model token usage are unavailable. Counts stay
 separate by preparation condition and execution stage; repeated uses of one
-package do not become independent builder measurements. No inferential analysis
-or cross-vendor claim is supported yet.
+package do not become independent builder measurements. This fixture provides
+no inferential analysis or cross-vendor evidence.
 
 The `native-codex-cli` route exercises native skill loading and executable
 packages in fresh Docker sandboxes. Native v2 supports UTF-8 file tasks with
@@ -216,9 +217,10 @@ for account totals, simple reconciliation and event reconciliation. Legacy runs
 remain verifiable and rescorable.
 The general preparer adds model-assisted tasks within a bounded JSON predicate
 contract. [Direct execution and external grading](docs/execution-roles.md) add
-separately frozen native/API role studies. Broader semantic checkers, additional
-native CLIs, live cross-vendor grading validation and inferential comparisons
-remain future work.
+separately frozen native/API role studies and live-validated Claude Code grading
+through saved OAuth. Broader semantic checkers, native subject/builder hosts,
+API live inference, broader grading validation and inferential comparisons remain
+future work.
 
 ## Design navigation
 
