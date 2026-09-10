@@ -7,6 +7,16 @@ from pathlib import Path
 from inspect_ai.model import ChatMessageSystem, ChatMessageUser
 
 from .app import external_root, procedure_files, runtime_versions
+from .control import (
+    control_link,
+    managed,
+    native_call,
+    result_path,
+    role_call,
+    same_or_new,
+    start_control,
+    verify_execution_freeze,
+)
 from .direct_contracts import DirectRequest, direct_plan
 from .evidence import (
     EvidenceStore,
@@ -208,10 +218,9 @@ def load_direct(root):
     return frozen, request, TaskContract.model_validate(frozen["task"]), materials, plan
 
 
+@managed("direct")
 def execute_direct(root, auth_path=None):
-    freeze = parse_json(read_regular(root / "freeze-seal.json"))
-    if [x for x in inventory(root) if x["path"] != "freeze-seal.json"] != freeze["files"]:
-        raise ValueError("direct freeze changed or execution already started")
+    verify_execution_freeze(root)
     frozen, request, task, materials, plan = load_direct(root)
     store = EvidenceStore(root)
     if (
@@ -227,6 +236,7 @@ def execute_direct(root, auth_path=None):
             p.name: read_regular(p) for p in sorted(RUNTIME.iterdir()) if p.is_file()
         }:
             raise ValueError("native runtime files changed after direct freeze")
+    start_control()
     arms = {a.id: a for a in request.arms}
     results = {}
     for trial in plan["trials"]:
@@ -250,14 +260,16 @@ def execute_direct(root, auth_path=None):
             "prompt_sha256": digest(prompt.encode()),
             "input_files": {n: digest(b) for n, b in files.items()},
         }
-        write_new(root / "bindings" / (trial["id"] + ".json"), canonical(binding))
+        same_or_new(root / "bindings" / (trial["id"] + ".json"), canonical(binding))
         print("Running " + trial["id"], flush=True)
         if native:
-            result = execute_native(
+            result = native_call(
+                execute_native,
                 root,
                 trial["id"],
                 prompt,
                 files,
+                role="direct",
                 image=request.role.image,
                 auth_path=auth_path,
                 config=store.get(frozen["config_id"])["config.toml"],
@@ -265,7 +277,8 @@ def execute_direct(root, auth_path=None):
                 executable=tuple(modes),
             )
         else:
-            result = call_api(
+            result = role_call(
+                call_api,
                 root / "attempts" / trial["id"],
                 request.role,
                 [
@@ -277,12 +290,13 @@ def execute_direct(root, auth_path=None):
                     ),
                 ],
                 trial["id"],
+                role="direct",
             )
             if result["completion"] is not None:
                 result["output_id"] = store.put({task.result_path: result["completion"].encode()})
         results[trial["id"]] = {**result, "launched": True, "common_id": common_id}
         print("Finished " + trial["id"] + ": " + result["status"], flush=True)
-    write_new(
+    same_or_new(
         root / "results.json",
         canonical({"study_id": frozen["id"], "plan_id": plan["id"], "trials": results}),
     )
@@ -432,6 +446,8 @@ def rescore_direct(root, label, reason=None):
     ]
     for trial in plan["trials"]:
         lines.append(f"- [{trial['id']} binding](../../bindings/{trial['id']}.json)")
-        lines.append(f"- [{trial['id']} result](../../attempts/{trial['id']}/result.json)")
+        recorded = result_path(root, trial["id"], root / "attempts" / trial["id"] / "result.json")
+        lines.append(f"- [{trial['id']} result](../../{recorded.relative_to(root).as_posix()})")
+    lines.append(control_link(root))
     write_new(destination / "report.md", ("\n".join(lines) + "\n").encode())
     return destination / "report.md"

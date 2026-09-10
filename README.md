@@ -5,34 +5,82 @@ tasks, using Inspect AI. For skill-builder comparisons, fresh agents use the
 generated packages on held-out work; recorded outcomes provide the evidence.
 Dovetail is the first subject.
 
-Users can bring study materials or start with a rough request. Yassa is intended
-to help clarify the work and prepare missing tasks and examples, supporting both
-small descriptive trials and studies requiring stronger evidence.
+**The core testing workflow works today and has completed live studies.** Users
+can bring study materials or start with a rough request, prepare and review a task,
+build or supply skills, test them with fresh agents on held-out cases, and inspect
+scored results and resource reports. The current interface is a CLI.
 
-**Product status: the full specification is not implemented.** The current
-foundation is a CLI execution and evidence backend for simulated fixtures and
-native Codex file studies, with recipe preparation and model-assisted preparation
-of user-described JSON work. It also supports direct native/API studies and
-calibrated external model grading. Broader semantic preparation, additional native
-vendor/builder roles, inferential planning/analysis, and complete resource
-and recovery controls remain partial or missing. Some recent study preparation,
-launch coordination and assessment were performed by the development agent and
-external scripts, rather than supplied as Yassa product operations.
+## What works today
 
-The delivery target remains the full spec. See the
+- **Prepare a study:** turn an ordinary description of JSON-based work into a
+  reviewed task, rubric, examples and held-out cases, or supply existing materials.
+  See [general preparation](docs/general-preparation.md).
+- **Compare skills:** evaluate generated packages with fresh native Codex agents,
+  include a no-package baseline, or compare existing skills through direct
+  native/API studies. See [native studies](docs/configurable-native.md) and
+  [direct execution](docs/execution-roles.md#direct-study-commands).
+- **Reconstruct code artifacts:** give fresh agents specification files and test
+  their saved Python projects against a separately held-out pytest suite. See
+  [artifact studies](docs/artifact-studies.md).
+- **Score recorded work:** use deterministic checkers or a calibrated model from
+  a different family, preserve original outputs and logs, and reproduce reports
+  without more model calls. See [external grading](docs/execution-roles.md#external-final-grading).
+- **Control execution:** share attempt and deadline budgets across preparation,
+  execution and grading; cancel and resume managed execution while retaining
+  completed work and explicit failure records. See
+  [resource controls and recovery](docs/resource-controls.md).
+
+To try your own task, start with [Configure a small trial](#configure-a-small-trial).
+To check the installation without live model calls, [run the simulated fixture](#run-the-fixture).
+
+## Live evidence
+
+These results come from recorded live runs, in addition to the software test suite.
+
+| Workflow | Observed result |
+| --- | --- |
+| [Task preparation through skill use](docs/general-preparation.md#live-native-preparation) | A synthetic room-booking task reached two accepted packages and 4/4 passing held-out uses, after an explicit preparation review correction. |
+| [Builder and baseline comparison](docs/package-reuse.md#recorded-results) | A 90-attempt study compared Dovetail, a common-request builder and a no-package baseline. All six packages were accepted; 84/84 consumers passed, including 12 baselines. |
+| [Direct execution and independent grading](docs/execution-roles.md#live-native-direct-and-claude-grading) | The corrected native-direct run passed 8/8 cases; Claude passed 6/6 calibration cases and completed eight passing source grades. |
+| [U-Neuron reconstruction from specifications](docs/u-neuron-reconstruction.md) | Dovetail passed 66/87 shipped tests versus 64/87 without it; the original passed 85/87. The two-test difference was error-message wording. Dovetail finished about 39% faster with 2.48× the reported tokens, mostly cached input; a mathematical correctness advantage was not established. |
+
+The linked evidence retains earlier failures and corrections. Preparation,
+execution, grading and offline replay used supported Yassa commands. Historical
+acceptance work also used development scripts for tasks such as package selection,
+calibration authorship and independent audits; those manual steps are identified
+in the evidence.
+
+These runs demonstrate that the framework operates. They do not establish a
+general skill ranking. The synthetic comparisons repeatedly reached a correctness
+ceiling, including the no-package baselines, which limited what they could tell us
+about differences in skill quality.
+
+## Next priority
+
+**Resolve the correctness oracle exposed by the completed U-Neuron comparison.**
+The [study record](docs/u-neuron-reconstruction.md) preserves the allocation,
+results, resource tradeoff and packaging correction. The shipped tests assume
+private implementation details and error-message wording absent from the two
+specification sheets, limiting what the raw scores say about correctness.
+
+The [next study work](docs/u-neuron-reconstruction.md#next-study-work) is to freeze
+the required public API and test observable spec behavior, then validate the
+oracle against legitimate alternatives and plausible mathematical errors.
+Preserve the original artifacts and scores. A revised study needs its own frozen
+definition and allocation; no additional model calls are implied. Further
+engineering should address a concrete blocker in this work. Preparation recovery
+is not a prerequisite for using the framework.
+
+The full specification remains the delivery target and is incomplete. Current
+task routes cover structured files/JSON and supplied Python/pytest artifacts;
+broader task semantics, additional execution roles and inferential analysis remain
+open. API execution is
+implemented but lacks live inference acceptance. Native hard token/spend caps and
+preparation resume are also absent. See the
 [capability coverage map](SPEC.md#151-capability-coverage),
 [development sequence](SPEC.md#152-development-sequence), and
-[current implementation priority](HANDOFF.md#current-development-priority).
-The [general preparation milestone](docs/general-preparation.md) connects
-user-described work, rubrics and cases to native execution and reporting through
-product commands. A subsequent bounded live room-booking acceptance exercises
-native preparation and the connected builder/consumer workflow; its exact outcome
-and corrections are recorded in the guide. [Execution and grading roles](docs/execution-roles.md)
-add existing-skill comparisons and a different-family grading gate. A separate
-[live roles acceptance](docs/execution-roles.md#live-native-direct-and-claude-grading)
-passed 8/8 native-direct cases, 6/6 Claude calibration cases and 8/8 recorded grades
-using saved Claude Code authentication. API inference and broader cross-vendor
-quality remain unverified. The milestones below establish only their recorded scope.
+[current priority and handoff](HANDOFF.md#current-development-priority) for the
+implemented scope and remaining work.
 
 ## Implemented foundation and study history
 
@@ -92,9 +140,11 @@ uv run --locked yassa prepare studies/fixture-study.json --run-dir $runDirectory
 uv run --locked yassa execute $runDirectory
 ```
 
-`prepare` prints the plan path. `execute` rejects changed inputs, code, or
-dependencies and an already-started run. Automatic crash recovery is not yet
-supported; an incomplete run is retained and cannot be scored as complete.
+`prepare` prints the plan path. `execute` rejects changed inputs, code or
+dependencies. A started managed run requires `execute RUN_DIRECTORY --resume`;
+uncertain launches require an explicit disposition. Incomplete runs retain all
+evidence and cannot be scored as complete. See
+[cancellation and recovery commands](docs/resource-controls.md#resume-retry-and-uncertain-work).
 
 ## Run the native Codex fixture
 
@@ -215,6 +265,11 @@ account-totals, reconciliation, exact-JSON or declarative JSON checkers, configu
 independent builds/repeats. Guided preparation now produces that same definition
 for account totals, simple reconciliation and event reconciliation. Legacy runs
 remain verifiable and rescorable.
+The [artifact route](docs/artifact-studies.md) freezes supplied specifications,
+reference source and pytest suites separately, then builds and scores saved
+Python projects. It has live U-Neuron evidence and requires preinstalled
+dependencies; broader build systems and automatic artifact-task preparation
+remain unsupported.
 The general preparer adds model-assisted tasks within a bounded JSON predicate
 contract. [Direct execution and external grading](docs/execution-roles.md) add
 separately frozen native/API role studies and live-validated Claude Code grading
@@ -225,6 +280,6 @@ future work.
 ## Design navigation
 
 - [SPEC.md](SPEC.md): product requirements, measurement design, and open study choices.
-- [ARCHITECTURE.md](ARCHITECTURE.md): proposed components, boundaries, and invariants.
+- [ARCHITECTURE.md](ARCHITECTURE.md): implemented boundaries, invariants, and proposed extensions.
 - [AGENTS.md](AGENTS.md): repository map and guidance for development agents.
-- [HANDOFF.md](HANDOFF.md): current checkout state, evidence, and the next implementation milestone.
+- [HANDOFF.md](HANDOFF.md): current checkout state, evidence, and development priority.

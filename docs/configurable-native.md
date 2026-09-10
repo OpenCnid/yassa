@@ -210,7 +210,9 @@ sessions, output bytes, boundary probes, and usage. Identical packages can share
 one content identity while retaining distinct independent build IDs.
 
 Execution rejects changed frozen inputs, code, runtime files, or installed
-dependencies. A started or incomplete run cannot be resumed. Rescoring validates
+dependencies. Newly managed runs support explicit
+[cancellation and resume](resource-controls.md); legacy interrupted runs without
+controller records cannot be adopted automatically. Rescoring validates
 the original seal and full planned result coverage, reads preserved output files,
 and creates a new interpretation. Changed checker source requires `--reason`.
 Legacy study/evidence version 1 dispatches to its existing readers and checker;

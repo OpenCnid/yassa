@@ -1,11 +1,65 @@
 # Development handoff
 
-Updated 2026-09-09: **the delivery target is the full specification, and the
+Updated 2026-09-10: **the delivery target is the full specification, and the
 product is incomplete.** The user clarified that their build approvals were for
 that target. The completed fixture milestones and study runs remain useful
 evidence, but do not substitute for the missing product capabilities.
 
 ## Current development priority
+
+The user-requested **U-Neuron reconstruction comparison is complete**. Its
+[study record](docs/u-neuron-reconstruction.md) preserves the design, source
+pins, corrections, results and evidence locations. Yassa's artifact commands
+ran and scored one reconstruction per arm from the two original specifications.
+Dovetail passed 66/87 shipped tests in 716.047 native seconds; the baseline
+passed 64/87 in 1167.125 seconds; the untouched reference passed 85/87.
+
+The two-test difference is error-message wording. The shared failures involve
+class/private API or wording assumptions not prescribed by the specs; blocked
+assertions must not be reclassified as passes. No mathematical correctness
+advantage was established. Dovetail finished about 39% faster in this pair,
+with three children, but used about 2.48 times the reported tokens, mostly
+cached input. The baseline used one session. Checks at completion: 299 passed,
+one skipped; lint, format, whitespace and evidence verification passed.
+
+The next study work is to define the required public API and validate an oracle
+that tests observable spec behavior while accepting legitimate alternatives.
+Follow the [recorded next steps](docs/u-neuron-reconstruction.md#next-study-work).
+Keep both submissions and original scores intact. This work is proposed, not a
+completed oracle revision or an allocation of additional live calls. General
+hardening and preparation recovery are not prerequisites for this study.
+
+The sealed runs are `C:/yr/u1` (baseline and original missing Dovetail preflight)
+and `C:/yr/u2` (corrected Dovetail); ledgers are `C:/yr/ubudget` and
+`C:/yr/ubudget2`. Source selection, correction, audits, implementation copies and
+the external report remain under
+`C:/Users/Darian/yassa-runs/u-neuron-reconstruction-20260910`. The initial catalog
+failure made no inference. Its reservation and packaging correction are
+preserved; the baseline was retained without selection or rerun. Product
+freeze/build/test/report commands worked; selection, correction and synthesis
+were manual and declared.
+
+### Earlier milestones and remaining product gaps
+
+The user requested the integrated resource and cancellation/recovery milestone
+(Y08/Y09/Y10, SPEC step 3). Its bounded implementation is described below and in
+[the resource/recovery guide](docs/resource-controls.md). Shared admission now spans
+preparation, builds, uses, direct execution, calibration and grading. Managed
+execution has cooperative cancellation, durable resume, explicit uncertainty
+dispositions and bounded linked infrastructure retries. This is expanded partial
+coverage, not completion of the full specification.
+
+The user subsequently prioritized representative work over another hardening
+milestone, leading to the completed U-Neuron comparison above. Further engineering
+should address a concrete study blocker. This priority does not reduce the
+full-specification delivery target or allocate additional live model usage.
+
+Preparation recovery, adapter-supported token/spend controls and authenticated
+native cancellation/restart validation remain gaps. Legacy interrupted-run
+adoption and reuse-curve cost allocation under retries remain unsupported.
+Preparation recovery is not a prerequisite for using the framework. Continue to
+distinguish software checks from live adapter evidence. No prior experimental
+allocation was reused for the resource/recovery milestone.
 
 The [execution roles implementation](docs/execution-roles.md) advances
 [SPEC step 2](SPEC.md#152-development-sequence), Y03, Y04, Y05 and Y07: direct
@@ -21,20 +75,72 @@ The user then explicitly requested native-direct and live grading validation and
 authorized saved Claude Code authentication. Both passed the bounded acceptance
 below. This is partial implementation coverage, not full-product completion.
 API live inference, additional native subject/builder roles and API builders, measured
-activation and clarification, semantic tasks outside JSON predicates, source
-research, inferential planning and the substantive first study remain open.
-Continue necessary integrated resource and durable cancellation/recovery work
-(Y08/Y09/Y10, SPEC step 3) alongside the remaining role support. Live validation
+activation and clarification, broader tasks beyond the JSON and Python/pytest
+routes, source research, inferential planning and the broader multi-domain,
+two-vendor study program remain open.
+The subsequent controller milestone advances integrated resource and durable
+cancellation/recovery work (Y08/Y09/Y10, SPEC step 3); remaining gaps are above. Live validation
 must serve a named capability; do not default to another benchmark. See the updated
 [capability map](SPEC.md#151-capability-coverage) and
 [implemented boundary](ARCHITECTURE.md#implemented-general-preparation).
 
-The new work began from PR #7's merge `8a7158259e6cc31240d7fda301946391cbd21131`
+The preceding execution/grading work began from PR #7's merge `8a7158259e6cc31240d7fda301946391cbd21131`
 in `C:/Users/Darian/.codex/worktrees/cdb4/yassa`, on branch
 `codex/general-preparation`. No prior benchmark allocation was reused. The
 90-attempt reuse study remains consumed; new live validation needs a named
 capability claim, concrete resource allocation and applicable authorization.
 Do not merge the new milestone PR without authorization.
+
+## Resource and recovery milestone
+
+This work starts from the clean merged-PR-8 checkout at
+`0ae0d8102aa10a977795e434f440351427f690fa`, in
+`C:/Users/Darian/.codex/worktrees/a8b4/yassa`.
+
+Implemented through product commands: `resource-init`, `resource-status`, `cancel`,
+`run-status`, `run-report`, execution `--resources`/`--resume`, and explicit
+`--retry`/`--mark-missing` decisions with reasons. An infrastructure retry allowance
+is frozen at first execution and requires a shared resource budget. It cannot be
+increased on resume. Exhaustion includes in-flight reservations; no reservation is
+refunded. Paused execute commands return exit code 3 and a partial report path.
+
+The controller binds each launch before effects, retains every physical attempt,
+checks reconstructed bindings and committed Inspect/artifact evidence, and reuses
+saved builder packages. Wrong answers and deadline outcomes receive no extra
+infrastructure retry. Grading retains its different-family and calibration gates.
+Shared preparation accounting includes failures and avoids charging imported
+history again. Native hard token/spend caps and preparation resume remain absent.
+
+Focused checks passed for the controller fault cases, direct/grading CLI composition,
+preparation charges and native package reuse. The actual Inspect fixture CLI test
+passed cancellation, OS process kill, restart, retained completed bytes and
+byte-identical offline replay. No authenticated native or live API calls ran.
+The full suite ran all 296 tests: **294 passed, one existing Windows symlink skip,
+and one report-link check failed**. That check tested an unnormalized Windows path
+longer than 260 characters; all 182 resolved report links existed. The check now
+resolves relative paths before testing them and **passed its targeted rerun**.
+No product source changed for that correction. Thus all 295 executable tests have
+passing results, including 25 new behavioral cases; this was a full run followed
+by one corrected check, not a second full green run.
+
+Ruff, formatting and patch whitespace passed. Wheel/sdist builds passed and all
+44 packaged source/runtime files matched the tested checkout. Documentation checks
+covered 449 local links/anchors without errors; 179 links in 18 new recovery reports
+also resolved. Verification is recorded under
+`C:/Users/Darian/yassa-runs/resource-controls-20260910-091849`: `verified-pytest.xml`,
+`report-link-pytest.xml`, `release-distribution-check.json`,
+`documentation-check.json`, `report-link-check.json` and `acceptance.json`.
+
+Implementation defects found during verification were corrected: random local
+Inspect message IDs must not change a reconstructed content binding, and atomic
+temporary filenames require Windows extended-path IO. Preflight authentication
+errors must leave a run unstarted. A Windows test that copied a live run was
+corrected to omit the operational locked file; evidence copying still preserves
+the pending launch. Saved execution policies now have an integrity hash, and
+stale copies cannot retry a reservation already settled in the shared ledger.
+Failed experimental work
+from earlier milestones and all historical seals remain untouched. Existing native
+runtime scripts and study fixture bytes are unchanged by this milestone.
 
 ## Latest live product acceptance
 
@@ -62,7 +168,7 @@ Allocations were separately recorded; there are no native hard token/spend caps.
 The earlier prepared study and selected package bytes remain unchanged. This uses
 previous acceptance cases with fresh subjects, and establishes no broad ranking.
 
-Final software verification: **270 passed, one existing Windows symlink skip**.
+Software verification at that milestone: **270 passed, one existing Windows symlink skip**.
 Ruff, formatting and patch whitespace passed. Wheel/sdist builds passed and all
 43 packaged source/runtime files matched this checkout. Current saved credential
 values were absent from 35,787 scanned uncompressed external evidence files;
@@ -92,8 +198,8 @@ runner/checker files and study fixtures are byte-unchanged from PR #8's prior he
 the previous 250-row historical replay remains earlier evidence, not a new replay.
 
 The unused preparation reservation does not authorize another study. Continue
-product implementation using the current priority above. Keep PR #8 unmerged
-unless the user explicitly authorizes merging.
+product implementation using the current priority above. PR #8 was awaiting merge
+authorization at that earlier handoff; this milestone starts from its merged commit.
 
 ## Latest completed experiment
 
@@ -440,7 +546,8 @@ The completed [compatibility summary](C:/Users/Darian/yassa-runs/general-prepara
 confirms 250 unchanged score rows across seven historical studies, plus the
 context diagnostic seal. Initial path/interpretation diagnostics and their
 explicit follow-up corrections are retained. PR [#8](https://github.com/OpenCnid/yassa/pull/8)
-is open and unmerged.
+was open and unmerged at that earlier handoff; this milestone starts from its
+merged commit noted above.
 
 Offline reuse implementation: **217 tests passed, 1 skipped** in 353.69 seconds.
 The existing Windows symlink skip remains. The focused reuse/resource/timing

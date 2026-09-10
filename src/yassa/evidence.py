@@ -3,6 +3,7 @@
 import os
 import re
 import stat
+import uuid
 from pathlib import Path, PurePosixPath
 
 from .records import canonical, digest, identity, parse_json
@@ -55,11 +56,22 @@ def read_regular(path: Path, max_bytes: int = 20_000_000) -> bytes:
 def write_new(path: Path, data: bytes) -> None:
     reject_links(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    # Existing records are never overwritten. A crash before sealing is incomplete evidence.
-    with path.open("xb") as file:
-        file.write(data)
-        file.flush()
-        os.fsync(file.fileno())
+    # Publish only complete records, without replacing an existing name. A hard
+    # crash may retain a pending file, but never a truncated authoritative record.
+    pending = path.with_name(".pending-" + uuid.uuid4().hex)
+    # The temporary name can exceed MAX_PATH even when the final filename fits.
+    # Link checks above already rejected reparse points; avoid resolving every
+    # ancestor again for each temporary and final publication path.
+    pending_io = Path("\\\\?\\" + os.path.abspath(pending)) if os.name == "nt" else pending
+    target_io = Path("\\\\?\\" + os.path.abspath(path)) if os.name == "nt" else path
+    try:
+        with pending_io.open("xb") as file:
+            file.write(data)
+            file.flush()
+            os.fsync(file.fileno())
+        os.link(pending_io, target_io)
+    finally:
+        pending_io.unlink(missing_ok=True)
 
 
 class EvidenceStore:
@@ -94,9 +106,12 @@ class EvidenceStore:
         if target.exists():
             self.get(artifact_id)
             return artifact_id
+        pending = self.root / "pending-artifacts" / uuid.uuid4().hex
         for name in sorted(names):
-            write_new(target / "files" / name, files[name])
-        write_new(target / "manifest.json", canonical(manifest))
+            write_new(pending / "files" / name, files[name])
+        write_new(pending / "manifest.json", canonical(manifest))
+        target.parent.mkdir(parents=True, exist_ok=True)
+        os.rename(pending, target)
         return artifact_id
 
     def put_json(self, data: dict, name: str = "record.json") -> str:
@@ -149,7 +164,12 @@ def inventory(root: Path) -> list[dict]:
     entries = []
     for path in sorted(root.rglob("*")):
         relative = path.relative_to(root).as_posix()
-        if relative == "run-seal.json" or relative.split("/")[0] == "interpretations":
+        if (
+            relative in {"run-seal.json", "control.lock"}
+            or relative.split("/")[0] == "interpretations"
+            or relative == "control/requests"
+            or relative.startswith("control/requests/")
+        ):
             continue
         reject_links(path)
         if path.is_file():
@@ -164,6 +184,14 @@ def inventory(root: Path) -> list[dict]:
 
 
 def seal_run(root: Path) -> str:
+    from .control import CURRENT, control_status, same_or_new
+
+    if CURRENT.get() is not None:
+        CURRENT.get().begin()
+        CURRENT.get().check_cancel()
+        if CURRENT.get().retry or CURRENT.get().abandon:
+            raise ValueError("recovery decisions did not match executed work")
+        same_or_new(root / "control" / "summary.json", canonical(control_status(root)))
     body = {"schema_version": 1, "files": inventory(root)}
     seal_id = identity(body)
     write_new(root / "run-seal.json", canonical({**body, "id": seal_id}))
@@ -172,7 +200,7 @@ def seal_run(root: Path) -> str:
 
 def verify_run(root: Path) -> str:
     if not (root / "run-seal.json").exists():
-        raise ValueError("run is incomplete/unsealed; automatic crash recovery is unsupported")
+        raise ValueError("run is incomplete/unsealed; use run-status and explicit resume")
     seal = parse_json(read_regular(root / "run-seal.json"))
     body = {key: value for key, value in seal.items() if key != "id"}
     if body.get("schema_version") != 1 or identity(body) != seal.get("id"):

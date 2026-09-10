@@ -335,6 +335,7 @@ def prepare_draft(
     previous: Path | None = None,
     *,
     auth_path: Path | None = None,
+    resources: Path | None = None,
 ) -> Path:
     """Create a new immutable round. A complete request needs no additional interview."""
     initial = parse_json(read_regular(input_path))
@@ -344,7 +345,9 @@ def prepare_draft(
     ) == "general":
         from .general_preparation import prepare_general
 
-        return prepare_general(input_path, destination, previous, auth_path=auth_path)
+        return prepare_general(
+            input_path, destination, previous, auth_path=auth_path, resources=resources
+        )
     destination = external_root(destination)
     raw = read_regular(input_path)
     patch = parse_json(raw)

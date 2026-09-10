@@ -11,7 +11,8 @@ context declared by their study.
 ## Repository map and navigation
 
 The repository implements simulated Inspect fixtures, the original bounded
-native Codex comparison, and configurable native file studies. See
+native Codex comparison, configurable native file studies, and Python artifact
+reconstruction studies. See
 [README.md](README.md) for usage, [the simulated milestone](docs/milestone-1.md),
 [the native fixture](docs/native-fixture.md), and
 [native v2](docs/configurable-native.md) for their measured scope.
@@ -45,6 +46,9 @@ Start with [README.md](README.md), then follow the relevant route:
 | Native catalog enforcement and failed captures | [Context control and evidence](docs/native-context.md) and [implemented boundary](ARCHITECTURE.md#implemented-native-context-control) |
 | Guided preparation and answer rounds | [Preparation guide](docs/guided-preparation.md) and [implemented preparation](ARCHITECTURE.md#implemented-guided-preparation) |
 | Direct native/API execution and external grading | [Execution roles](docs/execution-roles.md), [direct runner](src/yassa/direct_runner.py), and [grading](src/yassa/grading.py) |
+| Spec-only artifact reconstruction and held-out pytest | [Artifact studies](docs/artifact-studies.md), [artifact runner](src/yassa/artifact_runner.py), and [isolated testing](src/yassa/artifact_testing.py) |
+| U-Neuron comparison, corrections and the next correctness oracle | [Study record](docs/u-neuron-reconstruction.md), [failure analysis](docs/u-neuron-reconstruction.md#failure-analysis-and-interpretation), and [next study work](docs/u-neuron-reconstruction.md#next-study-work) |
+| Shared budgets, cancellation and durable resume | [Resource controls](docs/resource-controls.md), [controller](src/yassa/control.py), and [implemented boundary](ARCHITECTURE.md#integrated-resource-controls-and-recovery) |
 | General task/rubric preparation through native studies | [General preparation](docs/general-preparation.md), [public records](src/yassa/general_contracts.py), and [implemented boundary](ARCHITECTURE.md#implemented-general-preparation) |
 | Reconciliation pilot and consumer baseline | [Pilot design and evidence](docs/reconciliation-pilot.md) and [baseline contract](docs/configurable-native.md#consumer-baseline) |
 | Reconciliation work after the pilot ceiling | [Sensitivity preparation](docs/reconciliation-sensitivity.md), [event checker](src/yassa/reconciliation.py), and [constructed cases](src/yassa/reconciliation_templates.py) |

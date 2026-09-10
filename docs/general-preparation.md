@@ -228,12 +228,14 @@ Y01/Y02 remain partial for general semantic tasks, source research and verified
 real-world coverage. The subsequent [execution roles](execution-roles.md) add
 direct native/API studies and external grading; additional native vendor/builder
 roles, activation and measured clarification remain incomplete. Y10 remains partial
-for full role coverage, public/redacted derivatives and recovery coordination.
-Broader model-grading evidence and live calibration, inference/planning, hard native token/spend
-controls, crash recovery and the substantive first Dovetail study remain on the
-[full-spec roadmap](../SPEC.md#151-capability-coverage). The next implementation
-priority is [development step 2](../SPEC.md#152-development-sequence), with live
-validation scoped separately to a named capability and concrete resources.
+for full role coverage and public/redacted derivatives. The later
+[resource/recovery controller](resource-controls.md) adds shared preparation and
+execution accounting plus managed execution resume. Preparation resume, broader
+model-grading evidence, inference/planning, native hard token/spend controls and
+the substantive first Dovetail study remain on the
+[full-spec roadmap](../SPEC.md#151-capability-coverage). Follow the
+[current priority](../HANDOFF.md#current-development-priority); live validation is
+scoped separately to a named capability and concrete resources.
 
 ## Live native preparation
 

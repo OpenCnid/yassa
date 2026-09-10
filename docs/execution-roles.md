@@ -13,6 +13,12 @@ agent host, executable API packages, automatic activation, measured clarificatio
 or multi-vendor builders. Those differences remain explicit requirements rather
 than assumed properties of an API model.
 
+The subsequent [resource and recovery milestone](resource-controls.md) adds
+`--resources`, cancellation, `--resume` and explicitly allowed infrastructure
+retries to direct and grading execution. Default runs still make no automatic
+retries. Controller summaries retain every physical attempt; grading's logical
+call count and calibration gate remain separate from retry expenditure.
+
 ## Direct study commands
 
 Use the [locked environment](../README.md#run-the-fixture). Print the request
@@ -185,8 +191,10 @@ deadlines. API roles request an output-token cap; native roles retain native
 command deadlines without a hard token cap. Input tokens, spend and setup/export
 overhead are not hard capped. Native subagent work belongs to its root attempt.
 Provider-returned usage can omit interrupted calls. Reports keep unavailable
-fields explicit and distinguish calibration from external grading calls. Full
-cross-role budget coordination, cancellation and crash recovery remain unfinished.
+fields explicit and distinguish calibration from external grading calls. The
+[shared controller](resource-controls.md) now coordinates launch budgets,
+cooperative cancellation and local resume, including explicit linked retries.
+Preparation resume and authenticated native restart validation remain open.
 
 The adapter uses installed Inspect 0.3.263's supported
 [model providers](https://inspect.aisi.org.uk/providers.html),
